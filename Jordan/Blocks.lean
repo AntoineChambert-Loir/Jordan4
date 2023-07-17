@@ -7,6 +7,7 @@ Authors: Antoine Chambert-Loir
 -/
 import Jordan.ForMathlib.Stabilizer
 import Jordan.EquivariantMap
+import Mathlib.Algebra.Hom.GroupAction
 import Jordan.SubMulActions
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Algebra.BigOperators.Finprod

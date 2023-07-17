@@ -5,11 +5,13 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module sub_mul_actions
 -/
-import Mathbin.Data.Finset.Pointwise
-import Mathbin.GroupTheory.GroupAction.SubMulAction
-import Mathbin.GroupTheory.GroupAction.FixingSubgroup
-import Oneshot.EquivariantMap
-import Mathbin.Tactic.Group
+import Mathlib.Algebra.Hom.GroupAction
+-- import Jordan.EquivariantMap
+
+import Mathlib.Data.Finset.Pointwise
+import Mathlib.GroupTheory.GroupAction.SubMulAction
+import Mathlib.GroupTheory.GroupAction.FixingSubgroup
+import Mathlib.Tactic.Group
 
 /-!
 # Complements on sub_mul_actions
@@ -29,7 +31,6 @@ especially stabilizers and fixing subgroups : `sub_mul_action_of_compl`,
 and permit to manipulate them in a relatively smooth way.
 -/
 
-
 open scoped Pointwise
 
 open MulAction
@@ -42,16 +43,17 @@ section Inclusion
 
 variable {M N α : Type _} [SMul M α]
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/-- The inclusion of a sub_mul_action into the ambient set, as an equivariant map -/
+/-- The inclusion of a SubMulAction into the ambient set, as an equivariant map -/
 def inclusion (s : SubMulAction M α) : s →[M] α
     where
-  toFun := coe
-  map_smul' g y := rfl
+-- The inclusion map of the inclusion of a SubMulAction 
+  toFun := fun x => x.val
+-- The commutation property
+  map_smul' _ _ := rfl
 #align sub_mul_action.inclusion SubMulAction.inclusion
 
-theorem inclusion.toFun_eq_coe (s : SubMulAction M α) : s.inclusion.toFun = coe :=
-  rfl
+theorem inclusion.toFun_eq_coe (s : SubMulAction M α) : 
+  s.inclusion.toFun = fun x => x.val := rfl
 #align sub_mul_action.inclusion.to_fun_eq_coe SubMulAction.inclusion.toFun_eq_coe
 
 end Inclusion
@@ -68,7 +70,7 @@ def ofCompl (s : SubMulAction M α) : SubMulAction M α
     simp only [SetLike.mem_coe, Set.mem_compl_iff, SubMulAction.smul_mem_iff', imp_self]
 #align sub_mul_action.of_compl SubMulAction.ofCompl
 
-theorem ofCompl_def (s : SubMulAction M α) : (ofCompl M s).carrier = sᶜ :=
+theorem ofCompl_def (s : SubMulAction M α) : (ofCompl M s).carrier = (s : Set α)ᶜ :=
   rfl
 #align sub_mul_action.of_compl_def SubMulAction.ofCompl_def
 
@@ -83,7 +85,6 @@ def ofStabilizer (a : α) : SubMulAction (stabilizer M a) α
     intro hgx; rw [hgx]
     apply symm; rw [← smul_eq_iff_eq_inv_smul]
     conv_rhs => rw [← mem_stabilizer_iff.mp (SetLike.coe_mem g)]
-    rfl
 #align sub_mul_action.of_stabilizer SubMulAction.ofStabilizer
 
 theorem ofStabilizer.def (a : α) : (SubMulAction.ofStabilizer M a).carrier = {a}ᶜ :=
@@ -95,24 +96,26 @@ theorem ofStabilizer.mem_iff (a : α) {x : α} : x ∈ SubMulAction.ofStabilizer
 #align sub_mul_action.of_stabilizer.mem_iff SubMulAction.ofStabilizer.mem_iff
 
 theorem ofStabilizer.neq (a : α) {x : ↥(SubMulAction.ofStabilizer M a)} : ↑x ≠ a :=
-  x.Prop
+  x.prop
 #align sub_mul_action.of_stabilizer.neq SubMulAction.ofStabilizer.neq
 
+/- 
 instance ofStabilizerLift (a : α) : HasLiftT (SubMulAction.ofStabilizer M a) α :=
   coeToLift
 #align sub_mul_action.of_stabilizer_lift SubMulAction.ofStabilizerLift
+ -/
 
 /-- The sub_mul_action of fixing_subgroup M s on the complement -/
 def ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α
     where
   carrier := sᶜ
   smul_mem' := by
-    intro c x
-    simp only [Set.mem_compl_iff]
-    intro hx hcx; apply hx
-    rw [← one_smul M x, ← inv_mul_self ↑c, mul_smul]
-    change ↑c⁻¹ • c • x ∈ s
-    rw [(mem_fixingSubgroup_iff M).mp (SetLike.coe_mem c⁻¹) (c • x) hcx]
+    rintro ⟨c, hc⟩ x
+    rw [← Subgroup.inv_mem_iff] at hc
+    simp only [Set.mem_compl_iff, not_imp_not]
+    intro (hcx : c • x ∈ s)
+    rw [← one_smul M x, ← inv_mul_self c, mul_smul]
+    rw [(mem_fixingSubgroup_iff M).mp hc (c • x) hcx]
     exact hcx
 #align sub_mul_action.of_fixing_subgroup SubMulAction.ofFixingSubgroup
 
@@ -125,9 +128,8 @@ theorem ofFixingSubgroup.mem_iff {s : Set α} {x : α} :
   Iff.rfl
 #align sub_mul_action.of_fixing_subgroup.mem_iff SubMulAction.ofFixingSubgroup.mem_iff
 
-theorem SubMulActionOfFixingSubgroup.not_mem {s : Set α} (x : SubMulAction.ofFixingSubgroup M s) :
-    ↑x ∉ s :=
-  x.Prop
+theorem SubMulActionOfFixingSubgroup.not_mem {s : Set α} 
+  (x : SubMulAction.ofFixingSubgroup M s) : ↑x ∉ s := x.prop
 #align sub_mul_action.sub_mul_action_of_fixing_subgroup.not_mem SubMulAction.SubMulActionOfFixingSubgroup.not_mem
 
 end Complements
@@ -138,13 +140,35 @@ section fixingSubgroup
 
 variable (M : Type _) [Group M] {α : Type _} [MulAction M α]
 
+example (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : Set α := 
+  (fun x => x.val) '' s
+
 theorem fixingSubgroup_of_insert (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
-    fixingSubgroup M (insert a (coe '' s : Set α)) =
-      (Subgroup.map (Subgroup.subtype _) (fixingSubgroup (↥(stabilizer M a)) s) : Subgroup M) :=
+    fixingSubgroup M (insert a ((fun x => x.val) '' s : Set α)) =
+      (fixingSubgroup (↥(stabilizer M a)) s).map (Subgroup.subtype (stabilizer M a)) := 
+      --  (fixingSubgroup (↥(stabilizer M a)) s) : Subgroup M) :=
   by
   ext m
   constructor
   · intro hm
+    rw [mem_fixingSubgroup_iff] at hm
+    rw [Subgroup.mem_map]
+    suffices hm' : m ∈ stabilizer M a
+    use ⟨m, hm'⟩
+    simp only [Subgroup.coeSubtype, and_true]
+    rw [mem_fixingSubgroup_iff]
+    rintro ⟨y, hy⟩ hy'
+    simp only [SetLike.mk_smul_mk, Subtype.mk.injEq, SubMulActiondef]
+    change m • y = y 
+
+
+
+    sorry
+/-     intro hm
+    rw [Subgroup.mem_map]
+    simp_rw [mem_fixingSubgroup_iff]
+    use m
+    simp
     use m
     · rw [mem_stabilizer_iff]
       rw [mem_fixingSubgroup_iff] at hm 
@@ -159,19 +183,18 @@ theorem fixingSubgroup_of_insert (a : α) (s : Set (SubMulAction.ofStabilizer M 
         apply hm (↑y) this
       apply Set.mem_insert_of_mem
       use ⟨y, hy, rfl⟩
-      rfl
-  · rintro ⟨n, hn, rfl⟩
+      rfl -/
+  · rintro ⟨⟨n, hn'⟩, hn, rfl⟩
     simp only [Subgroup.coeSubtype, SetLike.mem_coe, mem_fixingSubgroup_iff] at hn ⊢
-    intro y hy
-    cases' set.mem_insert_iff.mp hy with hy hy
-    -- y = a
-    rw [hy];
-    simpa using n.prop
-    -- y ∈ s
-    simp only [Set.mem_image] at hy 
-    obtain ⟨y, hy1, rfl⟩ := hy
-    conv_rhs => rw [← hn y hy1]
-    rfl
+    intro x hx
+    rw [Set.mem_insert_iff] at hx
+    cases' hx with hx hx
+    . -- x = a  
+      simpa [hx] using hn'
+    . -- x ∈ s
+      simp only [Set.mem_image] at hx
+      rcases hx with ⟨y, hy, rfl⟩
+      conv_rhs => rw [← hn y hy]
 #align fixing_subgroup_of_insert fixingSubgroup_of_insert
 
 end fixingSubgroup

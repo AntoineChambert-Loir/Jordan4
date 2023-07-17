@@ -89,9 +89,11 @@ section SMul
 
 variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
 
+/- 
 /-- The map on scalars underlying an equivariant map -/
 def toSmulMap (_ : α →ₑ[φ] β) := φ
 #align equivariant_map.to_smul_map EquivariantMap.toSmulMap
+-/
 
 -- ACL : I copied a few of them from `group_theory.hom.group_action.lean` and `linear_map.lean`
 -- but I don't really know what I'm doing
@@ -135,10 +137,11 @@ protected def copy (f : α →ₑ[φ] β) (f' : α → β) (h : f' = ⇑f) : α 
 
 initialize_simps_projections EquivariantMap (toFun → apply)
 
-@[simp]
+/- @[simp]
 theorem coe_mk {φ : M → N} (f : α → β) (h) : 
   ((EquivariantMap.mk f h : α →ₑ[φ] β) : α → β) = f := rfl
 #align equivariant_map.coe_mk EquivariantMap.coe_mk
+ -/
 
 /- Why does this not work ?
 theorem coe_injective : @function.injective (α →ₑ[φ] β) (α → β) coe_fn :=
@@ -384,4 +387,6 @@ theorem isPretransitive_of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] �
 end Pretransitivity
 
 #lint
+
+
 
