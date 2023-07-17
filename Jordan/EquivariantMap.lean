@@ -5,10 +5,12 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module equivariant_map
 -/
-import Mathbin.Algebra.Group.Defs
-import Mathbin.Data.Set.Pointwise.Basic
-import Mathbin.GroupTheory.GroupAction.Defs
-import Oneshot.ForMathlib.Set
+
+import Jordan.ForMathlib.Set
+
+import Mathlib.Algebra.Group.Defs
+import Mathlib.Data.Set.Pointwise.Basic
+import Mathlib.GroupTheory.GroupAction.Defs
 
 /-! Equivariant maps
 
@@ -34,48 +36,52 @@ is equivariant with respect to `φ`.
 ## TODO
 
 If this is to replace `mul_action_hom`,
-then one has to rewrite the rest of `group_action.lean`
+then one has to rewrite the rest of `GroupAction.lean`
 
 -/
 
-
--- import data.finset.pointwise
--- import data.finset.pointwise
--- import group_theory.group_action.sub_mul_action
--- import group_theory.group_action.sub_mul_action
--- import group_theory.group_action.fixing_subgroup
--- import group_theory.group_action.fixing_subgroup
 /-- Equivariant maps -/
-structure EquivariantMap {M N : Type _} (φ : M → N) (α : Type _) (β : Type _) [SMul M α]
-    [SMul N β] where
+structure EquivariantMap {M N : Type _} 
+  (φ : M → N) (α : Type _) (β : Type _) [SMul M α] [SMul N β] where
+  /-- an equivariant map is a map -/
   toFun : α → β
-  map_smul' : ∀ (m : M) (a : α), to_fun (m • a) = φ m • to_fun a
+  /-- An equivariant map commutes with `SMul.smul` -/
+  map_smul' : ∀ (m : M) (a : α), toFun (m • a) = φ m • toFun a
 #align equivariant_map EquivariantMap
 
+/-- In the presence of `SMul : M α` and `SMul N β`, 
+  f : α →ₑ[φ] β` means that `f : α → β` is an equivariant map 
+  with respect to `φ : M → N` -/
 notation:25 α " →ₑ[" φ:25 "] " β:0 => EquivariantMap φ α β
 
+/-- In the presence of `SMul : M α` and `SMul M β`, 
+  f : α →[M] β` means that `f : α → β` is an equivariant map -/
 notation:25 α " →[" M:25 "] " β:0 => EquivariantMap (@id M) α β
 
 /-- Equivariant maps (unbundled version) -/
-structure IsEquivariantMap {M N α β : Type _} [SMul M α] [SMul N β] (φ : M → N) (f : α → β) :
-    Prop where
+structure IsEquivariantMap {M N α β : Type _} [SMul M α] [SMul N β] 
+  (φ : M → N) (f : α → β) : Prop where
+  /-- An equivariant map commutes with `SMul.smul` -/
   map_smul : ∀ (m : M) (a : α), f (m • a) = φ m • f a
 #align is_equivariant_map IsEquivariantMap
 
 -- ACL : I don't understand this, and this does not work as intended!
-/-- `equivariant_map_class F α β` states that `F` is a type of equivariant maps.
-You should declare an instance of this typeclass when you extend `equivariant_map`.
+/-- `EquivariantMapClass F α β` states that `F` is a type of equivariant maps.
+You should declare an instance of this typeclass when you extend `EquivariantMap`.
 -/
-class EquivariantMapClass (F : Type _) (α β : outParam <| Type _) (M N : Type _) (φ : M → N)
-    [SMul M α] [SMul N β] extends FunLike F α fun _ => β where
+class EquivariantMapClass (F : Type _) (M N : outParam (Type _)) 
+  (φ : outParam (M → N)) (α β : outParam (Type _)) 
+   [SMul M α] [SMul N β] 
+  extends FunLike F α fun _ => β where
+  /-- An equivariant map commutes with `SMul.smul` -/
   map_smul : ∀ (f : F) (m : M) (a : α), f (m • a) = φ m • f a
 #align equivariant_map_class EquivariantMapClass
 
 /-- Predicate stating that a map is equivariant -/
-theorem is_equivariant {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β] (f : α →ₑ[φ] β) :
-    IsEquivariantMap φ f.toFun :=
+theorem IsEquivariant {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β] 
+  (f : α →ₑ[φ] β) : IsEquivariantMap φ f.toFun :=
   ⟨f.map_smul'⟩
-#align is_equivariant is_equivariant
+#align is_equivariant IsEquivariant
 
 namespace EquivariantMap
 
@@ -84,8 +90,7 @@ section SMul
 variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
 
 /-- The map on scalars underlying an equivariant map -/
-def toSmulMap (f : α →ₑ[φ] β) :=
-  φ
+def toSmulMap (_ : α →ₑ[φ] β) := φ
 #align equivariant_map.to_smul_map EquivariantMap.toSmulMap
 
 -- ACL : I copied a few of them from `group_theory.hom.group_action.lean` and `linear_map.lean`
@@ -95,10 +100,12 @@ directly. -/
 instance : CoeFun (α →ₑ[φ] β) fun _ => α → β :=
   ⟨EquivariantMap.toFun⟩
 
+/- 
 @[simp]
 theorem toFun_eq_coe {f : α →ₑ[φ] β} : f.toFun = (f : α → β) :=
   rfl
 #align equivariant_map.to_fun_eq_coe EquivariantMap.toFun_eq_coe
+-/
 
 @[simp]
 theorem map_smul (f : α →ₑ[φ] β) (m : M) (a : α) : f (m • a) = φ m • f a :=
@@ -129,8 +136,8 @@ protected def copy (f : α →ₑ[φ] β) (f' : α → β) (h : f' = ⇑f) : α 
 initialize_simps_projections EquivariantMap (toFun → apply)
 
 @[simp]
-theorem coe_mk {φ : M → N} (f : α → β) (h) : ((EquivariantMap.mk f h : α →ₑ[φ] β) : α → β) = f :=
-  rfl
+theorem coe_mk {φ : M → N} (f : α → β) (h) : 
+  ((EquivariantMap.mk f h : α →ₑ[φ] β) : α → β) = f := rfl
 #align equivariant_map.coe_mk EquivariantMap.coe_mk
 
 /- Why does this not work ?
@@ -148,12 +155,13 @@ def ofEq {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) : α →ₑ[φ'] 
 #align equivariant_map.of_eq EquivariantMap.ofEq
 
 @[simp]
-theorem ofEq_coe {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) : (f.of_eq h).toFun = f.toFun :=
-  rfl
+theorem ofEq_coe {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) : 
+  (f.ofEq h).toFun = f.toFun := rfl
 #align equivariant_map.of_eq_coe EquivariantMap.ofEq_coe
 
 @[simp]
-theorem ofEq_apply {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) (a : α) : (f.of_eq h) a = f a :=
+theorem ofEq_apply {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) (a : α) : 
+  (f.ofEq h) a = f a :=
   rfl
 #align equivariant_map.of_eq_apply EquivariantMap.ofEq_apply
 
@@ -169,9 +177,8 @@ theorem id_apply (a : α) : EquivariantMap.id M a = a :=
   rfl
 #align equivariant_map.id_apply EquivariantMap.id_apply
 
-@[simp, norm_cast]
-theorem id_coe : ((EquivariantMap.id M : α →[M] α) : α → α) = id :=
-  rfl
+@[simp] -- porting note : remove norm_cast
+theorem id_coe : ((EquivariantMap.id M : α →[M] α) : α → α) = id := rfl
 #align equivariant_map.id_coe EquivariantMap.id_coe
 
 variable {M}
@@ -195,14 +202,14 @@ theorem comp_apply (g : β →ₑ[ψ] γ) (f : α →ₑ[φ] β) (a : α) : g.co
 
 @[simp]
 theorem id_comp (f : α →ₑ[φ] β) :
-    ((EquivariantMap.id N).comp f).of_eq (Function.comp.left_id φ) = f :=
-  ext fun x => by rw [of_eq_apply, comp_apply, id_apply]
+    ((EquivariantMap.id N).comp f).ofEq (Function.comp.left_id φ) = f :=
+  ext fun x => by rw [ofEq_apply, comp_apply, id_apply]
 #align equivariant_map.id_comp EquivariantMap.id_comp
 
 @[simp]
 theorem comp_id (f : α →ₑ[φ] β) :
-    (f.comp (EquivariantMap.id M)).of_eq (Function.comp.right_id φ) = f :=
-  ext fun x => by rw [of_eq_apply, comp_apply, id_apply]
+    (f.comp (EquivariantMap.id M)).ofEq (Function.comp.right_id φ) = f :=
+  ext fun x => by rw [ofEq_apply, comp_apply, id_apply]
 #align equivariant_map.comp_id EquivariantMap.comp_id
 
 variable {Q δ : Type _} [SMul Q δ] {χ : P → Q}
@@ -210,7 +217,7 @@ variable {Q δ : Type _} [SMul Q δ] {χ : P → Q}
 @[simp]
 theorem comp_assoc (h : γ →ₑ[χ] δ) (g : β →ₑ[ψ] γ) (f : α →ₑ[φ] β) :
     h.comp (g.comp f) = (h.comp g).comp f :=
-  ext fun x => rfl
+  ext fun _ => rfl
 #align equivariant_map.comp_assoc EquivariantMap.comp_assoc
 
 end Composition
@@ -234,27 +241,26 @@ def inverse (k₂ : Function.RightInverse ψ φ) (f : α →ₑ[φ] β) (g : β 
 #align equivariant_map.inverse EquivariantMap.inverse
 
 /-- Inverse composed with map is identity (if the map on scalars is bijective) -/
-@[simp]
 theorem inverse_comp (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
     (f : α →ₑ[φ] β) (g : β → α) (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-    ((inverse k₂ f g h₁ h₂).comp f).of_eq (Function.LeftInverse.id k₁) = EquivariantMap.id M :=
-  ext fun a => by rw [of_eq_apply, comp_apply, inverse_apply, id_coe, id.def, h₁]
+    ((inverse k₂ f g h₁ h₂).comp f).ofEq (Function.LeftInverse.id k₁) = EquivariantMap.id M :=
+  ext fun a => by rw [ofEq_apply, comp_apply, inverse_apply, id_coe, id.def, h₁]
 #align equivariant_map.inverse_comp EquivariantMap.inverse_comp
 
 /-- Map composed with inverse is identity -/
 @[simp]
 theorem comp_inverse (k₂ : Function.RightInverse ψ φ) (f : α →ₑ[φ] β) (g : β → α)
     (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-    (f.comp (inverse k₂ f g h₁ h₂)).of_eq (Function.RightInverse.id k₂) = EquivariantMap.id N :=
-  ext fun a => by rw [of_eq_apply, comp_apply, inverse_apply, id_coe, id.def, h₂]
+    (f.comp (inverse k₂ f g h₁ h₂)).ofEq (Function.RightInverse.id k₂) = EquivariantMap.id N :=
+  ext fun a => by rw [ofEq_apply, comp_apply, inverse_apply, id_coe, id.def, h₂]
 #align equivariant_map.comp_inverse EquivariantMap.comp_inverse
 
 -- Necessary ?
 @[simp]
 theorem inverse_inverse (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
-    (f : α →ₑ[φ] β) (g : β → α) (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
+    {f : α →ₑ[φ] β} {g : β → α} (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
     inverse k₁ (inverse k₂ f g h₁ h₂) (⇑f) h₂ h₁ = f :=
-  ext fun b => by simp only [to_fun_eq_coe, inverse_apply]
+  ext fun b => by simp only [inverse_apply] 
 #align equivariant_map.inverse_inverse EquivariantMap.inverse_inverse
 
 end Inverse
@@ -269,7 +275,7 @@ variable {f : α →ₑ[φ] β}
 @[simp]
 theorem image_smul_setₑ (m : M) (s : Set α) : f '' (m • s) = φ m • f '' s :=
   by
-  change f.to_fun '' ((fun a => m • a) '' s) = (fun b => φ m • b) '' (f.to_fun '' s)
+  change f.toFun '' ((fun a => m • a) '' s) = (fun b => φ m • b) '' (f.toFun '' s)
   simp only [Set.image_image]
   apply Set.image_congr
   intro a _; rw [f.map_smul']
@@ -358,12 +364,6 @@ theorem isPretransitive_of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} 
   use φ g; simp only [EquivariantMap.map_smul]
 #align is_pretransitive_of_surjective_map isPretransitive_of_surjective_map
 
-/-
-lemma _root_.mul_action.is_pretransitive.exists_smul_eq' (hN : is_pretransitive M α) :
-  ∀ (x y : α), ∃ (g : M), g • x = y :=
-begin
-sorry
-end -/
 theorem isPretransitive_of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] β}
     (hφ : Function.Surjective φ) (hf : Function.Bijective f) :
     IsPretransitive M α ↔ IsPretransitive N β :=
@@ -372,7 +372,7 @@ theorem isPretransitive_of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] �
   apply isPretransitive_of_surjective_map hf.surjective
   · intro hN
     -- let hN_heq := hN.exists_smul_eq,
-    apply is_pretransitive.mk
+    apply IsPretransitive.mk
     intro x y
     obtain ⟨k, hk⟩ := exists_smul_eq N (f x) (f y)
     obtain ⟨g, rfl⟩ := hφ k
