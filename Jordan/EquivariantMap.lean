@@ -54,6 +54,7 @@ notation:25 α " →ₑ[" φ:25 "] " β:0 => EquivariantMap φ α β
   f : α →[M] β` means that `f : α → β` is an equivariant map -/
 notation:25 α " →[" M:25 "] " β:0 => EquivariantMap (@id M) α β
 
+
 /-- Equivariant maps (unbundled version) -/
 structure IsEquivariantMap {M N α β : Type _} [SMul M α] [SMul N β] 
   (φ : outParam (M → N)) (f : α → β) : Prop where

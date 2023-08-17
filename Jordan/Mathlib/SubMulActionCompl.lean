@@ -43,7 +43,8 @@ def SubMulAction.ofStabilizer (a : X) : SubMulAction (stabilizer G a) X
 #align sub_mul_action_of_stabilizer SubMulAction.ofStabilizer
 
 -- Impossible to use the notation →[stabilizer G a] here ?
-
+variable (a : X)
+#check (SubMulAction.ofStabilizer G a) →ₑ[(stabilizer G a).subtype] X
 /-- The inclusion of the sub_mul_action of the stabilizer, as an equivariant map -/
 def SubMulAction.ofStabilizer.inclusion (a : X) :
     EquivariantMap (stabilizer G a).subtype (SubMulAction.ofStabilizer G a) X where
