@@ -35,7 +35,6 @@ then one has to rewrite the rest of `GroupAction.lean`
 -/
 
 
-
 /-- Equivariant maps -/
 structure EquivariantMap {M N : Type _} 
   (φ : outParam (M → N)) (α : Type _) (β : Type _) [SMul M α] [SMul N β] where

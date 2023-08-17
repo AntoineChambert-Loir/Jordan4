@@ -15,7 +15,15 @@ open scoped Pointwise
 variable (G : Type _) [Group G] {X : Type _} [MulAction G X]
 
 open MulAction
+variable {G}
 
+/-- The inclusion of a SubMulAction as an equivariant map -/
+def SubMulAction.inclusion (Y : SubMulAction G X) :
+  Y →ₑ[@id G] X := {
+    toFun := Subtype.val
+    map_smul' := fun _ _ ↦ rfl }
+
+variable (G)
 
 /-- Action on the complement of an invariant subset -/
 instance : HasCompl (SubMulAction G X) where
@@ -41,16 +49,6 @@ def SubMulAction.ofStabilizer (a : X) : SubMulAction (stabilizer G a) X
     apply symm; rw [← smul_eq_iff_eq_inv_smul]
     conv_rhs => rw [← mem_stabilizer_iff.mp (SetLike.coe_mem g)]
 #align sub_mul_action_of_stabilizer SubMulAction.ofStabilizer
-
--- Impossible to use the notation →[stabilizer G a] here ?
-variable (a : X)
-#check (SubMulAction.ofStabilizer G a) →ₑ[(stabilizer G a).subtype] X
-/-- The inclusion of the sub_mul_action of the stabilizer, as an equivariant map -/
-def SubMulAction.ofStabilizer.inclusion (a : X) :
-    EquivariantMap (stabilizer G a).subtype (SubMulAction.ofStabilizer G a) X where
-  toFun x := id x
-  map_smul' _ _ := rfl
-#align sub_mul_action_of_stabilizer.inclusion SubMulAction.ofStabilizer.inclusion
 
 theorem SubMulAction.ofStabilizer_def (a : X) : (SubMulAction.ofStabilizer G a).carrier = {a}ᶜ :=
   rfl

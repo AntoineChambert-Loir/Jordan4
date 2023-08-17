@@ -5,7 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.pretransitive
 -/
-import Mathbin.GroupTheory.GroupAction.Basic
+import Mathlib.GroupTheory.GroupAction.Basic
 
 /-! # Complements to pretransitive actions
 
@@ -24,13 +24,6 @@ respectively.
 
 -/
 
-
--- import group_theory.group_action.defs
--- import group_theory.group_action.defs
--- import group_theory.group_action.sub_mul_action
--- import group_theory.group_action.sub_mul_action
--- import group_theory.subgroup.pointwise
--- import group_theory.subgroup.pointwise
 variable (G : Type _) [Group G] {X : Type _} [MulAction G X]
 
 namespace MulAction
@@ -45,7 +38,7 @@ theorem IsPretransitive.mk_base_iff (a : X) : IsPretransitive G X ↔ ∀ x : X,
   · intro hG x; let hG_eq := hG.exists_smul_eq
     exact hG_eq a x
   · intro hG
-    apply is_pretransitive.mk
+    apply IsPretransitive.mk
     intro x y
     obtain ⟨g, hx⟩ := hG x
     obtain ⟨h, hy⟩ := hG y
@@ -56,7 +49,7 @@ theorem IsPretransitive.mk_base_iff (a : X) : IsPretransitive G X ↔ ∀ x : X,
 
 theorem IsPretransitive.mk_base (a : X) (hG : ∀ x : X, ∃ g : G, g • a = x) : IsPretransitive G X :=
   by
-  apply is_pretransitive.mk
+  apply IsPretransitive.mk
   intro x y
   obtain ⟨g, hx⟩ := hG x
   obtain ⟨h, hy⟩ := hG y
@@ -68,7 +61,7 @@ theorem IsPretransitive.mk_base (a : X) (hG : ∀ x : X, ∃ g : G, g • a = x)
 /-- An action is pretransitive iff the orbit of every given element is full -/
 theorem orbit.isPretransitive_iff (a : X) : orbit G a = ⊤ ↔ IsPretransitive G X :=
   by
-  rw [is_pretransitive.mk_base_iff a]
+  rw [IsPretransitive.mk_base_iff a]
   rw [Set.ext_iff]
   apply forall_congr'
   intro x
