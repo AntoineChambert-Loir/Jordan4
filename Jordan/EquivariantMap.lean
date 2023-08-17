@@ -38,7 +38,7 @@ then one has to rewrite the rest of `GroupAction.lean`
 
 /-- Equivariant maps -/
 structure EquivariantMap {M N : Type _} 
-  (φ : M → N) (α : Type _) (β : Type _) [SMul M α] [SMul N β] where
+  (φ : outParam (M → N)) (α : Type _) (β : Type _) [SMul M α] [SMul N β] where
   /-- an equivariant map is a map -/
   toFun : α → β
   /-- An equivariant map commutes with `SMul.smul` -/
@@ -56,7 +56,7 @@ notation:25 α " →[" M:25 "] " β:0 => EquivariantMap (@id M) α β
 
 /-- Equivariant maps (unbundled version) -/
 structure IsEquivariantMap {M N α β : Type _} [SMul M α] [SMul N β] 
-  (φ : M → N) (f : α → β) : Prop where
+  (φ : outParam (M → N)) (f : α → β) : Prop where
   /-- An equivariant map commutes with `SMul.smul` -/
   map_smul : ∀ (m : M) (a : α), f (m • a) = φ m • f a
 #align is_equivariant_map IsEquivariantMap
@@ -83,7 +83,7 @@ namespace EquivariantMap
 
 section SMul
 
-variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
+variable {α β M N : Type _} {φ : outParam (M → N)} [SMul M α] [SMul N β]
 
 /-- The map on scalars underlying an equivariant map -/
 def toSmulMap (_ : α →ₑ[φ] β) := φ
