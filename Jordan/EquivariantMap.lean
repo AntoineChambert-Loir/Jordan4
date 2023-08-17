@@ -6,7 +6,9 @@ Authors: Antoine Chambert-Loir
 ! This file was ported from Lean 3 source module equivariant_map
 -/
 
-import Jordan.ForMathlib.Set
+import Jordan.Mathlib.Set
+
+-- import Jordan.ForMathlib.MulActionSemiHom
 
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Data.Set.Pointwise.Basic
@@ -14,19 +16,11 @@ import Mathlib.GroupTheory.GroupAction.Defs
 
 /-! Equivariant maps
 
-In this file, we adapt the formalism of semi-linear maps (see `linear_map.lean`)
-to the context of group actions.
-This generalizes the notion defined as `mul_action_hom` in `group_action.lean`.
+In this file, we add some complements to `MulActionSemiHom`:
 
-We define :
+* some pointwise lemmas
 
-* `equivariant_map φ α β`, `α →ₑ[φ] β` : an equivariant map between to `has_smul`.
-This means that `φ : M → N` is a map, `has_smul M α`, `has_smul N β` and `f : α →ₑ[φ] β`
-satisfies `f(m • a) = φ(m) • f(a)`.
-
-* composition of such maps, identities, inverses when possible
-
-* some pointwise lemmas.
+* 
 
 We also introduce the notation `α →[M] β` to mean `α →ₑ[id M] β`.
 
@@ -39,6 +33,8 @@ If this is to replace `mul_action_hom`,
 then one has to rewrite the rest of `GroupAction.lean`
 
 -/
+
+
 
 /-- Equivariant maps -/
 structure EquivariantMap {M N : Type _} 
@@ -89,11 +85,9 @@ section SMul
 
 variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
 
-/- 
 /-- The map on scalars underlying an equivariant map -/
 def toSmulMap (_ : α →ₑ[φ] β) := φ
 #align equivariant_map.to_smul_map EquivariantMap.toSmulMap
--/
 
 -- ACL : I copied a few of them from `group_theory.hom.group_action.lean` and `linear_map.lean`
 -- but I don't really know what I'm doing
@@ -149,7 +143,10 @@ fun_like.coe_injective
 
 protected lemma congr_arg {x x' : α} {f : α →ₑ[φ] β} : x = x' → f x = f x' :=
 fun_like.congr_arg f
--/
+-/ 
+
+
+
 /-- Two equal maps on scalars give rise to an equivariant map for identity -/
 def ofEq {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) : α →ₑ[φ'] β
     where
@@ -167,7 +164,7 @@ theorem ofEq_apply {φ' : M → N} (h : φ = φ') (f : α →ₑ[φ] β) (a : α
   (f.ofEq h) a = f a :=
   rfl
 #align equivariant_map.of_eq_apply EquivariantMap.ofEq_apply
-
+ 
 variable (M)
 
 /-- The identity map as an equivariant map. -/
@@ -223,54 +220,59 @@ theorem comp_assoc (h : γ →ₑ[χ] δ) (g : β →ₑ[ψ] γ) (f : α →ₑ[
   ext fun _ => rfl
 #align equivariant_map.comp_assoc EquivariantMap.comp_assoc
 
-end Composition
+end Composition 
 
 section Inverse
 
-variable {ψ : N → M}
+variable {φ' : N → M}
 
 /-- The inverse of a bijective equivariant map is equivariant with
 respect to any right inverse of the scalar map -/
 @[simps]
-def inverse (k₂ : Function.RightInverse ψ φ) (f : α →ₑ[φ] β) (g : β → α)
-    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) : β →ₑ[ψ] α
+def inverse (f : α →ₑ[φ] β) (g : β → α)
+    (k₂ : Function.RightInverse φ' φ) 
+    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) : β →ₑ[φ'] α
     where
   toFun := g
-  map_smul' n b :=
-    calc
-      g (n • b) = g (φ (ψ n) • f (g b)) := by rw [k₂, h₂]
-      _ = g (f (ψ n • g b)) := by rw [f.map_smul]
-      _ = ψ n • g b := by rw [h₁]
+  map_smul' n b := calc
+      g (n • b) = g (φ (φ' n) • f (g b)) := by rw [k₂, h₂]
+      _ = g (f (φ' n • g b)) := by rw [f.map_smul]
+      _ = φ' n • g b := by rw [h₁] 
 #align equivariant_map.inverse EquivariantMap.inverse
 
 /-- Inverse composed with map is identity (if the map on scalars is bijective) -/
-theorem inverse_comp (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
-    (f : α →ₑ[φ] β) (g : β → α) (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-    ((inverse k₂ f g h₁ h₂).comp f).ofEq (Function.LeftInverse.id k₁) = EquivariantMap.id M :=
+theorem inverse_comp 
+    (f : α →ₑ[φ] β) (g : β → α) 
+    (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
+    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
+    ((f.inverse g k₂ h₁ h₂).comp f).ofEq (Function.LeftInverse.id k₁) = EquivariantMap.id M :=
   ext fun a => by rw [ofEq_apply, comp_apply, inverse_apply, id_coe, id.def, h₁]
 #align equivariant_map.inverse_comp EquivariantMap.inverse_comp
 
 /-- Map composed with inverse is identity -/
 @[simp]
-theorem comp_inverse (k₂ : Function.RightInverse ψ φ) (f : α →ₑ[φ] β) (g : β → α)
-    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-    (f.comp (inverse k₂ f g h₁ h₂)).ofEq (Function.RightInverse.id k₂) = EquivariantMap.id N :=
+theorem comp_inverse (f : α →ₑ[φ] β) (g : β → α)
+     (k₂ : Function.RightInverse ψ φ)
+     (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
+    (f.comp (f.inverse g k₂ h₁ h₂)).ofEq (Function.RightInverse.id k₂) = EquivariantMap.id N :=
   ext fun a => by rw [ofEq_apply, comp_apply, inverse_apply, id_coe, id.def, h₂]
 #align equivariant_map.comp_inverse EquivariantMap.comp_inverse
 
 -- Necessary ?
 @[simp]
-theorem inverse_inverse (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
-    {f : α →ₑ[φ] β} {g : β → α} (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-    inverse k₁ (inverse k₂ f g h₁ h₂) (⇑f) h₂ h₁ = f :=
-  ext fun b => by simp only [inverse_apply] 
-#align equivariant_map.inverse_inverse EquivariantMap.inverse_inverse
+theorem inverse_inverse 
+    {f : α →ₑ[φ] β} {g : β → α} 
+    (k₁ : Function.LeftInverse ψ φ) (k₂ : Function.RightInverse ψ φ)
+    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
+    (f.inverse g k₂ h₁ h₂).inverse f k₁ h₂ h₁ = f := 
+  ext fun b => by simp only [inverse_apply]
+-- #align equivariant_map.inverse_inverse EquivariantMap.inverse_inverse
 
-end Inverse
-
-section Pointwise
+end Inverse 
 
 open scoped Pointwise
+
+variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
 
 variable {f : α →ₑ[φ] β}
 
@@ -318,9 +320,6 @@ theorem preimage_smul_set' {m : M} (hmα : Function.Bijective fun a : α => m �
   preimage_smul_setₑ' hmα hmβ t
 #align equivariant_map.preimage_smul_set' EquivariantMap.preimage_smul_set'
 
-end Pointwise
-
-end SMul
 
 section Group
 
@@ -346,6 +345,8 @@ theorem preimage_smul_set {m : M} (t : Set β₁) : f₁ ⁻¹' (m • t) = m �
 
 end Group
 
+end SMul
+
 end EquivariantMap
 
 section Pretransitivity
@@ -356,7 +357,7 @@ variable {M : Type _} [Group M] {α : Type _} [MulAction M α]
 
 variable {N β : Type _} [Group N] [MulAction N β]
 
-theorem isPretransitive_of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Surjective f)
+theorem isPretransitive.of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Surjective f)
     (h : IsPretransitive M α) : IsPretransitive N β :=
   by
   apply MulAction.IsPretransitive.mk
@@ -365,14 +366,14 @@ theorem isPretransitive_of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} 
   obtain ⟨y', rfl⟩ := hf y
   obtain ⟨g, rfl⟩ := h_eq x' y'
   use φ g; simp only [EquivariantMap.map_smul]
-#align is_pretransitive_of_surjective_map isPretransitive_of_surjective_map
+#align is_pretransitive_of_surjective_map isPretransitive.of_surjective_map
 
-theorem isPretransitive_of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] β}
+theorem isPretransitive.of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] β}
     (hφ : Function.Surjective φ) (hf : Function.Bijective f) :
     IsPretransitive M α ↔ IsPretransitive N β :=
   by
   constructor
-  apply isPretransitive_of_surjective_map hf.surjective
+  apply isPretransitive.of_surjective_map hf.surjective
   · intro hN
     -- let hN_heq := hN.exists_smul_eq,
     apply IsPretransitive.mk
@@ -382,11 +383,6 @@ theorem isPretransitive_of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] �
     use g
     apply hf.injective
     simp only [hk, EquivariantMap.map_smul]
-#align is_pretransitive_of_bijective_map_iff isPretransitive_of_bijective_map_iff
+#align is_pretransitive_of_bijective_map_iff isPretransitive.of_bijective_map_iff
 
 end Pretransitivity
-
-#lint
-
-
-
