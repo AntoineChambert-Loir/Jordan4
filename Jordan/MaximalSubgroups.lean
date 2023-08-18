@@ -5,7 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module maximal_subgroups
 -/
-import Mathbin.GroupTheory.Subgroup.Basic
+import Mathlib.GroupTheory.Subgroup.Basic
 
 /-! # Maximal subgroups
 
@@ -35,6 +35,7 @@ namespace Subgroup
 
 /-- A subgroup is maximal if it is maximal in the collection of proper subgroups. -/
 class IsMaximal (K : Subgroup G) : Prop where
+/-- A subgroup is maximal if it is maximal in the collection of proper subgroups. -/
   out : IsCoatom K
 #align subgroup.is_maximal Subgroup.IsMaximal
 
@@ -50,17 +51,23 @@ theorem isMaximal_iff {K : Subgroup G} :
     K.IsMaximal ↔ K ≠ ⊤ ∧ ∀ (H : Subgroup G) (g), K ≤ H → g ∉ K → g ∈ H → H = ⊤ :=
   by
   constructor
-  · intro hK; constructor; exact is_maximal.ne_top hK
-    intro H g hKH hgK hgH
-    suffices : K < H
-    apply (is_maximal_def.1 hK).2; assumption
-    have zKH : K ≠ H := by rw [Ne.def]; intro z; rw [z] at hgK ; exact hgK hgH
-    exact (Ne.le_iff_lt zKH).mp hKH
+  · intro hK
+    constructor
+    · exact hK.ne_top 
+    · intro H g hKH hgK hgH
+      apply (isMaximal_def.1 hK).2
+      rw [← Ne.le_iff_lt]
+      exact hKH
+      · rw [Ne.def]
+        intro z
+        rw [z] at hgK
+        exact hgK hgH
   · rintro ⟨hG, hmax⟩
-    constructor; constructor; assumption
-    intro H hKH
-    obtain ⟨g, hgH, hgK⟩ := Set.exists_of_ssubset hKH
-    exact hmax H g (le_of_lt hKH) hgK hgH
+    constructor; constructor; 
+    · assumption
+    · intro H hKH
+      obtain ⟨g, hgH, hgK⟩ := Set.exists_of_ssubset hKH
+      exact hmax H g (le_of_lt hKH) hgK hgH
 #align subgroup.is_maximal_iff Subgroup.isMaximal_iff
 
 theorem IsMaximal.eq_of_le {K H : Subgroup G} (hK : K.IsMaximal) (hH : H ≠ ⊤) (KH : K ≤ H) :
