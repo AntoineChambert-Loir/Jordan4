@@ -5,9 +5,9 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.partitions
 -/
-import Mathbin.Data.Setoid.Partition
-import Mathbin.Algebra.BigOperators.Order
-import Mathbin.Data.Finite.Card
+import Mathlib.Data.Setoid.Partition
+import Mathlib.Algebra.BigOperators.Order
+import Mathlib.Data.Finite.Card
 
 /-!
 
@@ -41,59 +41,57 @@ open scoped BigOperators
 /-- A partion of a type induces partitions on subsets -/
 theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)} (hP : Setoid.IsPartition P)
     (s : Set α) :
-    Setoid.IsPartition {u : Set ↥s | ∃ t : Set α, t ∈ P ∧ coe ⁻¹' t = u ∧ t ∩ s ≠ ∅} :=
+    Setoid.IsPartition {u : Set s | ∃ t : Set α, t ∈ P ∧ Subtype.val ⁻¹' t = u ∧ t ∩ s ≠ ∅} :=
   by
   constructor
   · intro h
-    obtain ⟨t, htP, ht, hts⟩ := set.mem_set_of_eq.mp h
+    obtain ⟨t, _, ht, hts⟩ := Set.mem_setOf_eq.mp h
     apply hts
     rw [← Subtype.image_preimage_coe, ht, Set.image_empty]
   · intro a
     obtain ⟨t, ht⟩ := hP.right ↑a
     simp only [exists_unique_iff_exists, exists_prop, and_imp] at ht 
-    use coe ⁻¹' t
+    use Subtype.val ⁻¹' t
     constructor
     · simp only [Ne.def, Set.mem_setOf_eq, Set.mem_preimage, exists_unique_iff_exists, exists_prop]
-      use t
-      apply And.intro ht.left.left
-      apply And.intro rfl
-      intro h; rw [← Set.mem_empty_iff_false (a : α)]; rw [← h]
+      refine ⟨⟨t, ht.1.1, rfl, ?_⟩, ht.1.2⟩
+      intro h
+      rw [← Set.mem_empty_iff_false (a : α), ← h]
       exact Set.mem_inter ht.left.right (Subtype.mem a)
-      exact ht.left.right
     · simp only [Ne.def, Set.mem_setOf_eq, exists_unique_iff_exists, exists_prop, and_imp,
         forall_exists_index]
-      intro y x hxP hxy hxs hay; rw [← hxy]
-      rw [Subtype.preimage_coe_eq_preimage_coe_iff]
+      intro y x hxP hxy _ hay
+      rw [← hxy, Subtype.preimage_coe_eq_preimage_coe_iff]
       refine' congr_arg₂ _ _ rfl
       apply ht.right x hxP; rw [← Set.mem_preimage, hxy]; exact hay
 #align setoid.is_partition_on Setoid.isPartition_on
+
+
+
+section Classical
 
 open scoped Classical
 
 /-- The cardinal of ambient fintype equals
   the sum of cardinals of the parts of a partition (finset style)-/
 theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
-    (hc : Setoid.IsPartition ({s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c} : Set (Set α))) :
-    ∑ s : Finset α in c, s.card = Fintype.card α :=
-  by
+    (hc : Setoid.IsPartition  ({s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c} : Set (Set α))) :
+    ∑ s : Finset α in c, s.card = Fintype.card α := by
   rw [← mul_one (Fintype.card α), ← Finset.sum_card]
   intro a
   rw [Finset.card_eq_one]
   obtain ⟨s, hs, hs'⟩ := hc.right a
-  simp only [exists_unique_iff_exists, exists_prop, and_imp, exists_eq_left', Set.mem_setOf_eq] at
-    hs hs' 
-  have hs'2 : ∀ z : Finset α, z ∈ c → a ∈ z → z = s.to_finset :=
-    by
+  simp only [Set.mem_setOf_eq, exists_unique_iff_exists, exists_eq_left', exists_prop, and_imp] at hs hs' 
+  have hs'2 : ∀ z : Finset α, z ∈ c → a ∈ z → z = s.toFinset := by
     intro z hz ha
     rw [← Finset.coe_inj, Set.coe_toFinset]
-    refine' hs' z _ (finset.mem_coe.mpr ha)
+    refine' hs' z _ (Finset.mem_coe.mpr ha)
     -- To get the correct type automatically and perform the rewrite
-    suffices ∀ {u v : Finset α}, v ∈ c → u = v → u ∈ c
-      by
-      refine' this hz _
-      rw [← Finset.coe_inj, Set.coe_toFinset]
+    suffices : ∀ {u v : Finset α}, v ∈ c → u = v → u ∈ c
+    · refine' this hz _
+      convert Finset.toFinset_coe z
     · intro u v hu huv; rw [huv]; exact hu
-  use s.to_finset
+  use s.toFinset
   ext t
   simp only [Finset.mem_filter, Finset.mem_singleton]
   constructor
@@ -107,25 +105,32 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
 /-- The cardinal of ambient fintype equals
   the sum of cardinals of the parts of a partition (set style)-/
 theorem Partition.card_of_partition [Fintype α] {c : Set (Set α)} (hc : Setoid.IsPartition c) :
-    ∑ s : Set α in c.toFinset, s.toFinset.card = Fintype.card α :=
-  by
+    ∑ s : Set α in c.toFinset, s.toFinset.card = Fintype.card α := by
   let c' : Finset (Finset α) := {s : Finset α | (s : Set α) ∈ c}.toFinset
+  
   have hcc' : c = {s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c'} := by
-    simp only [Set.mem_toFinset, Set.mem_setOf_eq, exists_eq_left', Set.coe_toFinset,
-      Set.setOf_mem_eq]
+    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left, 
+      Finset.mem_filter, true_and, exists_eq_left', Set.coe_toFinset, Set.setOf_mem_eq]
   rw [hcc'] at hc 
   rw [← Partition.card_of_partition' hc]
-  have hi : ∀ (a : Set α) (ha : a ∈ c.to_finset), a.toFinset ∈ c' :=
-    by
-    intro a ha
-    simp only [Set.mem_toFinset, Set.mem_setOf_eq, Set.coe_toFinset]
-    simpa only [Set.mem_toFinset] using ha
-  have hj : ∀ (a : Finset α) (ha : a ∈ c'), (a : Set α) ∈ c.to_finset := by intro a ha;
-    simpa only [Set.mem_toFinset] using ha
+  suffices hi : ∀ a ∈ c.toFinset, a.toFinset ∈ c'
+  suffices hj : ∀ a ∈ c', (a : Set α) ∈ c.toFinset
   rw [Finset.sum_bij' _ hi _ _ hj]
-  · intro a ha; simp only [Set.coe_toFinset]
-  · intro a ha; rw [← Finset.coe_inj, Set.coe_toFinset]
-  · intro a ha; rfl
+  · intro a _; simp only [Set.coe_toFinset]
+  · intro a _; convert Finset.toFinset_coe a
+  · intro a _; rfl
+  · -- hj
+    intro a ha
+    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left, 
+      Finset.mem_filter, true_and] at ha 
+    simp only [Set.mem_toFinset]
+    exact ha
+  · -- hi
+    intro a ha
+    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left, 
+      Finset.mem_filter, Set.coe_toFinset, true_and]
+    simp only [Set.mem_toFinset] at ha 
+    exact ha
 #align partition.card_of_partition Partition.card_of_partition
 
 /-- Given a partition of the ambient finite type,
@@ -152,34 +157,21 @@ theorem Setoid.IsPartition.card_set_eq_sum_parts {α : Type _} [Fintype α] (s :
   the sum of the cardinalities of the parts of any partition -/
 theorem Setoid.IsPartition.card_eq_sum_parts {α : Type _} [Fintype α] {P : Set (Set α)}
     (hP : Setoid.IsPartition P) :
-    Fintype.card α = Finset.sum P.toFinset fun t : Set α => t.toFinset.card :=
-  by
-  change finset.univ.card = _
-  have : ∀ (t : Set α) (ht : t ∈ P.to_finset), t.to_finset.card = (Set.univ ∩ t).toFinset.card :=
-    by
-    intro t ht; apply congr_arg
-    rw [Set.toFinset_inj]; exact (Set.univ_inter t).symm
-  simp_rw [Finset.sum_congr rfl this]
-  simpa only [Set.toFinset_card, Fintype.card_ofFinset, Finset.filter_congr_decidable,
-    Set.toFinset_univ] using Setoid.IsPartition.card_set_eq_sum_parts Set.univ hP
+    Fintype.card α = Finset.sum P.toFinset fun t : Set α => t.toFinset.card := by
+  change Finset.univ.card = _
+  simp_rw [Finset.sum_congr rfl ?_]
+  convert Setoid.IsPartition.card_set_eq_sum_parts Set.univ hP
+  convert Eq.symm Set.toFinset_univ
+  simp only [Set.univ_inter]
 #align setoid.is_partition.card_eq_sum_parts Setoid.IsPartition.card_eq_sum_parts
 
 /-- The cardinality of a finset is the sum of the cardinalities
 of the traces of any partition of the ambient type  -/
 theorem Setoid.IsPartition.card_finset_eq_sum_parts {α : Type _} {P : Set (Set α)}
     (hP : Setoid.IsPartition P) {s : Finset α} :
-    let P' := {u : Set ↥s | ∃ t : Set α, t ∈ P ∧ coe ⁻¹' t = u ∧ t ∩ s ≠ ∅}
-    let hP' := Setoid.isPartition_on hP
-    s.card = Finset.sum P'.toFinset fun t : Set ↥s => t.toFinset.card :=
-  by
-  -- let P' := { u : set ↥s | ∃ (t : set α), t ∈ P ∧ coe ⁻¹' t = u ∧ t ∩ s ≠ ∅ },
-  -- let hP' := setoid.is_partition_on hP,
-  /-   have fs : fintype ↥(↑s : set α) := finset_coe.fintype s,
-    have fcs : fintype.card ↥s =  fintype.card ↥(s : set α) :=
-    by simp only [fintype.card_coe, finset.coe_sort_coe, fintype.card_coe],
-    have fcs' : fintype.card ↥(s : set α) = s.card :=
-    by simp only [finset.coe_sort_coe, fintype.card_coe],
-    -/
+    let P' := {u : Set s | ∃ t : Set α, t ∈ P ∧ Subtype.val ⁻¹' t = u ∧ t ∩ s ≠ ∅}
+    s.card = Finset.sum P'.toFinset fun t : Set s => t.toFinset.card := by
+  intro P'
   have :=
     @Partition.card_of_partition _ (FinsetCoe.fintype s) _ (Setoid.isPartition_on hP (s : Set α))
   simp only [Finset.coe_sort_coe, Fintype.card_coe] at this 
@@ -191,6 +183,37 @@ theorem Setoid.IsPartition.card_finset_eq_sum_parts {α : Type _} {P : Set (Set 
   · ext; apply congr_arg; rw [Set.toFinset_inj]
 #align setoid.is_partition.card_finset_eq_sum_parts Setoid.IsPartition.card_finset_eq_sum_parts
 
+
+end Classical
+
+section
+
+/-- The cardinal of ambient fintype equals
+  the sum of cardinals of the parts of a partition (finset style)-/
+theorem Partition.card_of_partition'' [DecidableEq α] [Fintype α] {c : Finset (Finset α)}
+    (hc : Setoid.IsPartition  ({s : Set α | ∃ t : Finset α, s = ↑t ∧ t ∈ c} : Set (Set α))) :
+    ∑ s : Finset α in c, s.card = Fintype.card α := by
+  classical
+  rw [← mul_one (Fintype.card α), ← Finset.sum_card]
+  intro a
+  rw [Finset.card_eq_one]
+  obtain ⟨s, ⟨hs, has⟩, hs'⟩ := hc.right a
+  simp only [Set.mem_setOf_eq] at hs 
+  simp only [Finset.mem_coe, Set.mem_setOf_eq, Finset.coe_inj, exists_eq_left', implies_true, and_true] at has 
+  simp only [Set.mem_setOf_eq, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index] at hs' 
+  obtain ⟨t, rfl, ht⟩ := hs
+  use t
+  ext u
+  simp only [Finset.mem_filter, Finset.mem_singleton]
+  constructor
+  · rintro ⟨huc, hau⟩
+    rw [← Finset.coe_inj]
+    exact hs' ↑u u rfl huc hau    
+  · intro hut
+    rw [hut]
+    exact ⟨ht, has⟩
+
+end 
 /-
 noncomputable def setoid.quotient_equiv {α β : Type*} {s : setoid α} (f : α → β)
   (hf : ∀ x y, s.rel x y ↔ f x = f y) (hf' : f.surjective) : quotient s ≃ β :=

@@ -5,8 +5,8 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.commutators
 -/
-import Mathbin.GroupTheory.QuotientGroup
-import Mathbin.GroupTheory.Abelianization
+import Mathlib.GroupTheory.QuotientGroup
+import Mathlib.GroupTheory.Abelianization
 
 variable {G : Type _} [Group G]
 
@@ -29,13 +29,13 @@ theorem Subgroup.map_top_eq_range {G H : Type _} [Group H] [Group G] (f : H →*
 #align subgroup.map_top_eq_range Subgroup.map_top_eq_range
 
 theorem Subgroup.map_commutator_eq {G H : Type _} [Group H] [Group G] (f : H →* G) :
-    Subgroup.map f (commutator H) = ⁅f.range, f.range⁆ := by
-  rw [commutator_def H, Subgroup.map_commutator, Subgroup.map_top_eq_range]
+    Subgroup.map f (_root_.commutator H) = ⁅f.range, f.range⁆ := by
+  rw [_root_.commutator_def, Subgroup.map_commutator, Subgroup.map_top_eq_range]
 #align subgroup.map_commutator_eq Subgroup.map_commutator_eq
 
 theorem Subgroup.commutator_eq' {G : Type _} [Group G] (H : Subgroup G) :
-    Subgroup.map H.Subtype (commutator H) = ⁅H, H⁆ := by
-  rw [Subgroup.map_commutator_eq, Subgroup.subtype_range]
+    Subgroup.map H.subtype (_root_.commutator H) = ⁅H, H⁆ := by
+  simp only [map_commutator_eq, subtype_range]
 #align subgroup.commutator_eq' Subgroup.commutator_eq'
 
 /-- If G and H have multiplications *
@@ -50,22 +50,14 @@ theorem surj_to_comm {G H : Type _} [Mul G] [Mul H] (φ : MulHom G H)
     IsCommutative H (· * ·) := by
   apply IsCommutative.mk
   intro a b
-  obtain ⟨a', ha'⟩ := is_surj a; obtain ⟨b', hb'⟩ := is_surj b
-  rw [← ha']; rw [← hb']
-  let z := ⇑φ; let z₂ := φ.to_fun; have : z = z₂ := by rfl
-  rw [← MulHom.map_mul φ a' b']
-  rw [← MulHom.map_mul φ b' a']
-  apply φ.congr_arg
-  refine' IsCommutative.casesOn is_comm _; intro
-  exact comm a' b'
+  obtain ⟨a', ha'⟩ := is_surj a
+  obtain ⟨b', hb'⟩ := is_surj b
+  simp only [← ha', ← hb', ← map_mul]
+  rw [is_comm.comm]
 #align surj_to_comm surj_to_comm
 
-theorem quotient_comm_contains_commutators_iff {N : Subgroup G}
-    (nN : N.Normal) :-- (∀ (a b : G ⧸ N), a * b = b * a)
-        IsCommutative
-        (G ⧸ N) (· * ·) ↔
-      commutator G ≤ N :=
-  by
+theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) :
+    IsCommutative (G ⧸ N) (· * ·) ↔ commutator G ≤ N := by
   skip
   constructor
   · intro hcomm
@@ -95,15 +87,14 @@ theorem quotient_comm_contains_commutators_iff {N : Subgroup G}
 /-- If N is a normal subgroup, H a commutative subgroup such that H ⊔ N = ⊤,
 then N contains the derived subgroup. -/
 theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G) (hHN : N ⊔ H = ⊤)
-    (hH : Subgroup.IsCommutative H) : commutator G ≤ N :=
-  by
+    (hH : Subgroup.IsCommutative H) : commutator G ≤ N := by
   -- Il suffit de prouver que Q = G ⧸ N est commutatif
   -- let Q := quotient_group.quotient N,
   rw [← quotient_comm_contains_commutators_iff nN]
   -- Q is a quotient of H
   let φ : H →* G ⧸ N := MonoidHom.comp (QuotientGroup.mk' N) (Subgroup.subtype H)
   -- Il suffit de prouver que φ est surjective
-  refine' surj_to_comm φ.to_mul_hom _ hH.is_comm
+  refine' surj_to_comm φ.toMulHom _ hH.is_comm
   suffices hφ : Function.Surjective φ; exact hφ
   -- On prouve que l'image de φ est égale à ⊤
   rw [← MonoidHom.range_top_iff_surjective]
@@ -118,7 +109,7 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
     let y := Quotient.out' x
     have hy : y ∈ φ.range.comap (QuotientGroup.mk' N) := by rw [S_top]; exact Subgroup.mem_top y
     rw [← QuotientGroup.out_eq' x]
-    exact subgroup.mem_comap.mp hy
+    exact Subgroup.mem_comap.mp hy
   rw [eq_top_iff, ← hHN, sup_le_iff]
   constructor
   -- have lN : N ≤ φ.range.comap (quotient_group.mk' N),
@@ -132,9 +123,7 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   · intro h hh
     simp only [Subgroup.mem_comap, MonoidHom.mem_range, MonoidHom.coe_comp, QuotientGroup.coe_mk',
       Subgroup.coeSubtype, Function.comp_apply]
-    use h; exact hh
-    simp only [Subgroup.coe_mk]
+    use ⟨h, hh⟩
 #align contains_commutators_of contains_commutators_of
 
-#lint
 
