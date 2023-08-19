@@ -5,85 +5,28 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module multiple_transitivity
 -/
-import Oneshot.SubMulActions
-import Oneshot.ForMathlib.Stabilizer
-import Oneshot.ForMathlib.Pretransitive
-import Oneshot.ForMathlib.Partitions
-import Oneshot.ForMathlib.Set
-import Oneshot.ForMathlib.Cardinal
-import Oneshot.Primitive
-import Oneshot.ForMathlib.Extensions
-import Mathbin.SetTheory.Cardinal.Finite
-import Mathbin.GroupTheory.Index
-import Mathbin.GroupTheory.GroupAction.Embedding
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Mathbin.GroupTheory.Perm.List
-import Mathbin.GroupTheory.Perm.Cycle.Concrete
-import Oneshot.IndexNormal
+import Jordan.Primitive
+import Jordan.IndexNormal
 
-/-
+import Jordan.Mathlib.Stabilizer
+import Jordan.Mathlib.Pretransitive
+import Jordan.Mathlib.Partitions
+import Jordan.Mathlib.Set
+import Jordan.Mathlib.SubMulActionCompl
+-- import Jordan.Mathlib.Cardinal
+import Jordan.Mathlib.Extensions
 
-
-import order.hom.basic
-import order.bounded_order
-
--- import group_theory.group_action.fixing_subgroup
--- import field_theory.galois
-
--- import group_theory.specific_groups.alternating
-
--- import group_theory.subgroup.pointwise
--- import group_theory.coset
--- import group_theory.quotient_group
--- import group_theory.abelianization
--- import group_theory.group_action.defs
--- import group_theory.group_action.basic
--- import group_theory.group_action.group
--- import group_theory.group_action.conj_act
--- import group_theory.group_action.sub_mul_action
-
--- import order.partition.finpartition
--- import data.finset.lattice
-
--- import data.setoid.partition
--- import data.set.basic
--- import data.fintype.basic
--- import order.rel_classes
--- import algebra.big_operators.order
--/
-/-
+import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.GroupAction.Embedding
+import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.Perm.List
+import Mathlib.GroupTheory.Perm.Cycle.Concrete
 
 
-import order.hom.basic
-import order.bounded_order
-
--- import group_theory.group_action.fixing_subgroup
--- import field_theory.galois
-
--- import group_theory.specific_groups.alternating
-
--- import group_theory.subgroup.pointwise
--- import group_theory.coset
--- import group_theory.quotient_group
--- import group_theory.abelianization
--- import group_theory.group_action.defs
--- import group_theory.group_action.basic
--- import group_theory.group_action.group
--- import group_theory.group_action.conj_act
--- import group_theory.group_action.sub_mul_action
-
--- import order.partition.finpartition
--- import data.finset.lattice
-
--- import data.setoid.partition
--- import data.set.basic
--- import data.fintype.basic
--- import order.rel_classes
--- import algebra.big_operators.order
--/
 open scoped BigOperators Pointwise Cardinal
 
-open scoped Classical
+-- open scoped Classical
 
 namespace MulAction
 
@@ -98,7 +41,7 @@ variable {M α : Type _} [Monoid M] [MulAction M α]
 theorem isPretransitive_of_submonoid {K : Submonoid M} (h : IsPretransitive K α) :
     IsPretransitive M α := by
   let h_eq := h.exists_smul_eq
-  apply is_pretransitive.mk
+  apply IsPretransitive.mk
   intro x y
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   exact ⟨k, hk'⟩
@@ -108,7 +51,7 @@ theorem isPretransitive_of_submonoid_le {G K : Submonoid M} (hKG : K ≤ G)
     (h : IsPretransitive K α) : IsPretransitive G α :=
   by
   let h_eq := h.exists_smul_eq
-  apply is_pretransitive.mk
+  apply IsPretransitive.mk
   intro x y
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   use ⟨k, hKG hk⟩
@@ -127,7 +70,7 @@ theorem card_orbit_eq_stabilizer_index {a : α} : Nat.card (orbit M a) = (stabil
   change _ = Nat.card (M ⧸ stabilizer M a)
   unfold Nat.card
   apply Cardinal.toNat_congr
-  exact orbit_equiv_quotient_stabilizer M a
+  exact orbitEquivQuotientStabilizer M a
 #align mul_action.card_orbit_eq_stabilizer_index MulAction.card_orbit_eq_stabilizer_index
 
 /-- Cardinal vs index of stabilizers, for a pretransitive action, in nat.card -/
@@ -137,12 +80,8 @@ theorem stabilizer_index_of_pretransitive (h : IsPretransitive M α) {a : α} :
   let heq := h.exists_smul_eq
   rw [← card_orbit_eq_stabilizer_index]
   apply Cardinal.toNat_congr
-  refine'
-    Equiv.mk (fun x => x)
-      (fun y =>
-        ⟨y, by
-          obtain ⟨g, hg⟩ := HEq a y
-          use g; rw [← hg]⟩)
+  refine' Equiv.mk (fun x => x)
+      (fun y => ⟨y, by obtain ⟨g, hg⟩ := heq a y; use g⟩)
       _ _
   · intro y; simp only [Subtype.coe_eta]
   · intro x; rfl
@@ -152,15 +91,15 @@ variable {M α}
 
 theorem isPretransitive_of_subgroup {K : Subgroup M} (h : IsPretransitive K α) :
     IsPretransitive M α := by
-  apply is_pretransitive_of_submonoid
-  swap; exact K.to_submonoid
+  apply isPretransitive_of_submonoid
+  swap; exact K.toSubmonoid
   exact h
 #align mul_action.is_pretransitive_of_subgroup MulAction.isPretransitive_of_subgroup
 
 theorem isPretransitive_of_subgroup_le {G K : Subgroup M} (hKG : K ≤ G) (h : IsPretransitive K α) :
     IsPretransitive G α := by
   let h_eq := h.exists_smul_eq
-  apply is_pretransitive.mk
+  apply IsPretransitive.mk
   intro x y
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   use ⟨k, hKG hk⟩
@@ -179,28 +118,29 @@ variable (M α : Type _) [Group M] [MulAction M α]
 
 /-- An action of a group on a type α is n-pretransitive if the associated
 action on (fin n ↪ α) is pretransitive -/
-def IsMultiplyPretransitive (n : ℕ) :=
-  IsPretransitive M (Fin n ↪ α)
+def IsMultiplyPretransitive (n : ℕ) := IsPretransitive M (Fin n ↪ α)
 #align mul_action.is_multiply_pretransitive MulAction.IsMultiplyPretransitive
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /-- The equivariant map from (fin 1 ↪ α) to α -/
-def finOneToMap : (Fin 1 ↪ α) →[M] α
+def finOneToMap : (Fin 1 ↪ α) →ₑ[@id M] α
     where
   toFun x := x ⟨0, Nat.one_pos⟩
-  map_smul' m x := rfl
+  map_smul' _ _ := rfl
 #align mul_action.fin_one_to_map MulAction.finOneToMap
 
-theorem finOneToMap_bijective : Function.Bijective (finOneToMap M α) :=
-  by
+theorem finOneToMap_bijective : Function.Bijective (finOneToMap M α) := by
   constructor
   · intro x y hxy
     ext i
-    rw [Fin.eq_zero i]; exact hxy
-  · intro a; use fun _ => a
-    · intro i j hij
-      rw [Fin.eq_zero i, Fin.eq_zero j]
-    rfl
+    rw [Fin.eq_zero i]
+    exact hxy
+  · intro a
+    use {
+      toFun := fun _ => a
+      inj' := fun i j _ => by 
+        rw [Fin.eq_zero i, Fin.eq_zero j] }
+    rfl 
 #align mul_action.fin_one_to_map_bijective MulAction.finOneToMap_bijective
 
 variable {M α}
@@ -208,68 +148,90 @@ variable {M α}
 theorem isMultiplyPretransitive_of_subgroup {n : ℕ} {K : Subgroup M}
     (h : IsMultiplyPretransitive K α n) : IsMultiplyPretransitive M α n :=
   by
-  unfold is_multiply_pretransitive at *
-  exact is_pretransitive_of_subgroup h
+  unfold IsMultiplyPretransitive at *
+  exact isPretransitive_of_subgroup h
 #align mul_action.is_multiply_pretransitive_of_subgroup MulAction.isMultiplyPretransitive_of_subgroup
 
 theorem isMultiplyPretransitive_of_le {n : ℕ} {H K : Subgroup M} (hHK : K ≤ H)
-    (h : IsMultiplyPretransitive K α n) : IsMultiplyPretransitive H α n :=
-  by
-  unfold is_multiply_pretransitive at *
-  refine' is_pretransitive_of_subgroup_le hHK h
+    (h : IsMultiplyPretransitive K α n) : IsMultiplyPretransitive H α n := by
+  unfold IsMultiplyPretransitive at *
+  refine' isPretransitive_of_subgroup_le hHK h
 #align mul_action.is_multiply_pretransitive_of_le MulAction.isMultiplyPretransitive_of_le
 
+
 /-- Given an equivariant map α → β, get an equivariant map on function types (ι ↪ α) → (ι ↪ β)-/
-def EquivariantMap.embeddingOfEquivariantMap {N β : Type _} [Group N] [MulAction N β] {φ : M → N}
-    {f : α →ₑ[φ] β} (hf : Function.Injective f) (ι : Type _) : (ι ↪ α) →ₑ[φ] ι ↪ β
-    where
+def EquivariantMap.embeddingOfEquivariantMap {N β : Type _} [Group N] [MulAction N β] 
+    {σ : M → N} 
+    {f : α →ₑ[σ] β} (hf : Function.Injective f) (ι : Type _) : 
+    (ι ↪ α) →ₑ[σ] (ι ↪ β) where
   toFun x := ⟨f.toFun ∘ x.toFun, hf.comp x.inj'⟩
   map_smul' m x := by
     ext i
-    simp only [smul_apply, coe_fn_mk, Function.comp_apply, to_fun_eq_coe, smul_apply]
+    simp only [smul_apply, coeFn_mk, Function.comp_apply, toFun_eq_coe, smul_apply]
     rw [f.map_smul']
 #align mul_action.equivariant_map.embedding_of_equivariant_map MulAction.EquivariantMap.embeddingOfEquivariantMap
 
 theorem EquivariantMap.embeddingOfEquivariantMap_apply {N β : Type _} [Group N] [MulAction N β]
-    {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Injective f) {ι : Type _} {x : ι ↪ α} {i : ι} :
+    {σ : M → N} {f : α →ₑ[σ] β} (hf : Function.Injective f) {ι : Type _} {x : ι ↪ α} {i : ι} :
     (EquivariantMap.embeddingOfEquivariantMap hf ι) x i = f (x i) :=
   rfl
 #align mul_action.equivariant_map.embedding_of_equivariant_map_apply MulAction.EquivariantMap.embeddingOfEquivariantMap_apply
 
 theorem EquivariantMap.embeddingOfEquivariantMap_is_injective {N β : Type _} [Group N]
-    [MulAction N β] {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Injective f) {ι : Type _} :
+    [MulAction N β] {σ : M → N} {f : α →ₑ[σ] β} (hf : Function.Injective f) {ι : Type _} :
     Function.Injective (EquivariantMap.embeddingOfEquivariantMap hf ι) :=
   by
   intro x y hxy
   ext i
   apply hf
-  simp only [← equivariant_map.embedding_of_equivariant_map_apply hf]
+  simp only [← EquivariantMap.embeddingOfEquivariantMap_apply hf]
   rw [hxy]
 #align mul_action.equivariant_map.embedding_of_equivariant_map_is_injective MulAction.EquivariantMap.embeddingOfEquivariantMap_is_injective
 
 theorem EquivariantMap.embeddingOfEquivariantMap_is_bijective {N β : Type _} [Group N]
-    [MulAction N β] {φ : M → N} (f : α →ₑ[φ] β) (hf : Function.Bijective f) {ι : Type _} :
-    Function.Bijective (EquivariantMap.embeddingOfEquivariantMap hf.Injective ι) :=
+    [MulAction N β] {σ : M → N} (f : α →ₑ[σ] β) (hf : Function.Bijective f) {ι : Type _} :
+    Function.Bijective (EquivariantMap.embeddingOfEquivariantMap hf.injective ι) :=
   by
   constructor
-  exact equivariant_map.embedding_of_equivariant_map_is_injective hf.injective
+  exact EquivariantMap.embeddingOfEquivariantMap_is_injective hf.injective
   intro y
-  obtain ⟨g, hgf, hfg⟩ := function.bijective_iff_has_inverse.mp hf
-  let hg := Function.RightInverse.injective hfg
+  obtain ⟨g, _, hfg⟩ := Function.bijective_iff_has_inverse.mp hf
   use ⟨g ∘ y, Function.Injective.comp hfg.injective (EmbeddingLike.injective y)⟩
   ext i
-  rw [equivariant_map.embedding_of_equivariant_map_apply]
-  simp only [coe_fn_mk, Function.comp_apply]
+  rw [EquivariantMap.embeddingOfEquivariantMap_apply]
+  simp only [coeFn_mk, Function.comp_apply]
   rw [hfg]
 #align mul_action.equivariant_map.embedding_of_equivariant_map_is_bijective MulAction.EquivariantMap.embeddingOfEquivariantMap_is_bijective
 
 /-- Multiple transitivity of an image by an equivariant map of a multiply transitive action -/
 theorem isMultiplyPretransitive_of_surjective_map {N β : Type _} [Group N] [MulAction N β] {n : ℕ}
-    {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Surjective f) (h : IsMultiplyPretransitive M α n) :
+    {σ : M → N} {f : α →ₑ[σ] β} (hf : Function.Surjective f) (h : IsMultiplyPretransitive M α n) :
     IsMultiplyPretransitive N β n :=
   by
   let h_eq := h.exists_smul_eq
-  apply is_pretransitive.mk
+  apply IsPretransitive.mk
+  let aux : (Fin n ↪ β) → (Fin n ↪ α) := fun x =>
+    { toFun := (Function.surjInv hf) ∘ x.toFun
+      inj' := fun u v huv => by
+        let huv' :=congr_arg f huv
+        simp only [Function.comp_apply, Function.surjInv_eq] at huv'
+        exact x.inj' huv' }
+  have aux_apply : ∀ (x : Fin n ↪ β) (i : Fin n), f.toFun (aux x i) = x i := fun x i => by
+    simp only [toFun_eq_coe, coeFn_mk, Function.comp_apply, Function.surjInv_eq]
+
+  intro x y
+  obtain ⟨g, hg⟩ := h_eq (aux x) (aux y)
+  use σ g
+  ext i
+  simp only [smul_apply]
+  simp only [← aux_apply]
+  dsimp
+  simp only [← EquivariantMap.map_smul', hg]
+
+
+
+
+
   --  intros x y,
   have aux : ∀ x : Fin n ↪ β, ∃ x' : Fin n ↪ α, f ∘ x' = x := fun x =>
     by
