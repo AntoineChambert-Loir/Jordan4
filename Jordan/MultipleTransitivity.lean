@@ -482,7 +482,7 @@ variable (α)
 theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : ℕ} :
     IsMultiplyPretransitive M α n.succ ↔
       ∀ a : α, IsMultiplyPretransitive (stabilizer M a) (SubMulAction.ofStabilizer M a) n := by
-  let hα'eq := hα'.exists_smul_eq
+  -- let hα'eq := hα'.exists_smul_eq
   constructor
   · -- if the action is n.succ-multiply transitive,
     -- then the action of sub_mul_action_of_stabilizer is n-multiply transitive
@@ -583,7 +583,7 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
         M α n.succ ↔
       IsMultiplyPretransitive (stabilizer M a) (SubMulAction.ofStabilizer M a) n :=
   by
-  let hα'eq := hα'.exists_smul_eq
+  -- let hα'eq := hα'.exists_smul_eq
   constructor
   · -- if the action is n.succ-multiply transitive,
     -- then the action of sub_mul_action_of_stabilizer is n-multiply transitive
