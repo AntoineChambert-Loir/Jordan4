@@ -9,7 +9,7 @@ import Jordan.Mathlib.Stabilizer
 import Jordan.Mathlib.Pretransitive
 import Jordan.Mathlib.Set
 import Jordan.Mathlib.Partitions
-import Jordan.Mathlib.SubMulActionCompl
+import Jordan.SubMulActions
 import Jordan.Mathlib.Commutators
 
 import Jordan.EquivariantMap

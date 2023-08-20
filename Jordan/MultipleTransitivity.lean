@@ -7,12 +7,12 @@ Authors: Antoine Chambert-Loir
 -/
 import Jordan.Primitive
 import Jordan.IndexNormal
+import Jordan.SubMulActions
 
 import Jordan.Mathlib.Stabilizer
 import Jordan.Mathlib.Pretransitive
 import Jordan.Mathlib.Partitions
 import Jordan.Mathlib.Set
-import Jordan.Mathlib.SubMulActionCompl
 -- import Jordan.Mathlib.Cardinal
 import Jordan.Mathlib.Extensions
 

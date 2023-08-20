@@ -21,8 +21,6 @@ import Jordan.EquivariantMap
 -/
 
 
-#check MulActionHom
-
 
 open scoped Pointwise
 
