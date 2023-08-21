@@ -79,7 +79,7 @@ theorem Compl_def (s : SubMulAction M α) :
 #align sub_mul_action.of_compl_def SubMulAction.Compl_def
 
 /-- Action of stabilizer of a point on the complement -/
-abbrev ofStabilizer (a : α) : SubMulAction (stabilizer M a) α
+def ofStabilizer (a : α) : SubMulAction (stabilizer M a) α
     where
   carrier := {a}ᶜ
   smul_mem' g x := by
@@ -112,7 +112,7 @@ instance ofStabilizerLift (a : α) : HasLiftT (SubMulAction.ofStabilizer M a) α
  -/
 
 /-- The sub_mul_action of fixing_subgroup M s on the complement -/
-abbrev ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α
+def ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α
     where
   carrier := sᶜ
   smul_mem' := by
@@ -256,10 +256,20 @@ instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
       (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := 
   SetLike.smul (SubMulAction.ofFixingSubgroup (stabilizer M a) s)
 
+instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+    MulAction (fixingSubgroup (stabilizer M a) s)
+      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := 
+  SubMulAction.mulAction (SubMulAction.ofFixingSubgroup (stabilizer M a) s)
+
 instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
     SMul (fixingSubgroup M (insert a (Subtype.val '' s)))
       (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) := 
   SetLike.smul (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)))
+
+instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+    MulAction (fixingSubgroup M (insert a (Subtype.val '' s)))
+      (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) := 
+  SubMulAction.mulAction (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)))
 
 /- def φ (m :
     fixingSubgroup M (insert a (Subtype.val '' s))) : fixingSubgroup (stabilizer M a) s := 
@@ -474,9 +484,18 @@ instance (s t : Set α) :
         Set (SubMulAction.ofFixingSubgroup M s))) :=  
   SetLike.smul (SubMulAction.ofFixingSubgroup { x // x ∈ fixingSubgroup M s } (Subtype.val ⁻¹' t))
   
-/-- The identity between the iterated sub_mul_action of the fixing_subgroups
-and the sub_mul_action of the fixing_subgroup of the union,
-as an equivariant map -/
+instance (s t : Set α) : 
+    MulAction (fixingSubgroup (fixingSubgroup M s) 
+        (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)))
+      (SubMulAction.ofFixingSubgroup (fixingSubgroup M s) 
+        (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s))) :=  
+  SubMulAction.mulAction 
+    (SubMulAction.ofFixingSubgroup (fixingSubgroup M s) 
+      (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)))
+  
+/-- The identity between the iterated sub_mul_action 
+  of the fixing_subgroups and the sub_mul_action of the fixing_subgroup 
+  of the union, as an equivariant map -/
 def SubMulAction.map_ofFixingSubgroupUnion (s t : Set α) :
     let ψ : fixingSubgroup M (s ∪ t) →
       fixingSubgroup (fixingSubgroup M s) 

@@ -130,7 +130,7 @@ theorem isMultiplyPreprimitive_ofStabilizer {n : ℕ} (hn : 1 ≤ n) (h : IsPret
     rfl
     · intro ha
       simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right] at ha
-      obtain ⟨b, hb⟩ := ha
+      obtain ⟨b, _⟩ := ha
       apply b
       simp only [Set.mem_singleton_iff]
     
@@ -139,7 +139,7 @@ theorem isMultiplyPreprimitive_ofStabilizer {n : ℕ} (hn : 1 ≤ n) (h : IsPret
     · rw [stabilizer.isMultiplyPretransitive M α h]
       exact hn_0.left
     · suffices 
-        ∀ (s : Set α) (hs : PartENat.card s + 1 = n.succ) (has : a ∈ s),
+        ∀ (s : Set α) (_ : PartENat.card s + 1 = n.succ) (_ : a ∈ s),
           IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) by
         intro s hs
         have : ∃ b : α, b ∈ s := by
@@ -189,21 +189,44 @@ theorem isMultiplyPreprimitive_ofStabilizer {n : ℕ} (hn : 1 ≤ n) (h : IsPret
           simpa only using hy
       rw [hst]
       rw [isPreprimitive_of_bijective_map_iff
-          (SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective).surjective
+          (SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective M a t).surjective
           (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective M a t)]
       · apply hn_0.right t
         have ha : a ∉ (Subtype.val '' t : Set α) := by
           rintro ⟨x, hx⟩
           apply x.prop; rw [hx.right]; simp only [Set.mem_singleton]
         -- let hz : (#↥(insert a (coe '' t))) = _ := Cardinal.mk_insert ha
-        sorry
-        rw [← hst, Cardinal.mk_image_eq Subtype.coe_injective] at hz 
         rw [← hs]
+        rw [hst]
+        simp only [Set.mem_image, Set.mem_preimage, Subtype.exists, exists_and_left, exists_prop]
+        have : PartENat.card Unit = 1 := by
+          simp only [PartENat.card_eq_coe_fintype_card, Fintype.card_ofSubsingleton, Nat.cast_one]
+        rw [← this, ← PartENat.card_sum]
         unfold PartENat.card
-        simp only [hz, map_add]
-        apply congr_arg₂ (· + ·) rfl
-        conv_lhs => rw [← Nat.cast_one]
-        rw [PartENat.coe_nat_eq_iff_eq]; rw [Nat.cast_one]
+        apply congr_arg
+        simp only [Cardinal.mk_sum, Cardinal.lift_id', Cardinal.mk_fintype, 
+          Fintype.card_ofSubsingleton, Nat.cast_one, Cardinal.lift_one, 
+          Set.mem_image, Set.mem_preimage, Subtype.exists, exists_and_left, exists_prop]
+        rw [Cardinal.mk_insert ?_]
+        apply congr_arg₂ _ _ rfl
+        apply symm
+        apply Cardinal.mk_image_eq_of_injOn
+        exact Set.injOn_subtype_val
+        · intro ha'
+          apply ha
+          rw [hst] at ha'
+          simp only [Set.mem_image, Set.mem_preimage, Subtype.exists, 
+            exists_and_left, exists_prop, Set.mem_insert_iff, SetLike.coe_eq_coe,
+            exists_eq_right, exists_eq_or_imp, and_true] at ha' 
+          cases' ha' with ha' ha'
+          · exfalso
+            simp only [SubMulAction.mem_ofStabilizer_iff] at ha' 
+            apply ha'
+            rfl 
+          · obtain ⟨b, _, hb, rfl⟩ := ha'
+            use ⟨b, hb⟩
+            simp only [Set.mem_preimage, and_true]
+            exact has
 #align mul_action.is_multiply_preprimitive_of_stabilizer MulAction.isMultiplyPreprimitive_ofStabilizer
 
 /- lemma is_multiply_preprimitive_of_subgroup {H : subgroup M}
@@ -263,13 +286,14 @@ theorem remaining_primitivity {n : ℕ} (h : IsMultiplyPreprimitive M α n) {d :
   constructor
   · apply remaining_transitivity M α d s hs; exact h.left
   · intro t ht
-    let t' : Set α := coe '' t
-    have htt' : t = coe ⁻¹' t' := by apply symm; apply Set.preimage_image_eq;
+    let t' : Set α := Subtype.val '' t
+    have htt' : t = Subtype.val ⁻¹' t' := by 
+      apply symm
+      apply Set.preimage_image_eq
       exact Subtype.coe_injective
     rw [htt']
-    apply
-      isPreprimitive_of_surjective_map
-        (SubMulAction.OfFixingSubgroupUnion.map_bijective M s t').Surjective
+    apply isPreprimitive_of_surjective_map
+        (SubMulAction.OfFixingSubgroupUnion.map_bijective M s t').surjective
     apply h.right
     unfold PartENat.card at ht hs ⊢
     rw [Cardinal.mk_union_of_disjoint]
@@ -277,8 +301,8 @@ theorem remaining_primitivity {n : ℕ} (h : IsMultiplyPreprimitive M α n) {d :
       rw [add_assoc, ht, hs, ← Nat.cast_add, PartENat.natCast_inj]
       exact Nat.add_sub_of_le hdn
     · rw [Set.disjoint_iff]
-      intro a; simp only [t']
-      rintro ⟨hbs, ⟨b, hbt, rfl⟩⟩
+      intro a 
+      rintro ⟨hbs, ⟨b, _, rfl⟩⟩
       exfalso
       exact b.prop hbs
 #align mul_action.remaining_primitivity MulAction.remaining_primitivity
@@ -289,22 +313,22 @@ theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
     IsMultiplyPreprimitive M α n :=
   by
   cases' Nat.eq_zero_or_pos n with hn hn
-  · rw [hn]; apply is_multiply_preprimitive_zero
+  · rw [hn]
+    apply isMultiplyPreprimitive_zero
   constructor
-  apply is_multiply_pretransitive_of_higher M α h
+  apply isMultiplyPretransitive_of_higher M α h
   exact Nat.le_succ n
   exact hα
   obtain ⟨m, hm⟩ := Nat.exists_eq_add_of_le hn
   rw [hm]
   intro s hs
-  apply is_preprimitive_of_two_pretransitive
+  apply IsMultiplyPretransitive.isPreprimitive_of_two
   suffices : 2 = n.succ - m
   rw [this]
   apply remaining_transitivity
   · simp at hs 
-    rw [← PartENat.add_right_cancel_iff]
-    rw [hs]; exact add_comm 1 ↑m
-    rw [← Nat.cast_one]; exact PartENat.natCast_ne_top 1
+    rw [← PartENat.add_right_cancel_iff, hs, add_comm]
+    exact PartENat.natCast_ne_top 1
   exact h
   simp only [hm, Nat.succ_eq_one_add, ← add_assoc]
   norm_num
@@ -315,17 +339,17 @@ theorem isMultiplyPreprimitive_of_higher {n : ℕ} {m : ℕ} (hmn : m ≤ n) (h�
     (hn : IsMultiplyPreprimitive M α n) : IsMultiplyPreprimitive M α m :=
   by
   cases' Nat.eq_zero_or_pos m with hm hm
-  · rw [hm]; apply is_multiply_preprimitive_zero
+  · rw [hm]; apply isMultiplyPreprimitive_zero
   induction' n with n hrec
   · exfalso; apply lt_irrefl 0
     apply lt_of_lt_of_le; exact hm; exact hmn
   cases' Nat.eq_or_lt_of_le hmn with hmn hmn'
   · rw [hmn]; exact hn
-  apply hrec (nat.lt_succ_iff.mp hmn')
+  apply hrec (Nat.lt_succ_iff.mp hmn')
   refine' le_trans _ hα
   rw [PartENat.coe_le_coe]
   exact Nat.le_succ n
-  apply is_multiply_preprimitive_of_multiply_pretransitive_succ M α hα hn.left
+  apply isMultiplyPreprimitive_of_multiply_pretransitive_succ M α hα hn.left
 #align mul_action.is_multiply_preprimitive_of_higher MulAction.isMultiplyPreprimitive_of_higher
 
 variable {M α}
@@ -334,7 +358,7 @@ theorem isMultiplyPreprimitive_of_bijective_map {N β : Type _} [Group N] [MulAc
     {f : α →ₑ[φ] β} (hf : Function.Bijective f) {n : ℕ} (h : IsMultiplyPreprimitive M α n) :
     IsMultiplyPreprimitive N β n := by
   constructor
-  apply is_multiply_pretransitive_of_surjective_map hf.surjective h.left
+  apply isMultiplyPretransitive_of_surjective_map hf.surjective h.left
   intro t ht
   let s := f ⁻¹' t
   have hs' : f '' s = t := Set.image_preimage_eq t hf.surjective
@@ -346,22 +370,25 @@ theorem isMultiplyPreprimitive_of_bijective_map {N β : Type _} [Group N] [MulAc
       rw [← hs', Set.mem_image_iff_bex] at hy 
       obtain ⟨x, hx, hx'⟩ := hy
       simp only [Subtype.coe_mk]
-      rw [← hx', ← EquivariantMap.toFun_eq_coe, ← f.map_smul']
+      rw [← hx', ← f.map_smul']
       apply congr_arg
       rw [mem_fixingSubgroup_iff] at hm 
       exact hm x hx⟩
   let f' : SubMulAction.ofFixingSubgroup M s →ₑ[φ'] SubMulAction.ofFixingSubgroup N t :=
-    { toFun := fun ⟨x, hx⟩ => ⟨f.to_fun x, fun h => hx (set.mem_preimage.mp h)⟩
+    { toFun := fun ⟨x, hx⟩ => ⟨f.toFun x, fun h => hx (Set.mem_preimage.mp h)⟩
       map_smul' := fun ⟨m, hm⟩ ⟨x, hx⟩ =>
         by
         rw [← SetLike.coe_eq_coe]
         exact f.map_smul' m x }
   have hf' : Function.Surjective f' := by
-    rintro ⟨y, hy⟩; obtain ⟨x, hx⟩ := hf.right y
-    use x
-    · intro h; apply hy; rw [← hs']; exact ⟨x, h, hx⟩
-    rw [← SetLike.coe_eq_coe]
-    exact hx
+    rintro ⟨y, hy⟩
+    obtain ⟨x, hx⟩ := hf.right y
+    use ⟨x, ?_⟩
+    · simp only [Subtype.mk.injEq, hx]
+    · intro h
+      apply hy
+      rw [← hs']
+      exact ⟨x, h, hx⟩
   exact isPreprimitive_of_surjective_map hf' (h.right s hs)
 #align mul_action.is_multiply_preprimitive_of_bijective_map MulAction.isMultiplyPreprimitive_of_bijective_map
 
