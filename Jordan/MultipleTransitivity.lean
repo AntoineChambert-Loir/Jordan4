@@ -796,9 +796,8 @@ private theorem IsMultiplyPretransitive.index_of_fixing_subgroup_aux
     exact hrec
     suffices : ∀ x,  x ∈ (SubMulAction.ofStabilizer M a) ↔  x ∈ (SubMulAction.ofStabilizer M a).carrier
     simp_rw [this, SubMulAction.ofStabilizer_carrier]
-    rw [Fintype.card_compl_set, Set.card_singleton]
-    · intro x
-      exact Iff.rfl
+    convert Fintype.card_compl_set _
+    intro x; rfl
   ·-- s.nonempty
     rw [← Finset.card_pos, hs];
     exact succ_pos k

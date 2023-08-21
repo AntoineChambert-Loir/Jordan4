@@ -5,14 +5,14 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module multiple_primitivity
 -/
-import Mathbin.Tactic.Lift
-import Mathbin.GroupTheory.GroupAction.Embedding
-import Oneshot.MultipleTransitivity
-import Oneshot.ForMathlib.Cardinal
+import Mathlib.Tactic.Lift
+import Mathlib.GroupTheory.GroupAction.Embedding
+import Jordan.MultipleTransitivity
+-- import Jordan.Mathlib.Cardinal
 
 open scoped BigOperators Pointwise Cardinal
 
-open scoped Classical
+-- open scoped Classical
 
 section MultiplePrimitivity
 
@@ -20,7 +20,7 @@ namespace MulAction
 
 variable (M α : Type _) [Group M] [MulAction M α]
 
-example (e : PartENat) (h : e + 1 = 1) : e = 0 :=
+/- example (e : PartENat) (h : e + 1 = 1) : e = 0 :=
   by
   rw [← PartENat.add_right_cancel_iff, zero_add]
   exact h
@@ -36,7 +36,7 @@ example (c : Cardinal) (n : ℕ) (h : c.toPartENat = n) : c = n :=
   by
   apply symm
   rw [← PartENat.coe_nat_eq_iff_eq]
-  exact h.symm
+  exact h.symm -/
 
 /-- An action is n-fold preprimitive if it is n-fold pretransitive
 and if the action of fixator of any (n-1) element subset on the remaining set
@@ -44,20 +44,18 @@ is not only pretransitive but also preprimitive. (Wielandt, §10)
 -/
 def IsMultiplyPreprimitive (n : ℕ) :=
   IsMultiplyPretransitive M α n ∧
-    ∀ (s : Set α) (hs : PartENat.card s + 1 = n),
+    ∀ (s : Set α) (_ : PartENat.card s + 1 = n),
       IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s)
 #align mul_action.is_multiply_preprimitive MulAction.IsMultiplyPreprimitive
 
 /-- Any action is 0-fold preprimitive -/
-theorem isMultiplyPreprimitive_zero : IsMultiplyPreprimitive M α 0 :=
-  by
+theorem isMultiplyPreprimitive_zero : IsMultiplyPreprimitive M α 0 := by
   constructor
-  apply MulAction.is_zero_pretransitive
-  · intro s
-    apply Not.elim
-    intro h
+  · apply MulAction.is_zero_pretransitive
+  · intro s h
+    exfalso
     simp only [Nat.cast_zero, add_eq_zero_iff] at h 
-    simpa only [one_ne_zero, and_false_iff] using h
+    apply one_ne_zero h.2
 #align mul_action.is_multiply_preprimitive_zero MulAction.isMultiplyPreprimitive_zero
 
 /-- An action is preprimitive iff it is 1-preprimitive -/
@@ -67,31 +65,33 @@ theorem isPreprimitive_iff_is_one_preprimitive :
   constructor
   · intro h
     constructor
-    rw [← is_pretransitive_iff_is_one_pretransitive]
-    exact h.to_is_pretransitive
+    rw [← isPretransitive_iff_is_one_pretransitive]
+    exact h.toIsPretransitive
     intro s hs; rw [Nat.cast_one] at hs 
-    suffices s = ∅ by
+--    suffices s = ∅ by
+    suffices PartENat.card s = 0 by
+      simp only [Set.isEmpty_coe_sort, PartENat.card_eq_zero_iff_empty] at this
       rw [this]
       rw [isPreprimitive_of_bijective_map_iff
-          (SubMulAction.of_fixingSubgroup_empty_map_scalars_surjective M α)
-          (SubMulAction.ofFixingSubgroupEmptyMap_bijective M α)]
+          (SubMulAction.of_fixingSubgroupEmpty_mapScalars_surjective M α)
+          (SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective M α)]
       exact h
-    suffices PartENat.card s = 0
-      by
+    /- suffices PartENat.card s = 0 by
+
       rw [← Cardinal.mk_emptyCollection_iff]
       apply symm
       rw [← Nat.cast_zero, ← PartENat.coe_nat_eq_iff_eq]
       unfold PartENat.card at this ; rw [this]
-      simp only [Nat.cast_zero]
+      simp only [Nat.cast_zero] -/
     rw [← PartENat.add_right_cancel_iff, zero_add]; exact hs
     rw [← Nat.cast_one]; exact PartENat.natCast_ne_top 1
-  · rintro ⟨h1, h1'⟩
-    apply
-      isPreprimitive_of_surjective_map
-        (Function.Bijective.surjective (SubMulAction.ofFixingSubgroupEmptyMap_bijective M α))
+  · rintro ⟨_, h1'⟩
+    apply isPreprimitive_of_surjective_map
+      (Function.Bijective.surjective 
+          (SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective M α))
     apply h1'
-    simp only [PartENat.card_eq_coe_fintype_card, Set.empty_card', Nat.cast_zero, zero_add,
-      Nat.cast_one]
+    simp only [PartENat.card_eq_coe_fintype_card, Set.empty_card', 
+      Nat.cast_zero, zero_add, Nat.cast_one]
 #align mul_action.is_preprimitive_iff_is_one_preprimitive MulAction.isPreprimitive_iff_is_one_preprimitive
 
 /-- A pretransitive  action is n.succ-fold preprimitive  iff
@@ -106,98 +106,97 @@ theorem isMultiplyPreprimitive_ofStabilizer {n : ℕ} (hn : 1 ≤ n) (h : IsPret
   constructor
   · intro hn
     cases' Nat.lt_or_ge n 1 with h0 h1
-    · rw [Nat.lt_one_iff] at h0 ; rw [h0]; apply is_multiply_preprimitive_zero
+    · rw [Nat.lt_one_iff] at h0
+      rw [h0]
+      apply isMultiplyPreprimitive_zero
     constructor
     -- n-pretransitive
-    exact (stabilizer.is_multiply_pretransitive M α h).mp hn.left
+    exact (stabilizer.isMultiplyPretransitive M α h).mp hn.left
     -- multiple preprimitivity property
     intro s hs
     --    let j := sub_mul_action_of_fixing_subgroup_of_stabilizer_bihom M a s,
-    apply
-      isPreprimitive_of_surjective_map
-        (SubMulAction.OfFixingSubgroupOfStabilizer.map_bijective M a s).Surjective
+    apply isPreprimitive_of_surjective_map
+        (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective M a s).surjective
     apply hn.right
-    suffices part_enat_one_ne_top : (1 : PartENat) ≠ ⊤
-    · simp only [Nat.cast_succ]
-      rw [PartENat.add_right_cancel_iff part_enat_one_ne_top]
-      apply symm
-      unfold PartENat.card
-      rw [PartENat.coe_nat_eq_iff_eq]
-      rw [Cardinal.mk_insert, Cardinal.mk_image_eq Subtype.coe_injective]
-      rw [← PartENat.coe_nat_eq_iff_eq]
-      rw [← hs]; simp only [map_add]
-      conv_rhs => rw [← Nat.cast_one]
-      rw [Cardinal.toPartENat_cast, Nat.cast_one,
-        PartENat.add_right_cancel_iff part_enat_one_ne_top]
-      rfl
-      · -- a ∉ coe '' s
-        rintro ⟨x, hx, hx'⟩
-        apply x.prop; simp only [Set.mem_singleton_iff]
-        exact hx'
-    ·-- (1 : part_enat) ≠ ⊤
-      rw [← Nat.cast_one];
-      exact PartENat.natCast_ne_top 1
+    rw [Nat.cast_succ]
+    unfold PartENat.card at hs ⊢
+    simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right, Cardinal.toPartENat_eq_natCast_iff]
+    
+
+    rw [Cardinal.mk_insert, Cardinal.mk_image_eq Subtype.coe_injective]
+    rw [map_add, ← hs]
+    congr
+    rw [← Nat.cast_one, Cardinal.toPartENat_cast]
+    rfl
+    · intro ha
+      simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right] at ha
+      obtain ⟨b, hb⟩ := ha
+      apply b
+      simp only [Set.mem_singleton_iff]
+    
   · intro hn_0
     constructor
-    · rw [stabilizer.is_multiply_pretransitive M α h]
+    · rw [stabilizer.isMultiplyPretransitive M α h]
       exact hn_0.left
-    · suffices
+    · suffices 
         ∀ (s : Set α) (hs : PartENat.card s + 1 = n.succ) (has : a ∈ s),
-          IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s)
-        by
+          IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) by
         intro s hs
-        have : ∃ b : α, b ∈ s :=
-          by
+        have : ∃ b : α, b ∈ s := by
           rw [← Set.nonempty_def, Set.nonempty_iff_ne_empty]
           intro h
           suffices n = 0 by
-            simpa only [this, ge_iff_le, nonpos_iff_eq_zero, Nat.one_ne_zero] using hn
-          rw [← Cardinal.mk_emptyCollection_iff] at h 
-          unfold PartENat.card at hs 
-          rw [h] at hs 
-          simp only [map_zero, Nat.cast_succ] at hs 
-          rw [← Nat.cast_zero] at hs 
-          rw [PartENat.add_right_cancel_iff, PartENat.natCast_inj] at hs 
-          exact hs.symm
-          rw [← Nat.cast_one]; exact PartENat.natCast_ne_top 1
+            simp only [this, ge_iff_le, nonpos_iff_eq_zero, Nat.one_ne_zero] at hn
+          simp only [h, PartENat.card_eq_coe_fintype_card, Fintype.card_of_isEmpty,
+            Nat.cast_zero, zero_add, Nat.cast_succ] at hs 
+          nth_rewrite 1 [← zero_add 1] at hs
+          rw [PartENat.add_right_cancel_iff] at hs 
+          rw [← PartENat.natCast_inj, ← hs]
+          simp only [Nat.cast_zero]
+          apply PartENat.natCast_ne_top 
         obtain ⟨b, hb⟩ := this
         obtain ⟨g, hg : g • b = a⟩ := h_eq b a
-        apply
-          isPreprimitive_of_surjective_map
-            (SubMulAction.ofFixingSubgroup.conjMap_bijective M (inv_smul_smul g s)).Surjective
+        apply isPreprimitive_of_surjective_map
+          (SubMulAction.conjMap_ofFixingSubgroup_bijective M (inv_smul_smul g s)).surjective
         refine' this (g • s) _ _
-        · suffices : (#↥(g • s)) = (#↥s)
-          rw [← hs]; unfold PartENat.card; rw [this]
-          change (#(fun x => g • x) '' s) = _
-          rw [Cardinal.mk_image_eq (MulAction.injective g)]
+        · rw [← hs, PartENat.add_right_cancel_iff ]
+          unfold PartENat.card
+          -- change (#(fun x => g • x) '' s) = _
+          apply congr_arg
+          exact Cardinal.mk_image_eq (MulAction.injective g)
+          apply PartENat.natCast_ne_top 
         exact ⟨b, hb, hg⟩
       intro s hs has
       rw [← Nat.cast_one, Nat.cast_add n 1] at hs 
       rw [PartENat.add_right_cancel_iff (PartENat.natCast_ne_top 1)] at hs 
-      let t : Set (SubMulAction.ofStabilizer M a) := coe ⁻¹' s
-      have hst : s = insert a (coe '' t) := by
-        ext
+      let t : Set (SubMulAction.ofStabilizer M a) := Subtype.val ⁻¹' s
+      have hst : s = insert a (Subtype.val '' t) := by
+        ext x
         constructor
         · intro hxs
-          cases' Classical.em (x = a) with hxa hxa
+          by_cases hxa : x = a 
           rw [hxa]; apply Set.mem_insert
-          apply Set.mem_insert_of_mem; use x
+          apply Set.mem_insert_of_mem
+          use ⟨x, ?_⟩
           refine' And.intro _ rfl
-          simp only [Set.mem_preimage, SubMulAction.coe_mk]; exact hxs
+          exact hxa
+          simp only [Set.mem_preimage]
+          exact hxs
         · intro hxat
-          cases' set.mem_insert_iff.mp hxat with hxa hxt
+          cases' Set.mem_insert_iff.mp hxat with hxa hxt
           rw [hxa]; exact has
           obtain ⟨y, hy, rfl⟩ := hxt
           simpa only using hy
       rw [hst]
       rw [isPreprimitive_of_bijective_map_iff
-          (SubMulAction.OfFixingSubgroupOfStabilizer.scalar_map_bijective M a t).Surjective
-          (SubMulAction.OfFixingSubgroupOfStabilizer.map_bijective M a t)]
+          (SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective).surjective
+          (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective M a t)]
       · apply hn_0.right t
-        have ha : a ∉ (coe '' t : Set α) := by
+        have ha : a ∉ (Subtype.val '' t : Set α) := by
           rintro ⟨x, hx⟩
           apply x.prop; rw [hx.right]; simp only [Set.mem_singleton]
-        let hz : (#↥(insert a (coe '' t))) = _ := Cardinal.mk_insert ha
+        -- let hz : (#↥(insert a (coe '' t))) = _ := Cardinal.mk_insert ha
+        sorry
         rw [← hst, Cardinal.mk_image_eq Subtype.coe_injective] at hz 
         rw [← hs]
         unfold PartENat.card
