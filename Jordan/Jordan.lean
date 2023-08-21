@@ -5,14 +5,15 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module jordan
 -/
-import Oneshot.ForMathlib.Set
-import Oneshot.Primitive
-import Oneshot.MultiplePrimitivity
-import Mathbin.GroupTheory.Perm.Support
-import Mathbin.GroupTheory.Index
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Mathbin.GroupTheory.SpecificGroups.Cyclic
-import Oneshot.IndexNormal
+import Jordan.Mathlib.Set
+import Jordan.Primitive
+import Jordan.IndexNormal
+import Jordan.MultiplePrimitivity
+
+import Mathlib.GroupTheory.Perm.Support
+import Mathlib.GroupTheory.Index
+import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-! # Theorems of Jordan
 
@@ -50,64 +51,63 @@ open MulAction
 
 open scoped Pointwise
 
+instance  {α : Type _} {G : Type _} [Group G] [MulAction G α] {s : Set α} :
+    SMul (fixingSubgroup G s) (SubMulAction.ofFixingSubgroup G s) := 
+  SetLike.smul (SubMulAction.ofFixingSubgroup G s)
+
 /-- A pretransitivity criterion -/
 theorem isPretransitive_ofFixingSubgroup_inter {α : Type _} {G : Type _} [Group G] [MulAction G α]
     {s : Set α} (hs : IsPretransitive (fixingSubgroup G s) (SubMulAction.ofFixingSubgroup G s))
     {g : G} {a : α} (ha : a ∉ s ∪ g • s) :
-    IsPretransitive (fixingSubgroup G (s ∩ g • s)) (SubMulAction.ofFixingSubgroup G (s ∩ g • s)) :=
-  by
+    IsPretransitive (fixingSubgroup G (s ∩ g • s)) (SubMulAction.ofFixingSubgroup G (s ∩ g • s)) := by
   have ha' : a ∈ (s ∩ g • s)ᶜ := by
     intro ha'; apply ha
     apply Set.mem_union_left
     exact Set.mem_of_mem_inter_left ha'
   -- For an unknown reason, rw does not work
-  apply (is_pretransitive.mk_base_iff (⟨a, ha'⟩ : SubMulAction.ofFixingSubgroup G (s ∩ g • s))).mpr
+  apply (IsPretransitive.mk_base_iff (⟨a, ha'⟩ : SubMulAction.ofFixingSubgroup G (s ∩ g • s))).mpr
   let hs_trans_eq := hs.exists_smul_eq
   rintro ⟨x, hx⟩
-  rw [SubMulAction.ofFixingSubgroup.mem_iff] at hx 
+  rw [SubMulAction.mem_ofFixingSubgroup_iff] at hx 
   rw [Set.mem_inter_iff, not_and_or] at hx 
   cases' hx with hx hx
   · -- x ∉ s
-    obtain ⟨⟨k, hk⟩, hkax⟩ := hs_trans_eq ⟨a, _⟩ ⟨x, hx⟩
-    use k
-    · rintro ⟨z, hz⟩
-      simp only [Subtype.coe_mk]
-      simp only [← SetLike.coe_eq_coe, Subtype.coe_mk] at hkax 
-      rw [mem_fixingSubgroup_iff] at hk 
-      rw [hk]
-      apply Set.mem_of_mem_inter_left hz
+    obtain ⟨⟨k, hk⟩, hkax⟩ := hs_trans_eq ⟨a, ?_⟩ ⟨x, hx⟩
+    use ⟨k, (by 
+      rw [mem_fixingSubgroup_iff] at hk ⊢
+      intro y  hy
+      apply hk
+      apply Set.mem_of_mem_inter_left hy)⟩
     · simp only [← SetLike.coe_eq_coe] at hkax ⊢
-      simp only [SubMulAction.val_smul_of_tower, SubMulAction.coe_mk, Subtype.coe_mk] at hkax ⊢
       exact hkax
     · intro ha'; apply ha
       apply Set.mem_union_left
       exact ha'
   · -- x ∉ g • s
-    obtain ⟨⟨k, hk⟩, hkax⟩ := hs_trans_eq ⟨g⁻¹ • a, _⟩ ⟨g⁻¹ • x, _⟩
-    use g * k * g⁻¹
-    · rintro ⟨z, hz⟩
-      simp only [Subtype.coe_mk]
-      simp only [← SetLike.coe_eq_coe, Subtype.coe_mk] at hkax 
-      simp only [← smul_smul]
-      rw [smul_eq_iff_eq_inv_smul]
-      rw [mem_fixingSubgroup_iff] at hk 
-      rw [hk]
+    obtain ⟨⟨k, hk⟩, hkax⟩ := hs_trans_eq ⟨g⁻¹ • a, ?_⟩ ⟨g⁻¹ • x, ?_⟩
+    use ⟨g * k * g⁻¹, (by 
+      rw [mem_fixingSubgroup_iff] at hk ⊢
+      intro y hy
+      simp [← smul_smul, smul_eq_iff_eq_inv_smul g]
+      apply hk
       rw [← Set.mem_smul_set_iff_inv_smul_mem]
-      apply Set.mem_of_mem_inter_right hz
+      exact Set.mem_of_mem_inter_right hy)⟩
     · simp only [← SetLike.coe_eq_coe] at hkax ⊢
-      simp only [SubMulAction.val_smul_of_tower, SubMulAction.coe_mk, Subtype.coe_mk] at hkax ⊢
-      change k • g⁻¹ • a = g⁻¹ • x at hkax 
-      change (g * k * g⁻¹) • a = x
+      simp only [SetLike.val_smul] at hkax ⊢
       rw [← smul_eq_iff_eq_inv_smul] at hkax 
-      simp only [← smul_smul]
+      change (g * k * g⁻¹) • a = x
+      simp only [← smul_smul]      
       exact hkax
-    · rw [SubMulAction.ofFixingSubgroup.mem_iff]
+    · rw [SubMulAction.mem_ofFixingSubgroup_iff]
       rw [← Set.mem_smul_set_iff_inv_smul_mem]
-      intro h; apply ha; apply Set.mem_union_right; exact h
-    · rw [SubMulAction.ofFixingSubgroup.mem_iff]
-      intro h; apply hx
+      intro h
+      apply ha
+      apply Set.mem_union_right _ h
+    · rw [SubMulAction.mem_ofFixingSubgroup_iff]
+      intro h
+      apply hx
       rw [Set.mem_smul_set_iff_inv_smul_mem]
-      exact h
+      exact h  
 #align is_pretransitive_of_fixing_subgroup_inter isPretransitive_ofFixingSubgroup_inter
 
 section Jordan
