@@ -119,110 +119,129 @@ variable {G : Type _} [Group G] [MulAction G α]
 /-- In a 2-pretransitive action, the normal closure of stabilizers is the full group -/
 theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
     (hG' : IsMultiplyPretransitive G α 2) {a : α} :
-    Subgroup.normalClosure (stabilizer G a).carrier = ⊤ :=
-  by
-  have hG : is_pretransitive G α :=
-    by
-    rw [is_pretransitive_iff_is_one_pretransitive]
-    apply is_multiply_pretransitive_of_higher
+    Subgroup.normalClosure ((stabilizer G a) : Set G) = ⊤ := by
+  have hG : IsPretransitive G α := by
+    rw [isPretransitive_iff_is_one_pretransitive]
+    apply isMultiplyPretransitive_of_higher
     exact hG'
     norm_num
     rw [Nat.cast_two]
     exact le_of_lt hsn'
-  suffices : (stabilizer G a).IsMaximal
-  rw [Subgroup.isMaximal_def] at this 
-  apply this.right
-  · --  unfold subgroup.normal_closure,
-    constructor
-    · intro g hg; apply Subgroup.closure_le_normalClosure
-      apply Subgroup.subset_closure; exact hg
-    · intro hyp
-      -- prendre b, c ≠ a
-      have : ∃ b c : SubMulAction.ofStabilizer G a, b ≠ c :=
-        by
-        let x : Fin 1 ↪ α :=
-          { toFun := fun _ => a
-            inj' := Function.injective_of_subsingleton _ }
-        obtain ⟨y : Fin 3 ↪ α, hy⟩ := may_extend _ _ x
-        let hy_inj := y.inj'; simp at hy_inj 
-        have ha : x ⟨0, by norm_num⟩ = a; rfl
-        have ha' : y ⟨0, by norm_num⟩ = a; rw [← ha]; rw [← hy]; rfl
-        use y ⟨1, by norm_num⟩
-        · intro h
-          simpa only [Fin.mk_one, Set.mem_singleton_iff, ← ha', Fin.mk_zero,
-            EmbeddingLike.apply_eq_iff_eq, Fin.one_eq_zero_iff, Nat.succ_succ_ne_one] using h
-        use y ⟨2, by norm_num⟩
-        · intro h; simp at h ; rw [← ha'] at h 
-          simp only [Fin.mk_zero, EmbeddingLike.apply_eq_iff_eq, Fin.eq_iff_veq] at h 
-          simpa using h
-        · intro h; rw [← SetLike.coe_eq_coe] at h 
-          simp only [SubMulAction.coe_mk] at h 
-          rw [EmbeddingLike.apply_eq_iff_eq, Fin.eq_iff_veq] at h 
-          simpa using h
-        -- 1 ≤ 3
-        simp only [one_le_bit1, zero_le']
-        -- ↑3 ≤ part_enat.card α,
-        rw [PartENat.coe_le_iff]
-        intro h; rw [Nat.succ_le_iff]; revert h
-        rw [← PartENat.coe_lt_iff, Nat.cast_two]
-        exact hsn'
-      /-
-              rw ← nontrivial_iff ,
-      
-              rw ← cardinal.one_lt_iff_nontrivial,
-              change 1 < cardinal.mk (sub_mul_action.of_stabilizer G a).carrier,
-              rw sub_mul_action.of_stabilizer.def,
-              rw [← nat.cast_one, cardinal.mk_fintype, cardinal.nat_cast_lt],
-              rw ← add_lt_add_iff_left 1,
-              refine lt_of_lt_of_le hsn' (le_of_eq _),
-              rw ← fintype.card_of_subsingleton _,
-              apply cardinal.nat_cast_injective,
-      
-              rw [← cardinal.mk_fintype, nat.cast_add, ← cardinal.mk_fintype],
-              simp only [← cardinal.mk_fintype],
-              rw cardinal.mk_sum_compl ,
-              { use a, exact set.mem_singleton a },
-              exact unique.subsingleton -/
-      obtain ⟨⟨b, hb⟩, ⟨c, hc⟩, hbc⟩ := this
-      simp only [Ne.def, Subtype.mk_eq_mk] at hbc 
-      have : is_pretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) :=
-        by
-        rw [is_pretransitive_iff_is_one_pretransitive]
-        exact (stabilizer.is_multiply_pretransitive G α hG).mp hG'
-      --      let hatrans_eq := hatrans.exists_smul_eq,
-      -- trouver g ∈ stabilizer G a, g • b = c,
-      obtain ⟨⟨g, hg⟩, hgbc⟩ :=
-        exists_smul_eq (stabilizer G a) (⟨b, hb⟩ : SubMulAction.ofStabilizer G a) ⟨c, hc⟩
-      have hgbc' : g • b = c := by rw [← SetLike.coe_eq_coe] at hgbc ; exact hgbc
-      -- trouver h ∈ G, h⁻¹ • a = b,
-      obtain ⟨h : G, hinvab : h • b = a⟩ := exists_smul_eq G b a
-      suffices (h * g * h⁻¹) • a ≠ a
-        by
-        -- h * g * h⁻¹ ∈ subgroup.normal_closure (stabilizer G a)
-        apply this
-        rw [← mem_stabilizer_iff]
-        apply hyp
-        refine' Subgroup.normalClosure_normal.conj_mem _ _ _
-        apply Subgroup.subset_normalClosure
-        exact hg
-      -- h * g * h⁻¹ • a = h • g • b = h • c ≠ h • b = a
-      suffices (h * g * h⁻¹) • a = h • c by
-        rw [this]; rw [← hinvab]
-        intro z
-        apply hbc; apply MulAction.injective h; exact z.symm
-      simp only [← smul_smul]
-      rw [← hgbc']
-      refine' congr_arg₂ _ rfl _
-      refine' congr_arg₂ _ rfl _
-      rw [inv_smul_eq_iff]; exact hinvab.symm
   have : Nontrivial α := by
     rw [← PartENat.one_lt_card_iff_nontrivial]
     refine' lt_trans _ hsn'
     rw [← Nat.cast_two, ← Nat.cast_one, PartENat.coe_lt_coe]
     norm_num
-  rw [maximal_stabilizer_iff_preprimitive G a]
-  apply is_preprimitive_of_two_pretransitive
-  exact hG'
+  have hGa : (stabilizer G a).IsMaximal :=  by
+    rw [maximal_stabilizer_iff_preprimitive G a]
+    exact hG'.isPreprimitive_of_two
+  rw [Subgroup.isMaximal_def] at hGa 
+  apply hGa.right
+  -- Remains to prove: (stabilizer G a) < Subgroup.normalClosure (stabilizer G a)
+  -- SIMPLIFIER !!
+  constructor
+  · apply Subgroup.le_normalClosure
+  · intro hyp
+    -- prendre b, c ≠ a
+    have : ∃ b c : SubMulAction.ofStabilizer G a, b ≠ c := by
+      let x : Fin 1 ↪ α :=
+        { toFun := fun _ => a
+          inj' := Function.injective_of_subsingleton _ }
+      obtain ⟨y : Fin 3 ↪ α, hy⟩ := may_extend _ ?_ x
+      let hy_inj := y.inj'
+      simp at hy_inj 
+      have ha : x ⟨0, by norm_num⟩ = a; rfl
+      have ha' : y ⟨0, by norm_num⟩ = a := by
+        rw [← ha, ← hy]
+        rfl
+        norm_num
+      use ⟨y 1, (by 
+        rw [SubMulAction.mem_ofStabilizer_iff]
+        intro h
+        rw [← ha', EmbeddingLike.apply_eq_iff_eq] at h
+        norm_num at h)⟩ 
+      use ⟨y 2, (by
+        rw [SubMulAction.mem_ofStabilizer_iff]
+        intro h
+        rw [← ha', EmbeddingLike.apply_eq_iff_eq] at h
+        norm_num at h)⟩
+      · intro h
+        rw [← SetLike.coe_eq_coe, EmbeddingLike.apply_eq_iff_eq] at h
+        refine ne_of_lt ?_ h
+        rw [← Fin.coe_sub_iff_lt]
+        rfl
+      /- 
+
+      · intro h
+        simpa only [Fin.mk_one, Set.mem_singleton_iff, ← ha', Fin.mk_zero,
+          EmbeddingLike.apply_eq_iff_eq, Fin.one_eq_zero_iff, Nat.succ_succ_ne_one] using h
+      use y ⟨2, by norm_num⟩
+      · intro h; simp at h ; rw [← ha'] at h 
+        simp only [Fin.mk_zero, EmbeddingLike.apply_eq_iff_eq, Fin.eq_iff_veq] at h 
+        simpa using h
+      · intro h; rw [← SetLike.coe_eq_coe] at h 
+        simp only [SubMulAction.coe_mk] at h 
+        rw [EmbeddingLike.apply_eq_iff_eq, Fin.eq_iff_veq] at h 
+        simpa using h
+      -- 1 ≤ 3
+      simp only [one_le_bit1, zero_le']
+      -- ↑3 ≤ part_enat.card α,
+      rw [PartENat.coe_le_iff]
+      intro h; rw [Nat.succ_le_iff]; revert h
+      rw [← PartENat.coe_lt_iff, Nat.cast_two]
+      exact hsn'
+    /-
+            rw ← nontrivial_iff ,
+    
+            rw ← cardinal.one_lt_iff_nontrivial,
+            change 1 < cardinal.mk (sub_mul_action.of_stabilizer G a).carrier,
+            rw sub_mul_action.of_stabilizer.def,
+            rw [← nat.cast_one, cardinal.mk_fintype, cardinal.nat_cast_lt],
+            rw ← add_lt_add_iff_left 1,
+            refine lt_of_lt_of_le hsn' (le_of_eq _),
+            rw ← fintype.card_of_subsingleton _,
+            apply cardinal.nat_cast_injective,
+    
+            rw [← cardinal.mk_fintype, nat.cast_add, ← cardinal.mk_fintype],
+            simp only [← cardinal.mk_fintype],
+            rw cardinal.mk_sum_compl ,
+            { use a, exact set.mem_singleton a },
+            exact unique.subsingleton -/ -/
+    · rw [PartENat.coe_le_iff]
+      intro h; rw [Nat.succ_le_iff]; revert h
+      rw [← PartENat.coe_lt_iff, Nat.cast_two]
+      exact hsn'
+    obtain ⟨⟨b, hb⟩, ⟨c, hc⟩, hbc⟩ := this
+    simp only [Ne.def, Subtype.mk_eq_mk] at hbc 
+    have : IsPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) := by
+      rw [isPretransitive_iff_is_one_pretransitive]
+      exact (stabilizer.isMultiplyPretransitive G α hG).mp hG'
+    --      let hatrans_eq := hatrans.exists_smul_eq,
+    -- trouver g ∈ stabilizer G a, g • b = c,
+    obtain ⟨⟨g, hg⟩, hgbc⟩ :=
+      exists_smul_eq (stabilizer G a) (⟨b, hb⟩ : SubMulAction.ofStabilizer G a) ⟨c, hc⟩
+    have hgbc' : g • b = c := by rw [← SetLike.coe_eq_coe] at hgbc ; exact hgbc
+    -- trouver h ∈ G, h⁻¹ • a = b,
+    obtain ⟨h : G, hinvab : h • b = a⟩ := exists_smul_eq G b a
+    suffices (h * g * h⁻¹) • a ≠ a
+      by
+      -- h * g * h⁻¹ ∈ subgroup.normal_closure (stabilizer G a)
+      apply this
+      rw [← mem_stabilizer_iff]
+      apply hyp
+      refine' Subgroup.normalClosure_normal.conj_mem _ _ _
+      apply Subgroup.subset_normalClosure
+      exact hg
+    -- h * g * h⁻¹ • a = h • g • b = h • c ≠ h • b = a
+    suffices (h * g * h⁻¹) • a = h • c by
+      rw [this]; rw [← hinvab]
+      intro z
+      apply hbc; apply MulAction.injective h; exact z.symm
+    simp only [← smul_smul]
+    rw [← hgbc']
+    refine' congr_arg₂ _ rfl _
+    refine' congr_arg₂ _ rfl _
+    rw [inv_smul_eq_iff]; exact hinvab.symm
 #align normal_closure_of_stabilizer_eq_top normalClosure_of_stabilizer_eq_top
 
 variable [Fintype α]
@@ -945,7 +964,7 @@ theorem isPretransitive_of_cycle [DecidableEq α] {g : Equiv.Perm α} (hg : g �
   have hs : ∀ x : α, g • x ≠ x ↔ x ∈ SubMulAction.ofFixingSubgroup G ((↑g.support : Set α)ᶜ) :=
     by
     intro x
-    rw [SubMulAction.ofFixingSubgroup.mem_iff]
+    rw [SubMulAction.mem_ofFixingSubgroup_iff]
     simp only [Set.mem_compl_iff, Finset.mem_coe, Equiv.Perm.not_mem_support]
     rfl
   let ha := (hs a).mp hga
@@ -953,7 +972,7 @@ theorem isPretransitive_of_cycle [DecidableEq α] {g : Equiv.Perm α} (hg : g �
     ∀ x ∈ SubMulAction.ofFixingSubgroup G ((↑g.support : Set α)ᶜ),
       ∃ k : fixingSubgroup G ((↑g.support : Set α)ᶜ), x = k • a
     by
-    apply is_pretransitive.mk
+    apply IsPretransitive.mk
     rintro ⟨x, hx⟩ ⟨y, hy⟩
     obtain ⟨k, hk⟩ := this x hx
     obtain ⟨k', hk'⟩ := this y hy
@@ -973,15 +992,13 @@ theorem isPretransitive_of_cycle [DecidableEq α] {g : Equiv.Perm α} (hg : g �
 #align is_pretransitive_of_cycle isPretransitive_of_cycle
 
 theorem Equiv.Perm.IsSwap.cycleType [DecidableEq α] {σ : Equiv.Perm α} (h : σ.IsSwap) :
-    σ.cycleType = {2} :=
-  by
-  simp only [Equiv.Perm.IsCycle.cycleType h.is_cycle, equiv.perm.card_support_eq_two.mpr h]
-  rfl
+    σ.cycleType = {2} := by
+  simp only [h.isCycle.cycleType, Equiv.Perm.card_support_eq_two.mpr h]
 #align equiv.perm.is_swap.cycle_type Equiv.Perm.IsSwap.cycleType
 
 theorem Equiv.Perm.IsSwap.orderOf [DecidableEq α] {σ : Equiv.Perm α} (h : σ.IsSwap) :
     orderOf σ = 2 := by
-  rw [← Equiv.Perm.lcm_cycleType, h.cycle_type, Multiset.lcm_singleton, normalize_eq]
+  rw [← Equiv.Perm.lcm_cycleType, h.cycleType, Multiset.lcm_singleton, normalize_eq]
 #align equiv.perm.is_swap.order_of Equiv.Perm.IsSwap.orderOf
 
 /-- A primitive permutation group that contains a swap is the full permutation group (Jordan)-/
@@ -989,36 +1006,30 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
     (h2g : Equiv.Perm.IsSwap g) (hg : g ∈ G) : G = ⊤ := by
   classical
   cases' Nat.lt_or_ge (Fintype.card α) 3 with hα3 hα3
-  · -- trivial case : fintype.card α ≤ 2
+  · -- trivial case : Fintype.card α ≤ 2
     rw [Nat.lt_succ_iff] at hα3 
     apply Subgroup.eq_top_of_card_eq
-    apply le_antisymm
-    apply Fintype.card_subtype_le
+    apply le_antisymm (Fintype.card_subtype_le _)
     rw [Fintype.card_equiv (Equiv.cast rfl)]
     refine' le_trans (Nat.factorial_le hα3) _
     rw [Nat.factorial_two]
-    apply Nat.le_of_dvd
-    exact Fintype.card_pos
-    suffices orderOf g = 2
-      by
-      rw [← SetLike.coe_mk g hg, orderOf_subgroup] at this 
-      rw [← this]; exact orderOf_dvd_card_univ
-    apply Equiv.Perm.IsSwap.orderOf; exact h2g
+    apply Nat.le_of_dvd Fintype.card_pos
+    rw [← h2g.orderOf, orderOf_subgroup ⟨g, hg⟩]
+    exact orderOf_dvd_card_univ
+  -- important case : Fintype.card α ≥ 3
   obtain ⟨n, hn⟩ := Nat.exists_eq_add_of_le hα3
   rw [add_comm] at hn 
   let s := (g.support : Set α)
-  have hs2 : Fintype.card s = 2 :=
-    by
+  have hs2 : Fintype.card s = 2 := by
     simp only [Finset.coe_sort_coe, Fintype.card_coe, Equiv.Perm.card_support_eq_two]
     exact h2g
-  have hsc : Fintype.card (sᶜ : Set α) = n.succ :=
-    by
+  have hsc : Fintype.card (sᶜ : Set α) = n.succ := by
     rw [Fintype.card_compl_set, hs2, hn]
-    simp only [Nat.succ_sub_succ_eq_sub, Nat.add_succ_sub_one]
-  suffices : is_multiply_preprimitive G α (Fintype.card α - 1)
-  exact eq_top_of_is_full_minus_one_pretransitive this.left
-  have hn' : Fintype.card α - 1 = 1 + n.succ :=
-    by
+    simp only [ge_iff_le, Nat.succ_sub_succ_eq_sub, nonpos_iff_eq_zero, add_eq_zero, and_false, tsub_zero]
+
+  suffices : IsMultiplyPreprimitive G α (Fintype.card α - 1)
+  exact this.left.eq_top_of_is_full_minus_one_pretransitive 
+  have hn' : Fintype.card α - 1 = 1 + n.succ := by
     rw [hn]
     conv_rhs => rw [add_comm, Nat.succ_eq_add_one]
     simp only [Nat.add_succ_sub_one]
