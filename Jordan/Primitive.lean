@@ -31,6 +31,7 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Card
 import Mathlib.Algebra.BigOperators.Order
+import Mathlib.Data.Set.Card
 
 /-!
 # Primitive actions and the Iwasawa criterion
@@ -645,6 +646,71 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
     simp only [Nat.card_eq_fintype_card]
     rfl }
 #align is_preprimitive_of_large_image isPreprimitive_of_large_image
+
+
+/-- The target of an equivariant map of large image is preprimitive if the source is -/
+theorem isPreprimitive_of_large_image' 
+    [Fintype β] [htβ : IsPretransitive N β] {φ : M → N}
+    {f : α →ₑ[φ] β} (hM : IsPreprimitive M α)
+    (hf' : Fintype.card β < 2 * Set.ncard (Set.range f)) : IsPreprimitive N β :=  by
+  -- classical
+  apply IsPreprimitive.mk
+  intro B hB
+  cases' subsingleton_or_nontrivial B with hB hB_nt
+  · left; rwa [Set.subsingleton_coe] at hB 
+  dsimp only [IsTrivialBlock]
+  rw [or_iff_not_imp_right]
+  intro hB_ne_top
+  -- Two ways of saying that B is nonempty
+  have hB_ne : Set.Nonempty B := by
+    rw [← Set.nonempty_coe_sort]
+    apply Nontrivial.to_nonempty 
+  suffices : B.ncard < 2
+  · rw [Nat.lt_succ_iff, Set.ncard_le_one_iff] at this
+    intro x hx y hy 
+    exact this hx hy
+  
+  -- We reduce to proving that
+  -- Fintype.card (Set.range f) ≤ Fintype.card (Set.range (λ g, g • B))
+  apply lt_of_mul_lt_mul_right (lt_of_le_of_lt _ hf') (Nat.zero_le _)
+  simp only [← Nat.card_eq_fintype_card, ← nat_card_block_mul_card_orbit_eq hB hB_ne]
+  apply Nat.mul_le_mul_left _
+  -- We reduce to proving that
+  -- fintype.card (set.range f ∩ g • B)) ≤ 1 for every g
+  simp only [Nat.card_eq_fintype_card]
+  simp only [← Set.toFinset_card]
+  rw [Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
+      (IsBlockSystem.of_block hB hB_ne).left]
+  rw [Finset.card_eq_sum_ones]
+  refine' Finset.sum_le_sum _
+  intro t ht
+  rw [Set.toFinset_card, Fintype.card_le_one_iff_subsingleton, Set.inter_comm, 
+    ← Set.image_preimage_eq_inter_range, Set.subsingleton_coe]
+  
+  -- It suffices to prove that the preimage is subsingleton
+  simp only [Set.mem_toFinset, Set.mem_range] at ht 
+  obtain ⟨g, rfl⟩ := ht
+  apply Set.Subsingleton.image
+  -- Since the action of M on α is primitive, it suffices to prove that
+  -- the preimage is a block which is not ⊤
+  apply Or.resolve_right (hM.has_trivial_blocks (IsBlock_preimage f (IsBlock_of_block g hB)))
+  intro h
+  have h' : ⊤ ⊆ f ⁻¹' (g • B) := subset_of_eq h.symm
+  rw [Set.top_eq_univ, ← Set.image_subset_iff, Set.image_univ] at h' 
+  -- We will prove that B is large, which will contradict the assumption that it is not ⊤
+  apply hB_ne_top
+  apply is_top_of_large_block hB
+  -- It remains to show that fintype.card β < 2 * fintype.card B
+  rw [Nat.card_eq_fintype_card]
+  apply lt_of_lt_of_le hf'
+  simp only [mul_le_mul_left, Nat.succ_pos']
+  rw [← smul_set_card_eq g B]
+  -- This last step is disgusting :
+  -- the types are identical, but not the proofs that they are finite
+  refine' le_trans _ (le_trans (Set.card_le_of_subset h') _)
+  all_goals {
+    simp only [Nat.card_eq_fintype_card]
+    rfl }
 
 /-- Theorem of Rudio (Wielandt, 1964, Th. 8.1) -/
 theorem Rudio (hpGX : IsPreprimitive M α) (A : Set α) (hfA : A.Finite) (hA : A.Nonempty)

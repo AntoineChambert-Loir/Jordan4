@@ -67,24 +67,21 @@ theorem smul_set_iInter₂ (a : α) (s : ∀ i, κ i → Set β) :
     simp_rw [smul_set_iInter]
 #align mul_action.smul_set_Inter₂ MulAction.smul_set_iInter₂
 
-/- theorem smul_set_card_eq [DecidableEq β] (a : α) (s : Set β) [Fintype s] :
-    Fintype.card (a • s) = Fintype.card s :=
-  by
+theorem smul_set_card_eq' [DecidableEq β] (a : α) (s : Set β) [Fintype s] :
+    Fintype.card (a • s) = Fintype.card s := by
   change Fintype.card ((fun x => a • x) '' s) = _
   simp_rw [Set.image_eq_range (fun x => a • x) s]
   rw [Set.card_range_of_injective]
   apply Subtype.restrict_injective
   exact MulAction.injective a
-#align mul_action.smul_set_card_eq MulAction.smul_set_card_eq
- -/
+#align mul_action.smul_set_card_eq MulAction.smul_set_card_eq'
+
 
 theorem smul_set_card_eq [DecidableEq β] (a : α) (s : Set β) :
-    Nat.card (a • s) = Nat.card s :=
-  by
+    Nat.card (a • s) = Nat.card s := by
   apply symm
   apply Nat.card_congr
   refine Equiv.Set.imageOfInjOn _ s (s.injOn_of_injective (MulAction.injective a))
-#align mul_action.smul_set_card_eq MulAction.smul_set_card_eq
 
 end MulAction
 

@@ -12,6 +12,7 @@ import Jordan.SubMulActions
 -- import Jordan.Mathlib.Algebra.Hom.GroupAction
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Algebra.BigOperators.Finprod
+import Mathlib.Data.Set.Card
 
 /-! # Blocks
 
@@ -651,7 +652,7 @@ section Fintype
 theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid.IsPartition c) :
     (finsum fun x : c => Nat.card x) = Nat.card α := by
   classical
-  letI := Fintype.ofFinite α
+  have := Fintype.ofFinite α
   simp only [finsum_eq_sum_of_fintype, Nat.card_eq_fintype_card]
   rw [← Fintype.card_sigma]
   refine' Fintype.card_congr (Equiv.ofBijective (fun x => x.snd : (Σ a : ↥c, a) → α) _)
@@ -677,81 +678,97 @@ theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid
 /-- The cardinality of the ambient is the product of
   of the cardinality of a block
   by the cardinality of the set of iterates of that block -/
-theorem nat_card_block_mul_card_orbit_eq [Finite X] [IsPretransitive G X] {B : Set X}
+theorem ncard_block_mul_ncard_orbit_eq [Finite X] [IsPretransitive G X] {B : Set X}
     (hB : IsBlock G B) (hB_ne : B.Nonempty) :
-    Nat.card B * Nat.card (Set.range fun g : G => g • B) = Nat.card X := by
-   classical
+    Set.ncard B * Set.ncard (Set.range fun g : G => g • B) = Nat.card X := by
+  classical
   have := Fintype.ofFinite X
   rw [← Setoid.nat_sum (IsBlockSystem.of_block hB hB_ne).1]
-  simp only [finsum_eq_sum_of_fintype, Nat.card_eq_fintype_card]
-  
-  suffices : ∀ x : Set.range fun g : G => g • B, Fintype.card x = Fintype.card B
-  · simp_rw [this]
-    rw [Finset.sum_const]
-    rw [nsmul_eq_mul, Nat.cast_id]
-    apply mul_comm
-  · rintro ⟨C, ⟨g, hg : g • B = C⟩⟩
-    simp only [← Set.toFinset_card, ← hg]
-    rw [Set.toFinset_smul_set g B, Finset.card_smul_finset]
-#align mul_action.nat_card_block_mul_card_orbit_eq MulAction.nat_card_block_mul_card_orbit_eq
+  simp only [finsum_eq_sum_of_fintype]
+  simp only [Finset.sum_finset_coe]
+  simp_rw [Set.Nat.card_coe_set_eq]
+  rw [Finset.sum_congr rfl ?_]
+  rw [Finset.sum_const]
+  rw [mul_comm]
+  congr
+  rw [Set.ncard_eq_toFinset_card']
+  -- this is painful…
+  rw [Finset.card_congr]
+  exact fun s hs => ⟨s, Set.mem_toFinset.mp hs⟩ 
+  · intro s hs
+    apply Finset.mem_univ
+  · intro s t hs ht hst
+    rw [← Subtype.val_inj] at hst
+    exact hst
+  · rintro ⟨b, hb⟩ _ 
+    use b
+    simp only [Set.mem_toFinset]
+    use hb
+  -- this was painful…
+  rintro ⟨x, ⟨g, rfl⟩⟩ _
+  simp only
+  exact Set.ncard_image_of_injective B (MulAction.injective g)
+#align mul_action.nat_card_block_mul_card_orbit_eq MulAction.ncard_block_mul_ncard_orbit_eq
+
 
 /-- The cardinality of a block divides the cardinality of the ambient type -/
-theorem nat_card_of_block_divides [Finite X] [IsPretransitive G X] {B : Set X}
-    (hB : IsBlock G B) (hB_ne : B.Nonempty) : Nat.card B ∣ Nat.card X :=
-  Dvd.intro _ (nat_card_block_mul_card_orbit_eq hB hB_ne)
-#align mul_action.nat_card_of_block_divides MulAction.nat_card_of_block_divides
+theorem ncard_of_block_divides [Finite X] [IsPretransitive G X] {B : Set X}
+    (hB : IsBlock G B) (hB_ne : B.Nonempty) : Set.ncard B ∣ Nat.card X :=
+  Dvd.intro _ (ncard_block_mul_ncard_orbit_eq hB hB_ne)
+#align mul_action.nat_card_of_block_divides MulAction.ncard_of_block_divides
 
 /-- A too large block is equal to ⊤ -/
 theorem is_top_of_large_block [hfX : Finite X] [hGX : IsPretransitive G X] {B : Set X}
-    (hB : IsBlock G B) (hB' : Nat.card X < 2 * Nat.card B) : B = ⊤ := by
+    (hB : IsBlock G B) (hB' : Nat.card X < 2 * Set.ncard B) : B = ⊤ := by
   classical
   letI := Fintype.ofFinite X
   cases' Set.eq_empty_or_nonempty B with hB_e hB_ne
-  --  cases nat.eq_zero_or_pos (nat.card B),
+  -- case when B is empty (exfalso)
   · exfalso; rw [hB_e] at hB' 
-    simp only [Nat.card_eq_fintype_card, Set.empty_card', MulZeroClass.mul_zero,
-      Nat.not_lt_zero] at hB'
-  rw [Set.top_eq_univ, ← Set.toFinset_inj, Set.toFinset_univ, ← Finset.card_eq_iff_eq_univ,
-    Set.toFinset_card]
-  obtain ⟨k, h⟩ := nat_card_of_block_divides hB hB_ne
+    simp only [Set.ncard_empty, mul_zero, gt_iff_lt, not_lt_zero'] at hB' 
+  -- case when B is not empty
+  rw [Set.top_eq_univ, ← Set.toFinset_inj, Set.toFinset_univ, ← Finset.card_eq_iff_eq_univ, ← Set.ncard_eq_toFinset_card']
+  obtain ⟨k, h⟩ := ncard_of_block_divides hB hB_ne
   simp only [← Nat.card_eq_fintype_card]
   rw [h] at hB' ⊢
   suffices : k = 1
   simp only [this, mul_one]
   apply le_antisymm
-  · apply Nat.le_of_lt_succ
-    rw [lt_iff_not_le]; intro hk
-    rw [lt_iff_not_le] at hB' ; apply hB'
+  · rw [← not_lt, ← Nat.succ_le_iff]
+    intro hk
+    rw [← not_le] at hB'
+    apply hB'
     rw [mul_comm]
-    refine' Nat.mul_le_mul_left _ hk
-  · rw [Nat.one_le_iff_ne_zero]; intro hk
-    rw [hk, MulZeroClass.mul_zero, Nat.card_eq_fintype_card] at h 
-    apply (lt_iff_not_le.mp hB') (Eq.le _)
-    suffices : Nat.card B = 0; rw [this, MulZeroClass.mul_zero, MulZeroClass.zero_mul]
-    rw [← le_zero_iff, ← h, Nat.card_eq_fintype_card]
-    exact set_fintype_card_le_univ B
+    apply Nat.mul_le_mul_left _ hk
+  · rw [← not_lt, Nat.lt_one_iff]
+    intro hk
+    simp only [Nat.card_eq_fintype_card, hk, mul_zero, Fintype.card_eq_zero_iff, ← not_nonempty_iff] at h
+    exact h (Set.Nonempty.to_type hB_ne)
 #align mul_action.is_top_of_large_block MulAction.is_top_of_large_block
 
-/-- If a block has too many translates, then it is a singleton  -/
-theorem is_top_of_small_block [Finite X] [IsPretransitive G X] {B : Set X}
-    (hB : IsBlock G B)
-    (hB' : Nat.card X < 2 * Nat.card (Set.range fun g : G => (g • B : Set X))) : B.Subsingleton :=
-  by
-  classical
-  letI := Fintype.ofFinite X
-  rw [← Set.subsingleton_coe, ← Fintype.card_le_one_iff_subsingleton, ← Nat.card_eq_fintype_card]
+/-- If a block has too many translates, then it is a (sub)singleton  -/
+theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X] 
+    {B : Set X} (hB : IsBlock G B)
+    (hB' : Nat.card X < 2 * Set.ncard (Set.range fun g : G => (g • B : Set X))) : 
+    B.Subsingleton := by
+--  classical
+  have := Fintype.ofFinite X
+  suffices : Set.ncard B ≤ 1 
+  · rw [Set.ncard_le_one_iff_eq] at this
+    cases' this with h h
+    rw [h]; exact Set.subsingleton_empty
+    obtain ⟨a, ha⟩ := h; rw [ha]; exact Set.subsingleton_singleton
   cases Set.eq_empty_or_nonempty B with
-  | inl h => 
-    simp only [h, Nat.card_eq_fintype_card, Fintype.card_of_isEmpty, zero_le]
+  | inl h => rw [h, Set.ncard_empty]; norm_num
   | inr h =>
-    let hk := nat_card_block_mul_card_orbit_eq hB h
-    cases' Nat.lt_or_ge (Nat.card B) 2 with hb hb
-    rwa [Nat.lt_succ_iff] at hb 
-    exfalso
-    rw [← hk, lt_iff_not_ge] at hB' 
-    apply hB'
-    refine' Nat.mul_le_mul_right _ hb
-#align mul_action.is_top_of_small_block MulAction.is_top_of_small_block
+    let hk := ncard_block_mul_ncard_orbit_eq hB h
+    cases' Nat.lt_or_ge (Set.ncard B) 2 with hb hb
+    · rw [← Nat.lt_succ_iff]; exact hb
+    · exfalso
+      rw [← hk, lt_iff_not_ge] at hB' 
+      apply hB'
+      refine' Nat.mul_le_mul_right _ hb
+#align mul_action.is_top_of_small_block MulAction.IsBlock.is_subsingleton
 
 -- TODO : Is the assumption B.finite necessary ?
 /-- The intersection of the translates of a *finite* subset which contain a given point
