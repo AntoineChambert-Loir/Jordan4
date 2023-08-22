@@ -125,6 +125,12 @@ def ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α
     exact hcx
 #align sub_mul_action.of_fixing_subgroup SubMulAction.ofFixingSubgroup
 
+instance (s : Set α) : SMul (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) :=
+  inferInstance
+
+instance (s : Set α) : MulAction (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) :=
+  inferInstance
+
 theorem ofFixingSubgroup_carrier {s : Set α} : (SubMulAction.ofFixingSubgroup M s).carrier = sᶜ :=
   rfl
 #align sub_mul_action.of_fixing_subgroup.def SubMulAction.ofFixingSubgroup_carrier
