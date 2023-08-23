@@ -549,14 +549,6 @@ variable {N β : Type _} [Group N] [MulAction N β]
 
 open scoped BigOperators Pointwise
 
-lemma Set.subsingleton_iff_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
-  Set.Subsingleton B ↔ Set.ncard B ≤ 1 := by
-  sorry
-
-lemma Set.subsingleton_iff_encard_le_one {α : Type _} (B : Set α) :
-  Set.Subsingleton B ↔ Set.encard B ≤ 1 := by
-  sorry
-
 lemma Set.nontrivial_iff_not_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
     Set.Nontrivial B ↔ ¬(Set.ncard B ≤ 1) := by
   rw [not_le, Set.one_lt_ncard_iff]
@@ -572,6 +564,14 @@ lemma Set.nontrivial_iff_not_encard_le_one {α : Type _} (B : Set α) :
   all_goals {
     rintro ⟨a, ha, b, hb, hab⟩
     exact ⟨a, b, ha, hb, hab⟩ }
+
+lemma Set.subsingleton_iff_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
+  Set.Subsingleton B ↔ Set.ncard B ≤ 1 := by
+  rw [← Set.not_nontrivial_iff, not_iff_comm, ← Set.nontrivial_iff_not_ncard_le_one]
+
+lemma Set.subsingleton_iff_encard_le_one {α : Type _} (B : Set α) :
+  Set.Subsingleton B ↔ Set.encard B ≤ 1 := by
+  rw [← Set.not_nontrivial_iff, not_iff_comm, ← Set.nontrivial_iff_not_encard_le_one]
 
 example (n m : ℕ) (h : n + m = n) : m = 0 := by
   exact Nat.add_left_cancel h
@@ -728,8 +728,6 @@ theorem isPreprimitive_of_large_image'
   -- ncard (Set.range f ∩ g • B)) ≤ 1 for every g
   -- simp only [Nat.card_eq_fintype_card]
   simp only [Set.ncard_eq_toFinset_card']
-  let hzz := Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
-      (IsBlockSystem.of_block hB hB_ne).left
   classical
   rw [Set.ncard_eq_toFinset_card', 
     Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
@@ -759,7 +757,7 @@ theorem isPreprimitive_of_large_image'
   apply Set.ncard_le_of_subset
   rw [← Set.image_univ, Set.image_subset_iff, ← Set.top_eq_univ, h]
   exact Set.toFinite (g • B)
-  
+
 /-- Theorem of Rudio (Wielandt, 1964, Th. 8.1) -/
 theorem Rudio (hpGX : IsPreprimitive M α) (A : Set α) (hfA : A.Finite) (hA : A.Nonempty)
     (hA' : A ≠ ⊤) (a b : α) (h : a ≠ b) : ∃ g : M, a ∈ g • A ∧ b ∉ g • A :=
