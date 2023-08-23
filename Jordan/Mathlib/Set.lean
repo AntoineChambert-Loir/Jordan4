@@ -8,6 +8,7 @@ Authors: Antoine Chambert-Loir
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Pointwise
 import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Data.Set.Card
 
 /-! # Stuff to put somewhere in mathlib
 
@@ -67,6 +68,15 @@ theorem smul_set_iInter₂ (a : α) (s : ∀ i, κ i → Set β) :
     simp_rw [smul_set_iInter]
 #align mul_action.smul_set_Inter₂ MulAction.smul_set_iInter₂
 
+theorem smul_set_encard_eq [DecidableEq β] (a : α) (s : Set β) :
+    Set.encard (a • s) = Set.encard s := 
+  (MulAction.injective a).encard_image s
+
+theorem smul_set_ncard_eq [DecidableEq β] (a : α) (s : Set β) :
+    Set.ncard (a • s) = Set.ncard s := 
+  Set.ncard_image_of_injective s (MulAction.injective a)
+
+/- 
 theorem smul_set_card_eq' [DecidableEq β] (a : α) (s : Set β) [Fintype s] :
     Fintype.card (a • s) = Fintype.card s := by
   change Fintype.card ((fun x => a • x) '' s) = _
@@ -82,6 +92,6 @@ theorem smul_set_card_eq [DecidableEq β] (a : α) (s : Set β) :
   apply symm
   apply Nat.card_congr
   refine Equiv.Set.imageOfInjOn _ s (s.injOn_of_injective (MulAction.injective a))
-
+ -/
 end MulAction
 
