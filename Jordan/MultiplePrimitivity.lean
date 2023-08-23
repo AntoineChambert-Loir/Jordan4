@@ -44,7 +44,7 @@ is not only pretransitive but also preprimitive. (Wielandt, §10)
 -/
 def IsMultiplyPreprimitive (n : ℕ) :=
   IsMultiplyPretransitive M α n ∧
-    ∀ (s : Set α) (_ : PartENat.card s + 1 = n),
+    ∀ (s : Set α) (_ : s.encard + 1 = n),
       IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s)
 #align mul_action.is_multiply_preprimitive MulAction.IsMultiplyPreprimitive
 
