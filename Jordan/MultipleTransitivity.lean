@@ -1043,10 +1043,10 @@ theorem aux_lt_iff_lt_or_eq {m n : ℕ} (hmn : m < n) : m < n - 1 ∨ m = n - 1 
       exact Nat.le_antisymm (Nat.le_pred_of_lt hmn) h
 #align mul_action.aux_lt_iff_lt_or_eq MulAction.aux_lt_iff_lt_or_eq
 
-/-- A subgroup of equiv.perm α is ⊤ iff it is (fintype.card α - 1)-pretransitive -/
+/-- A subgroup of Equiv.Perm α is ⊤ iff it is (Fintype.card α - 1)-pretransitive -/
 theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive 
     {G : Subgroup (Equiv.Perm α)}
-    (hmt : IsMultiplyPretransitive (↥G) α (Fintype.card α - 1)) : 
+    (hmt : IsMultiplyPretransitive G α (Fintype.card α - 1)) : 
     G = ⊤ := by
   let j : Fin (Fintype.card α - 1) ↪ Fin (Fintype.card α) :=
     (Fin.castLEEmb ((Fintype.card α).sub_le 1)).toEmbedding
@@ -1093,7 +1093,7 @@ variable (α)
 -- mais sans elle, Lean utilise des classical dont il ne se dépêtre plus après !
 -- (cf alternating_iwasawa)
 
-/-- The alternating group on α is (fintype.card α - 2)-pretransitive -/
+/-- The `alternatingGroup` on α is (Fintype.card α - 2)-pretransitive -/
 theorem IsMultiplyPretransitive.alternatingGroup_of_sub_two [DecidableEq α] :
     IsMultiplyPretransitive (alternatingGroup α) α (Fintype.card α - 2) := by
   cases' lt_or_ge (Fintype.card α) 2 with h2 h2
@@ -1157,15 +1157,15 @@ theorem IsMultiplyPretransitive.alternatingGroup_of_sub_two [DecidableEq α] :
 
 variable {α}
 
-/-- A subgroup of equiv.perm α which is (fintype.card α - 2)-pretransitive
-  contains the alternating group  -/
+/-- A subgroup of `Equiv.Perm α` which is (Fintype.card α - 2)-pretransitive
+  contains `alternatingGroup α`  -/
 theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
     {G : Subgroup (Equiv.Perm α)}
     (hmt : IsMultiplyPretransitive G α (Fintype.card α - 2)) : 
     alternatingGroup α ≤ G := by
   classical
   cases' Nat.lt_or_ge (Fintype.card α) 2 with hα1 hα
-  · -- fintype.card α  < 2
+  · -- Fintype.card α  < 2
     rw [Nat.lt_succ_iff] at hα1 
     suffices : alternatingGroup α = ⊥
     · rw [this]; exact bot_le
@@ -1175,22 +1175,18 @@ theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
       rw [Fintype.card_perm]
       exact Nat.factorial_le hα1
     convert Fintype.card_subtype_le (fun x ↦ x ∈ alternatingGroup α)
-  suffices : ∃ s : Set α, Nat.card s = Fintype.card α - 2
-  obtain ⟨s, hs⟩ := this
-  rw [← hs] at hmt 
-  let hyp := hmt.index_of_fixingSubgroup G α s
-  rw [hs, Nat.sub_sub_self hα, Nat.factorial_two] at hyp 
-  have hyp' : (fixingSubgroup G s).index * 2 ≤ Fintype.card G * 2
-  · apply Nat.mul_le_mul_right
-    apply Nat.le_of_dvd
-    exact Fintype.card_pos
-    apply Subgroup.index_dvd_card 
-  rw [hyp, mul_comm] at hyp' 
   apply large_subgroup_of_perm_contains_alternating
-  rw [Fintype.card_equiv (Equiv.refl _)]; exact hyp'
-  obtain ⟨s, hs⟩ := Finset.exists_smaller_set (⊤ : Finset α) (Fintype.card α - 2) (Nat.sub_le _ _)
-  use ↑s
-  simp only [Finset.coe_sort_coe, card_eq_fintype_card, Fintype.card_coe, ge_iff_le, hs.right]
+  rw [Fintype.card_equiv (Equiv.refl _)]
+  obtain ⟨s, _, hs⟩ := Set.exists_smaller_set (Set.univ : Set α) (Fintype.card α - 2) 
+    (by 
+      rw [Set.ncard_univ, Nat.card_eq_fintype_card]
+      exact sub_le (Fintype.card α) 2)
+  rw [← hs] at hmt 
+  rw [← hmt.index_of_fixingSubgroup G α s, hs, Nat.sub_sub_self hα, 
+    Nat.factorial_two, mul_comm]
+  apply Nat.mul_le_mul_left 
+  apply Nat.le_of_dvd (Fintype.card_pos)
+  apply Subgroup.index_dvd_card
 #align mul_action.alternating_group_le_of_full_minus_two_pretransitive MulAction.IsMultiplyPretransitive.alternatingGroup_le_of_sub_two
 
 /-- The alternating group on 3 letters or more acts transitively -/
@@ -1206,8 +1202,9 @@ theorem alternatingGroup.isPretransitive [DecidableEq α] (h : 3 ≤ Fintype.car
     tsub_le_iff_right, le_add_iff_nonneg_right]
 #align mul_action.alternating_group.is_pretransitive MulAction.alternatingGroup.isPretransitive
 
-/- This lemma proves the trivial blocks property even if the action is not preprimitive
-because it is not pretransitive (for fintype.card α ≤ 2)-/
+/- This lemma proves the trivial blocks property.
+  This holds even when `Fintype.card α ≤ 2` 
+  — then the action is not preprimitive  because it is not pretransitive -/
 theorem alternatingGroup.has_trivial_blocks [DecidableEq α]
     (B : Set α) (hB : IsBlock (alternatingGroup α) B) :
     IsTrivialBlock B := by
