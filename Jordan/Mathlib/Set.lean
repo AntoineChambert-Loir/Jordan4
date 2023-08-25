@@ -68,7 +68,7 @@ theorem smul_set_iInter₂ (a : α) (s : ∀ i, κ i → Set β) :
     simp_rw [smul_set_iInter]
 #align mul_action.smul_set_Inter₂ MulAction.smul_set_iInter₂
 
-theorem smul_set_encard_eq [DecidableEq β] (a : α) (s : Set β) :
+theorem smul_set_encard_eq (a : α) (s : Set β) :
     Set.encard (a • s) = Set.encard s := 
   (MulAction.injective a).encard_image s
 

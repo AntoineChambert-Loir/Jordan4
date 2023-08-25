@@ -39,6 +39,7 @@ theorem gimme_some_equiv {m : ℕ} [Fintype α] (hα : m = Fintype.card α) : No
 
 #align gimme_some_equiv gimme_some_equiv
 
+
 theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) : 
     Nonempty (Fin m ≃ α) := by
   cases' fintypeOrInfinite α with h h -- <;> skip
@@ -48,7 +49,6 @@ theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) :
     exfalso
     apply PartENat.natCast_ne_top m
     rw [hα]
-#align equiv_fin_of_part_enat_card_eq equiv_fin_of_partENat_card_eq
 
 /-- Given an embedding and a strict nat.card inequality, get another element  -/
 theorem gimme_another {m : ℕ} (f : Fin m → α) (hα : ↑m < PartENat.card α) :
