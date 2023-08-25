@@ -120,16 +120,32 @@ variable {α : Type _}
 variable {G : Type _} [Group G] [MulAction G α]
 
 
+lemma _root_.SubMulAction.add_encard_ofStabilizer_eq (a : α) : 
+    1 + (SubMulAction.ofStabilizer G a).carrier.encard = PartENat.card α :=  by
+  classical
+  rw [SubMulAction.ofStabilizer_carrier]
+  rw [← Nat.cast_one]
+  apply PartENat.withTopAddEquiv.injective
+  rw [map_add]
+  convert Set.encard_add_encard_compl {a}
+  · rw [Set.encard_singleton]
+    apply PartENat.toWithTop_natCast' 
+  · rw [← AddEquiv.eq_symm_apply]
+    rfl
+  · convert (Set.encard_univ α).symm
 
-lemma _root_.SubMulaction.add_card_ofStabilizer_eq (a : α) : 
-    1 + PartENat.card (SubMulAction.ofStabilizer G a) = PartENat.card α :=  by
-  unfold PartENat.card
-  rw [← Cardinal.mk_sum_compl {a}, map_add]
-  congr
-  simp only [Cardinal.mk_fintype, Fintype.card_ofSubsingleton, Nat.cast_one]
-  conv_lhs => rw [← Nat.cast_one]
-  apply symm
-  exact Iff.mpr Cardinal.toPartENat_eq_natCast_iff rfl
+lemma _root_.SubMulaction.add_encard_ofStabilizer_eq' (a : α) : 
+    1 + (SubMulAction.ofStabilizer G a).carrier.encard = PartENat.card α :=  by
+  classical
+  rw [SubMulAction.ofStabilizer_carrier]
+  rw [← Nat.cast_one]
+  apply PartENat.withTopEquiv.injective
+  rw [← Equiv.toFun_as_coe_apply, ← Set.encard_univ α]
+  change PartENat.toWithTop _ = _
+  simp only [Nat.cast_one, PartENat.toWithTop_add, PartENat.toWithTop_ofENat]
+  convert Set.encard_add_encard_compl {a}
+  rw [Set.encard_singleton, ← Nat.cast_one, PartENat.toWithTop_natCast', Nat.cast_one]
+
 
 /-- In a 2-pretransitive action, the normal closure of stabilizers is the full group -/
 theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
@@ -157,6 +173,8 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
   · apply Subgroup.le_normalClosure
   · intro hyp
     have : Nontrivial (SubMulAction.ofStabilizer G a) := by
+      apply Set.Nontrivial.coe_sort
+
       rw [← PartENat.one_lt_card_iff_nontrivial]
       rw [← PartENat.add_lt_add_iff_left (z := 1) ?_]
       convert hsn'
