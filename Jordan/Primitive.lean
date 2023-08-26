@@ -549,7 +549,7 @@ variable {N β : Type _} [Group N] [MulAction N β]
 
 open scoped BigOperators Pointwise
 
-lemma Set.nontrivial_iff_not_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
+/- lemma Set.nontrivial_iff_not_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
     Set.Nontrivial B ↔ ¬(Set.ncard B ≤ 1) := by
   rw [not_le, Set.one_lt_ncard_iff]
   constructor
@@ -586,6 +586,7 @@ lemma Set.eq_top_iff_ncard {α : Type _} [Fintype α] (B : Set α) :
     rw [H, add_zero]
   · intro H
     exact Nat.add_left_cancel H.symm
+ -/
 
 /-- A pretransitive action on a set of prime order is preprimitive -/
 theorem isPreprimitive_of_prime [Fintype α] [hGX : IsPretransitive M α]
@@ -690,7 +691,7 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
  -/
 
 /-- The target of an equivariant map of large image is preprimitive if the source is -/
-theorem isPreprimitive_of_large_image' 
+theorem isPreprimitive_of_large_image
     [Fintype β] [htβ : IsPretransitive N β] {φ : M → N}
     {f : α →ₑ[φ] β} (hM : IsPreprimitive M α)
     (hf' : Fintype.card β < 2 * Set.ncard (Set.range f)) : IsPreprimitive N β :=  by

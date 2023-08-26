@@ -58,28 +58,6 @@ theorem isMultiplyPreprimitive_zero : IsMultiplyPreprimitive M α 0 := by
     apply one_ne_zero h.2
 #align mul_action.is_multiply_preprimitive_zero MulAction.isMultiplyPreprimitive_zero
 
-
-lemma _root_.Set.encard_add_eq_add_iff (s : Set α) (m n : ℕ) : 
-    s.encard + m = n + m ↔ s.encard = n := by
-  constructor
-  · intro hs
-    cases' s.finite_or_infinite with hs' hs'
-    -- when s is finite
-    · rw [← Set.Finite.cast_ncard_eq hs', ← Nat.cast_add, ← Nat.cast_add, Nat.cast_inj, add_left_inj] at hs 
-      rw [← hs'.cast_ncard_eq, hs]
-    -- when s is infinite (cannot happen)
-    · exfalso
-      apply WithTop.coe_ne_top
-      rw [← Set.encard_eq_top_iff] at hs'
-      rw [hs', top_add] at hs 
-      exact hs.symm
-  · intro hs
-    rw [hs]
-
-lemma _root_.Set.encard_add_one_eq_succ_iff (s : Set α) (n : ℕ) : 
-    s.encard + 1 = n.succ ↔ s.encard = n := by
-  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_eq_add_iff]
-
 /-- An action is preprimitive iff it is 1-preprimitive -/
 theorem isPreprimitive_iff_is_one_preprimitive :
     IsPreprimitive M α ↔ IsMultiplyPreprimitive M α 1 :=

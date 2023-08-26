@@ -57,8 +57,28 @@ def inclusion (s : SubMulAction M α) : s →ₑ[@id M] α
 #align sub_mul_action.inclusion SubMulAction.inclusion
 
 theorem inclusion.toFun_eq_coe (s : SubMulAction M α) : 
-  s.inclusion.toFun = fun x => x.val := rfl
+    s.inclusion.toFun = fun x => x.val := rfl
 #align sub_mul_action.inclusion.to_fun_eq_coe SubMulAction.inclusion.toFun_eq_coe
+
+lemma image_inclusion (s : SubMulAction M α) : 
+    Set.range s.inclusion = s.carrier  := by
+  ext a
+  simp only [Set.mem_range, Subtype.exists, mem_carrier, SetLike.mem_coe]
+  constructor
+  · intro ha
+    obtain ⟨a, h, rfl⟩ := ha
+    exact h
+  · intro h
+    use a
+    use h
+    rfl
+
+lemma inclusion_injective (s : SubMulAction M α) :
+    Function.Injective s.inclusion := by
+  rintro ⟨a, ha⟩ ⟨b, hb⟩ h 
+  simp only [Subtype.mk.injEq]
+  exact h
+
 
 end Inclusion
 
@@ -578,6 +598,13 @@ def SubMulAction.ofFixingSubgroup.mapOfInclusion {s t : Set α} (hst : t ⊆ s) 
   map_smul' := fun _ _ => rfl
 #align sub_mul_action.of_fixing_subgroup.map_of_inclusion SubMulAction.ofFixingSubgroup.mapOfInclusion
 
+lemma SubMulAction.ofFixingSubgroup.mapOfInclusion_injective 
+    {s t : Set α} (hst : t ⊆ s) :
+    Function.Injective (SubMulAction.ofFixingSubgroup.mapOfInclusion M hst) := by
+  rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
+  rw [← SetLike.coe_eq_coe] at hxy ⊢
+  exact hxy
+  
 /-- The equivariant map between sub_mul_action.of_stabilizer
   and .of_fixing_subgroup of the singleton -/
 def SubMulAction.OfFixingSubgroupOfSingleton.map (a : α) :
