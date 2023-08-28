@@ -5,19 +5,19 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module perm_maximal
 -/
-import Mathbin.Tactic.Basic
-import Mathbin.Tactic.Group
-import Mathbin.GroupTheory.Solvable
-import Mathbin.GroupTheory.GroupAction.SubMulAction
+import Mathlib.Tactic.Basic
+import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Solvable
+import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathbin.Order.Minimal
-import Oneshot.ForMathlib.Alternating
-import Oneshot.ForMathlib.GroupTheorySubgroupBasic
-import Oneshot.ForMathlib.Stabilizer
-import Oneshot.ForMathlib.Set
-import Oneshot.Primitive
-import Oneshot.MultipleTransitivity
-import Oneshot.Jordan
-import Oneshot.MulActionFinset
+import Jordan.Mathlib.Alternating
+import Jordan.Mathlib.GroupTheorySubgroupBasic
+import Jordan.Mathlib.Stabilizer
+import Jordan.Mathlib.Set
+import Jordan.Primitive
+import Jordan.MultipleTransitivity
+import Jordan.Jordan
+import Jordan.MulActionFinset
 
 /-# Maximal subgroups of the symmetric groups
 

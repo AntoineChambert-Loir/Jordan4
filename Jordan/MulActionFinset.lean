@@ -5,36 +5,42 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module mul_action_finset
 -/
-import Mathbin.Tactic.Basic
-import Mathbin.Tactic.Group
-import Mathbin.GroupTheory.GroupAction.SubMulAction
-import Oneshot.SubMulActions
-import Oneshot.MultipleTransitivity
-import Oneshot.ForMathlib.Extensions
-import Mathbin.GroupTheory.GroupAction.Embedding
 
-open scoped Pointwise
+import Jordan.SubMulActions
+-- import Jordan.MultipleTransitivity
+-- import Jordan.Mathlib.Extensions
+import Mathlib.Tactic.Basic
+import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.GroupAction.SubMulAction
+import Mathlib.GroupTheory.GroupAction.Embedding
+-- import Mathlib.GroupTheory.GroupAction.Basic
+
+open scoped Pointwise 
 
 open MulAction
 
-def Nat.finset (α : Type _) (n : ℕ) :=
-  {s : Finset α | s.card = n}
+variable (α : Type*) [DecidableEq α] 
+  (G : Type*) [Group G] [MulAction G α]
+
+def Nat.finset (n : ℕ) := {s : Finset α | s.card = n}
 #align nat.finset Nat.finset
 
-theorem Nat.finset.def (α : Type _) (n : ℕ) (s : Nat.finset α n) : (s : Finset α).card = n :=
-  s.Prop
+theorem Nat.finset.def  {n : ℕ} (s : Nat.finset α n) : 
+    (s : Finset α).card = n :=
+  s.prop
 #align nat.finset.def Nat.finset.def
 
-theorem Nat.FinsetMem.def (α : Type _) (n : ℕ) (s : Finset α) (hs : s ∈ Nat.finset α n) :
-    s.card = n := by simpa only
-#align nat.finset_mem.def Nat.FinsetMem.def
+theorem Nat.finset.mem_iff {n : ℕ} {s : Finset α} :
+    s ∈ Nat.finset α n ↔ s.card = n := by 
+  unfold Nat.finset
+  simp only [Set.mem_setOf_eq]
+#align nat.finset_mem.def Nat.finset.mem_iff
 
-variable (α : Type _) [DecidableEq α] (G : Type _) [Group G] [MulAction G α]
+variable {α G} 
 
-variable {α G}
 
-theorem Finset.smul_card_eq (s : Finset α) (g : G) : (g • s).card = s.card :=
-  by
+theorem Finset.smul_card_eq (s : Finset α) (g : G) : 
+  (s.map ⟨fun x => g • x, MulAction.injective g⟩).card = s.card := by
   change (Finset.image (fun x => g • x) s).card = _
   rw [Finset.card_image_of_injective]
   exact MulAction.injective g
@@ -42,44 +48,40 @@ theorem Finset.smul_card_eq (s : Finset α) (g : G) : (g • s).card = s.card :=
 
 variable (n : ℕ)
 
-theorem is_eq_iff_is_le (s t : n.Finset α) : s = t ↔ s ≤ t :=
+theorem is_eq_iff_is_le (s t : n.finset α) : s = t ↔ s ≤ t :=
   by
   constructor
-  · intro h; rw [h]; exact le_refl t
+  · intro h
+    rw [h]
   · intro h
     rw [← Subtype.coe_inj]
-    -- rw ← subtype.coe_eta s s.prop, rw ← subtype.coe_eta t t.prop,
-    -- rw ← subtype.coe_inj,
-    -- simp only [subtype.coe_mk],
     apply Finset.eq_of_subset_of_card_le h
-    suffices : ∀ s : n.finset α, (s : Finset α).card = n
-    simp only [this]
-    intro s; exact s.prop
+    rw [s.prop, t.prop]
 #align is_eq_iff_is_le is_eq_iff_is_le
 
 variable (α G)
 
-def Nat.finset.MulAction.finset' : SubMulAction G (Finset α)
-    where
-  carrier := n.Finset α
+instance Nat.finset.SubMulAction : SubMulAction G (Finset α) where
+  carrier := n.finset α
   smul_mem' g s hs := by
-    change (g • s).card = n
-    change s.card = n at hs 
+    rw [Nat.finset.mem_iff] at hs ⊢
     rw [← hs]
     rw [Finset.smul_card_eq]
-#align nat.finset.mul_action.finset' Nat.finset.MulAction.finset'
+#align nat.finset.mul_action.finset' Nat.finset.SubMulAction
 
-instance Nat.finset.MulAction.finset : MulAction G (n.Finset α) :=
-  (Nat.finset.MulAction.finset' α G n).MulAction
-#align nat.finset.mul_action.finset Nat.finset.MulAction.finset
+instance Nat.finset.MulAction : MulAction G (n.finset α) := 
+  (Nat.finset.SubMulAction α G n).mulAction
+#align nat.finset.mul_action.finset Nat.finset.MulAction
 
 variable {α G}
 
 @[simp]
-theorem Nat.finset.MulAction.finset_apply {g : G} {s : Finset α} {hs : s ∈ n.Finset α} :
-    ↑(g • (⟨s, hs⟩ : n.Finset α)) = g • s :=
+theorem Nat.finset.MulAction_apply {g : G} {s : Finset α} {hs : s ∈ n.Finset α} :
+    (g • (⟨s, hs⟩ : n.Finset α)) = g • s := by
   rfl
-#align nat.finset.mul_action.finset_apply Nat.finset.MulAction.finset_apply
+
+-- #align nat.finset.mul_action.finset_apply Nat.finset.MulAction_apply
+
 
 @[simp]
 theorem Nat.finset.MulAction.coe_apply' (g : G) (s : n.Finset α) : ↑(g • s) = g • (↑s : Finset α) :=
