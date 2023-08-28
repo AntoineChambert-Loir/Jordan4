@@ -87,9 +87,15 @@ theorem isPreprimitive_iff_is_one_preprimitive :
     simp only [Set.encard_empty, zero_add, Nat.cast_one]
 #align mul_action.is_preprimitive_iff_is_one_preprimitive MulAction.isPreprimitive_iff_is_one_preprimitive
 
+/-- A multiply preprimitive action is multiply pretransitive -/
+theorem IsMultiplyPreprimitive.toIsMultiplyPretransitive
+    {n : ℕ} (h : IsMultiplyPreprimitive M α n) : 
+    IsMultiplyPretransitive M α n := 
+  h.left
+
 /-- A pretransitive  action is n.succ-fold preprimitive  iff
   the action of stabilizers is n-fold preprimitive -/
-theorem isMultiplyPreprimitive_ofStabilizer 
+theorem stabilizer.isMultiplyPreprimitive
     {n : ℕ} (hn : 1 ≤ n) (h : IsPretransitive M α) {a : α} :
     -- (hα : (n.succ : cardinal) ≤ #α):
     IsMultiplyPreprimitive M α n.succ ↔
@@ -167,7 +173,7 @@ theorem isMultiplyPreprimitive_ofStabilizer
         rintro ⟨x, hx⟩
         apply x.prop; rw [hx.right]; simp only [Set.mem_singleton]
 
-#align mul_action.is_multiply_preprimitive_of_stabilizer MulAction.isMultiplyPreprimitive_ofStabilizer
+#align mul_action.is_multiply_preprimitive_of_stabilizer MulAction.stabilizer.isMultiplyPreprimitive
 
 /- lemma is_multiply_preprimitive_of_subgroup {H : subgroup M}
   {n : ℕ} (hn : n ≥ 1) (hH : is_multiply_preprimitive H α n) :
