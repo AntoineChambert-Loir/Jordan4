@@ -37,29 +37,27 @@ lemma Set.one_lt_encard_iff_nontrivial (s : Set α) :
     rintro ⟨a, b, c, d, e⟩
     exact ⟨a, c, b, d, e⟩ }
 
-lemma Set.nontrivial_iff_not_encard_le_one {α : Type _} (B : Set α) :
-    Set.Nontrivial B ↔ ¬(Set.encard B ≤ 1) := by
-  rw [not_le, Set.one_lt_encard_iff_nontrivial]
+-- lemma Set.nontrivial_iff_not_encard_le_one {α : Type _} (B : Set α) :
+--     Set.Nontrivial B ↔ ¬(Set.encard B ≤ 1) := by
+--   rw [not_le, Set.one_lt_encard_iff_nontrivial]
 
 lemma Set.one_lt_ncard_iff_nontrivial (s : Set α) [Finite s] : 
     1 < s.ncard ↔ Set.Nontrivial s := by
   rw [← Set.one_lt_encard_iff_nontrivial, ← Set.Finite.cast_ncard_eq (toFinite s),
     Nat.one_lt_cast] 
 
-lemma Set.nontrivial_iff_not_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
-    Set.Nontrivial B ↔ ¬(Set.ncard B ≤ 1) := by
-  rw [not_le, Set.one_lt_ncard_iff_nontrivial]
+-- lemma Set.nontrivial_iff_not_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
+--     Set.Nontrivial B ↔ ¬(Set.ncard B ≤ 1) := by
+--   rw [not_le, Set.one_lt_ncard_iff_nontrivial]
 
-lemma Set.subsingleton_iff_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
-  Set.Subsingleton B ↔ Set.ncard B ≤ 1 := by
-  rw [← Set.not_nontrivial_iff, not_iff_comm, ← Set.nontrivial_iff_not_ncard_le_one]
 
 lemma Set.subsingleton_iff_encard_le_one {α : Type _} (B : Set α) :
   Set.Subsingleton B ↔ Set.encard B ≤ 1 := by
-  rw [← Set.not_nontrivial_iff, not_iff_comm, ← Set.nontrivial_iff_not_encard_le_one]
+  rw [← Set.not_nontrivial_iff, not_iff_comm, not_le, Set.one_lt_encard_iff_nontrivial]
 
-example (n m : ℕ) (h : n + m = n) : m = 0 := by
-  exact Nat.add_left_cancel h
+lemma Set.subsingleton_iff_ncard_le_one {α : Type _} [Finite α] (B : Set α) :
+  Set.Subsingleton B ↔ Set.ncard B ≤ 1 := by
+  rw [← Set.not_nontrivial_iff, not_iff_comm, not_le, ← Set.one_lt_ncard_iff_nontrivial]
 
 lemma Set.eq_top_iff_ncard {α : Type _} [Fintype α] (B : Set α) :
     B = ⊤ ↔ Set.ncard B = Fintype.card α := by
@@ -72,32 +70,69 @@ lemma Set.eq_top_iff_ncard {α : Type _} [Fintype α] (B : Set α) :
   · intro H
     exact Nat.add_left_cancel H.symm
 
-lemma Set.encard_add_eq_add_iff (s : Set α) (m n : ℕ) : 
-    s.encard + m = n + m ↔ s.encard = n := by
+lemma WithTop.add_eq_add_iff (c : ℕ∞) (m n : ℕ) :
+    c + m = n + m ↔ c = n := by
   rw [WithTop.add_right_cancel_iff]
   exact WithTop.coe_ne_top
 
-lemma Set.encard_add_one_eq_succ_iff (s : Set α) (n : ℕ) : 
-    s.encard + 1 = n.succ ↔ s.encard = n := by
-  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_eq_add_iff]
+-- lemma Set.encard_add_eq_add_iff (s : Set α) (m n : ℕ) : 
+--     s.encard + m = n + m ↔ s.encard = n := by
+--   rw [WithTop.add_right_cancel_iff]
+--   exact WithTop.coe_ne_top
 
-lemma Set.encard_add_coe_lt_add_iff (s : Set α) (m n : ℕ) : 
-    s.encard + m < n + m ↔ s.encard < n := by
+lemma WithTop.add_one_eq_coe_succ_iff (c : ℕ∞) (n : ℕ) :
+    c + 1 = n.succ ↔ c = n := by
+  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, WithTop.add_eq_add_iff]
+
+-- lemma Set.encard_add_one_eq_succ_iff (s : Set α) (n : ℕ) : 
+--     s.encard + 1 = n.succ ↔ s.encard = n := by
+--   rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_eq_add_iff]
+
+lemma WithTop.add_coe_lt_add_iff (c : ℕ∞) (m n : ℕ) : 
+    c + m < n + m ↔ c < n := by
   rw [WithTop.add_lt_add_iff_right]
   exact WithTop.coe_ne_top
 
-lemma Set.encard_add_one_lt_succ_iff (s : Set α) (n : ℕ) : 
-    s.encard + 1 < n.succ ↔ s.encard < n := by
-  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_coe_lt_add_iff]
+-- lemma Set.encard_add_coe_lt_add_iff (s : Set α) (m n : ℕ) : 
+--     s.encard + m < n + m ↔ s.encard < n := by
+--   rw [WithTop.add_lt_add_iff_right]
+--   exact WithTop.coe_ne_top
 
-lemma Set.encard_add_coe_le_add_iff (s : Set α) (m n : ℕ) : 
-    s.encard + m ≤ n + m ↔ s.encard ≤ n := by
+
+lemma WithTop.add_one_lt_coe_succ_iff (c : ℕ∞) (n : ℕ) : 
+    c + 1 < n.succ ↔ c < n := by
+  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, WithTop.add_coe_lt_add_iff]
+
+-- lemma Set.encard_add_one_lt_succ_iff (s : Set α) (n : ℕ) : 
+--     s.encard + 1 < n.succ ↔ s.encard < n := by
+--   rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_coe_lt_add_iff]
+
+lemma WithTop.add_coe_le_add_iff (c : ℕ∞) (m n : ℕ) : 
+    c + m ≤ n + m ↔ c ≤ n := by
   rw [WithTop.add_le_add_iff_right]
   exact WithTop.coe_ne_top
 
-lemma Set.encard_add_one_le_succ_iff (s : Set α) (n : ℕ) : 
-    s.encard + 1 ≤ n.succ ↔ s.encard ≤ n := by
-  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_coe_le_add_iff]
+-- lemma Set.encard_add_coe_le_add_iff (s : Set α) (m n : ℕ) : 
+--     s.encard + m ≤ n + m ↔ s.encard ≤ n := by
+--   rw [WithTop.add_le_add_iff_right]
+--   exact WithTop.coe_ne_top
+
+lemma WithTop.add_one_le_coe_succ_iff (c : ℕ∞) (n : ℕ) : 
+    c + 1 ≤ n.succ ↔ c ≤ n := by
+  rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, WithTop.add_coe_le_add_iff]
+
+-- lemma Set.encard_add_one_le_succ_iff (s : Set α) (n : ℕ) : 
+--     s.encard + 1 ≤ n.succ ↔ s.encard ≤ n := by
+--   rw [← Nat.cast_one, Nat.succ_eq_add_one, Nat.cast_add, Set.encard_add_coe_le_add_iff]
+
+lemma WithTop.coe_lt_iff_succ_le (n : ℕ) (c : ℕ∞) : n < c ↔ n.succ ≤ c := by
+  induction c using WithTop.recTopCoe with
+  | top =>
+    simp only [Nat.cast_succ, le_top, iff_true]
+    apply WithTop.coe_lt_top
+  | coe m => 
+    simp only [ENat.some_eq_coe, Nat.cast_lt, Nat.cast_le]
+    exact Nat.lt_iff_add_one_le
 
 open Function
 

@@ -76,7 +76,7 @@ theorem isPreprimitive_iff_is_one_preprimitive :
           (SubMulAction.of_fixingSubgroupEmpty_mapScalars_surjective M α)
           (SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective M α)]
       exact h
-      rw [← Set.encard_eq_zero, ← Nat.cast_zero, ← Set.encard_add_one_eq_succ_iff]
+      rw [← Set.encard_eq_zero, ← Nat.cast_zero, ← WithTop.add_one_eq_coe_succ_iff]
       exact hs
 
   · rintro ⟨_, h1'⟩
@@ -145,7 +145,7 @@ theorem stabilizer.isMultiplyPreprimitive
         rw [smul_set_encard_eq, hs]
 
       intro s hs has
-      rw [Set.encard_add_one_eq_succ_iff] at hs
+      rw [WithTop.add_one_eq_coe_succ_iff] at hs
       let t : Set (SubMulAction.ofStabilizer M a) := Subtype.val ⁻¹' s
       have hst : s = insert a (Subtype.val '' t) := by
         ext x
@@ -270,7 +270,7 @@ theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
   rw [hm]
   intro s hs
   apply IsMultiplyPretransitive.isPreprimitive_of_two
-  rw [add_comm _ m, Nat.cast_add, ← Nat.cast_one, Set.encard_add_eq_add_iff] at hs
+  rw [add_comm _ m, Nat.cast_add, ← Nat.cast_one, WithTop.add_eq_add_iff] at hs
   have : Finite s := by rw [Set.finite_coe_iff]; exact Set.finite_of_encard_eq_coe hs
   apply remaining_transitivity M α s h
   unfold Set.ncard

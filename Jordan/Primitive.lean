@@ -602,7 +602,7 @@ theorem isPreprimitive_of_prime [Fintype α] [hGX : IsPretransitive M α]
     suffices : Set.ncard B = 1 ∨ Set.ncard B = Fintype.card α
     cases' this with h h
     · exfalso
-      rw [Set.nontrivial_iff_not_ncard_le_one] at hB'
+      rw [← Set.one_lt_ncard_iff_nontrivial, ← not_le] at hB'
       exact hB' (le_of_eq h)
     · rw [Set.eq_top_iff_ncard]
       exact h

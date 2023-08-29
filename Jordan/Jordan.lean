@@ -208,7 +208,7 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
     have : Nontrivial (SubMulAction.ofStabilizer G a) := by
       apply Set.Nontrivial.coe_sort
       rw [← Set.one_lt_encard_iff_nontrivial]
-      rw [← not_le, ← Nat.cast_one, ← Set.encard_add_one_le_succ_iff, not_le]
+      rw [← not_le, ← Nat.cast_one, ← WithTop.add_one_le_coe_succ_iff, not_le]
       rw [← PartENat.withTopEquiv_lt, ← Set.encard_univ] at hsn'
       convert hsn'
       simp only [SetLike.coe_sort_coe, Nat.cast_succ, Nat.cast_one]
@@ -662,7 +662,7 @@ theorem isMultiplyPreprimitive_jordan
       exact hG.toIsPretransitive
     · intro t h
       simp only [Nat.zero_eq, Nat.cast_add, Nat.cast_one] at h 
-      rw [← Nat.cast_one, Set.encard_add_eq_add_iff, Nat.cast_one] at h
+      rw [← Nat.cast_one, WithTop.add_eq_add_iff, Nat.cast_one] at h
       obtain ⟨b, htb⟩ := Set.encard_eq_one.mp h
       obtain ⟨g, hg⟩ := exists_smul_eq G a b
       have hst : g • ({a} : Set α) = ({b} : Set α) := by

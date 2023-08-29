@@ -5,11 +5,12 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.alternating
 -/
-import Mathbin.Tactic.Group
-import Mathbin.GroupTheory.Solvable
-import Mathbin.GroupTheory.Subgroup.Basic
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Oneshot.ForMathlib.Commutators
+
+import Jordan.Mathlib.Commutators
+import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Solvable
+import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.GroupTheory.SpecificGroups.Alternating
 
 /-!
 * `three_cycle_is_commutator`, `three_cycle_mem_commutator` : every 3-cycle

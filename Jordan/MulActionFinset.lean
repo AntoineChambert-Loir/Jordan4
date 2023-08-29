@@ -22,34 +22,34 @@ open MulAction
 variable (α : Type*) [DecidableEq α] 
   (G : Type*) [Group G] [MulAction G α]
 
-def Nat.finset (n : ℕ) := {s : Finset α | s.card = n}
-#align nat.finset Nat.finset
+def Nat.Combination (n : ℕ) := {s : Finset α | s.card = n}
+#align nat.finset Nat.Combination
 
-theorem Nat.finset.def  {n : ℕ} (s : Nat.finset α n) : 
-    (s : Finset α).card = n :=
-  s.prop
-#align nat.finset.def Nat.finset.def
+-- theorem Nat.Combination.def  {n : ℕ} (s : n.Combination α) : 
+--     (s : Finset α).card = n :=
+--   s.prop
+-- #align nat.finset.def Nat.Combination.def
 
-theorem Nat.finset.mem_iff {n : ℕ} {s : Finset α} :
-    s ∈ Nat.finset α n ↔ s.card = n := by 
-  unfold Nat.finset
+theorem Nat.Combination.mem_iff {n : ℕ} {s : Finset α} :
+    s ∈ n.Combination α ↔ s.card = n := by 
+  unfold Combination
   simp only [Set.mem_setOf_eq]
-#align nat.finset_mem.def Nat.finset.mem_iff
+#align nat.finset_mem.def Nat.Combination.mem_iff
 
 variable {α G} 
 
-
-theorem Finset.smul_card_eq (s : Finset α) (g : G) : 
-  (s.map ⟨fun x => g • x, MulAction.injective g⟩).card = s.card := by
-  change (Finset.image (fun x => g • x) s).card = _
-  rw [Finset.card_image_of_injective]
-  exact MulAction.injective g
-#align finset.smul_card_eq Finset.smul_card_eq
+-- theorem Finset.smul_card_eq (s : Finset α) (g : G) : 
+--   (g • s).card = s.card := by
+--   simp only [card_smul_finset]
+-- #align finset.smul_card_eq Finset.smul_card_eq
 
 variable (n : ℕ)
 
-theorem is_eq_iff_is_le (s t : n.finset α) : s = t ↔ s ≤ t :=
-  by
+theorem Nat.Combination.eq_iff {n : ℕ} (s t : n.Combination α) : 
+    s = t ↔ (s : Finset α) = (t : Finset α) := Subtype.ext_iff
+  
+theorem Nat.Combination.eq_iff_finset_le {n : ℕ} (s t : n.Combination α) : 
+    s = t ↔ (s : Finset α) ≤ (t : Finset α) := by
   constructor
   · intro h
     rw [h]
@@ -57,122 +57,117 @@ theorem is_eq_iff_is_le (s t : n.finset α) : s = t ↔ s ≤ t :=
     rw [← Subtype.coe_inj]
     apply Finset.eq_of_subset_of_card_le h
     rw [s.prop, t.prop]
-#align is_eq_iff_is_le is_eq_iff_is_le
+#align is_eq_iff_is_le Nat.Combination.eq_iff_finset_le
 
 variable (α G)
 
-instance Nat.finset.SubMulAction : SubMulAction G (Finset α) where
-  carrier := n.finset α
+instance Nat.Combination.SubMulAction : SubMulAction G (Finset α) where
+  carrier := n.Combination α
   smul_mem' g s hs := by
-    rw [Nat.finset.mem_iff] at hs ⊢
+    rw [Nat.Combination.mem_iff] at hs ⊢
     rw [← hs]
-    rw [Finset.smul_card_eq]
-#align nat.finset.mul_action.finset' Nat.finset.SubMulAction
+    rw [Finset.card_smul_finset]
+#align nat.finset.mul_action.finset' Nat.Combination.SubMulAction
 
-instance Nat.finset.MulAction : MulAction G (n.finset α) := 
-  (Nat.finset.SubMulAction α G n).mulAction
-#align nat.finset.mul_action.finset Nat.finset.MulAction
+instance Nat.Combination.MulAction : MulAction G (n.Combination α) := 
+  (Nat.Combination.SubMulAction α G n).mulAction
+#align nat.finset.mul_action.finset Nat.Combination.MulAction
 
 variable {α G}
 
+-- Why does `Nat.Combination.mulAction_apply` doesn't work?
 @[simp]
-theorem Nat.finset.MulAction_apply {g : G} {s : Finset α} {hs : s ∈ n.Finset α} :
-    (g • (⟨s, hs⟩ : n.Finset α)) = g • s := by
+theorem Nat.combination_mulAction_apply 
+    {n : ℕ} {g : G} {s : Finset α} {hs : s ∈ n.Combination α} :
+    g • s = (g • (⟨s, hs⟩ : n.Combination α)) := by
   rfl
+#align nat.finset.mul_action.finset_apply Nat.combination_mulAction_apply
 
--- #align nat.finset.mul_action.finset_apply Nat.finset.MulAction_apply
 
 
 @[simp]
-theorem Nat.finset.MulAction.coe_apply' (g : G) (s : n.Finset α) : ↑(g • s) = g • (↑s : Finset α) :=
+theorem Nat.combination_mulAction.coe_apply' (g : G) (s : n.Combination α) : 
+    ↑(g • s) = g • (↑s : Finset α) :=
   rfl
-#align nat.finset.mul_action.coe_apply' Nat.finset.MulAction.coe_apply'
+#align nat.finset.mul_action.coe_apply' Nat.combination_mulAction.coe_apply'
 
-theorem smul_ne_iff_hasMem_not_mem {s t : n.Finset α} {g : G} :
-    g • s ≠ t ↔ ∃ (a : α) (ha : a ∈ (s : Finset α)), a ∉ g⁻¹ • (t : Finset α) :=
-  by
+theorem Nat.combination.smul_ne_iff_hasMem_not_mem {s t : n.Combination α} {g : G} :
+    g • s ≠ t ↔ ∃ a  ∈ (s : Finset α), a ∉ g⁻¹ • (t : Finset α) := by
+  simp only [ne_eq, exists_prop]
   rw [← Finset.not_subset]
-  rw [not_iff_comm]; rw [Classical.not_not]
-  rw [← Nat.finset.MulAction.finset_apply n]
-  rw [← Finset.le_eq_subset]
-  rw [Subtype.coe_le_coe]
-  simp only [Subtype.coe_eta]
-  rw [← is_eq_iff_is_le]
-  rw [smul_eq_iff_eq_inv_smul g]
-  exact t.prop
-#align smul_ne_iff_has_mem_not_mem smul_ne_iff_hasMem_not_mem
+  rw [not_iff_not]
+  rw [← Nat.combination_mulAction.coe_apply']
+  rw [Nat.Combination.eq_iff_finset_le]
+  simp only [Nat.combination_mulAction.coe_apply', Finset.le_eq_subset]
+  exact Finset.smul_finset_subset_iff
+#align smul_ne_iff_has_mem_not_mem Nat.combination.smul_ne_iff_hasMem_not_mem
 
-theorem Nat.finset.mulAction_faithful [Fintype α] (hn : 1 ≤ n) (hα : n < Fintype.card α)
-    -- (g : equiv.perm α)
-    {g : G}
-    (hg : (MulAction.toPerm g : Equiv.Perm α) ≠ 1) : ∃ s : n.Finset α, g • s ≠ s :=
-  by
+theorem Nat.combination.mulAction_faithful (hn : 1 ≤ n) (hα : n.succ ≤ PartENat.card α)
+      {g : G}
+      (hg : (MulAction.toPerm g : Equiv.Perm α) ≠ 1) : 
+      ∃ s : n.Combination α, g • s ≠ s := by
   --  mul_action.fixed_by (perm α) (action_on_pairs_of (perm α) α) g ≠ ⊤ :=
-  have : ∃ a : α, g • a ≠ a := by
-    by_contra
+  classical
+  have zob : ∃ (a : α), (g • a : α) ≠ a := by
+    by_contra h
     push_neg at h 
     apply hg
     ext a
     simpa only using h a
-  obtain ⟨a, ha⟩ := this
-  suffices : ∃ s : Finset α, s.card = n ∧ {a} ⊆ s ∧ s ⊆ {g • a}ᶜ
-  obtain ⟨s, hs, ha, ha'0⟩ := this
-  rw [Finset.singleton_subset_iff] at ha 
-  have ha' : g • a ∉ s := by
-    intro h
-    simpa only [Finset.mem_compl, Finset.mem_singleton, eq_self_iff_true, not_true] using ha'0 h
-  use ⟨s, hs⟩
+  obtain ⟨a, ha⟩ := zob
+  suffices : ∃ (s : Set α), s.encard = n ∧ a ∈ s ∧ g • a ∉ s
+  obtain ⟨s, hs, has, has'⟩ := this
+  have : Set.Finite s := Set.finite_of_encard_eq_coe hs
+  rw [Set.Finite.encard_eq_coe_toFinset_card this, cast_inj] at hs 
+  use ⟨Set.Finite.toFinset this, hs⟩
   · -- g • s ≠ s,
+    simp only [ne_eq]
+    rw [Nat.Combination.eq_iff, ← Finset.coe_inj, combination_mulAction.coe_apply', Finset.coe_smul_finset, Set.Finite.coe_toFinset]
     intro h
-    rw [← Subtype.coe_inj] at h 
-    change g • s = s at h 
-    suffices : a ∉ s
-    exact this ha
-    exfalso; apply ha'
+    apply has'
     rw [← h]
-    rw [Finset.mem_smul_finset]
-    use ⟨a, ha, rfl⟩
-  -- ∃ (s : finset α), s.card = n ∧ a ∈ s ∧ g • a ∉ s,
-  have hA : ({a} : Finset α) ⊆ {g • a}ᶜ :=
-    by
-    simp only [Finset.singleton_subset_iff, Finset.mem_compl, Finset.mem_singleton]
-    intro h; exact ha h.symm
-  obtain ⟨s, ha, ha', hs⟩ := Finset.exists_intermediate_set (n - 1) _ hA
+    exact Set.smul_mem_smul_set has
+
+  -- ∃ (s : Set α), s.encard = n ∧ a ∈ s ∧ g • a ∉ s,
+  have : ({a} : Set α) ⊆ {g • a}ᶜ := by
+    simp only [Set.subset_compl_singleton_iff, Set.mem_singleton_iff]
+    exact ha
+  have hα' : n ≤ Set.encard ({g • a}ᶜ) := by
+    rw [← not_lt, ← WithTop.add_one_lt_succ_iff, not_lt, add_comm, 
+      ← Set.encard_singleton (g • a), Set.encard_add_encard_compl, Set.encard_univ]
+    rw [← PartENat.withTopEquiv_natCast, PartENat.withTopEquiv_le]
+    exact hα
+  obtain ⟨s, has, has', hs⟩ := Set.exists_supset_subset_encard_eq this 
+    (by rw [Set.encard_singleton, ← Nat.cast_one, Nat.cast_le]
+        exact hn) hα'
   use s
   constructor
-  rw [hs, Finset.card_singleton]
-  rw [Nat.sub_add_cancel hn]
-  constructor; exact ha; exact ha'
-  -- n - 1 + {a}.card ≤ {g • a}ᶜ.card
-  simp only [Finset.card_singleton, Nat.sub_add_cancel hn, Finset.card_compl]
-  exact Nat.le_pred_of_lt hα
-#align nat.finset.mul_action_faithful Nat.finset.mulAction_faithful
+  · exact hs
+  · simp only [Set.singleton_subset_iff, Set.subset_compl_singleton_iff] at has has' 
+    exact ⟨has, has'⟩
+#align nat.finset.mul_action_faithful Nat.combination.mulAction_faithful
+
 
 example {s : Set α} {a : α} {g : G} : a ∉ g⁻¹ • s ↔ g • a ∈ sᶜ := by
   rw [Set.mem_smul_set_iff_inv_smul_mem]; rw [inv_inv]; rw [← Set.mem_compl_iff]
 
 example : MulAction G (Fin n ↪ α) := by infer_instance
 
-example : MulAction G (n.Finset α) := by infer_instance
+example : MulAction G (n.Combination α) := by infer_instance
 
 -- variable (α n)
 variable (α)
 
 variable (G)
 
-variable (n)
-
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-def EmbeddingToFinset.map : (Fin n ↪ α) →[G] n.Finset α
+def EmbeddingToFinset.map : (Fin n ↪ α) →ₑ[@id G] n.Combination α
     where
   toFun := fun f : Fin n ↪ α =>
-    ⟨Finset.univ.map f, by
-      change (finset.univ.map f).card = n
-      rw [Finset.card_map]
-      exact Finset.card_fin n⟩
+    ⟨Finset.univ.map f, by rw [Nat.Combination.mem_iff, Finset.card_map, Finset.card_fin]⟩
   map_smul' g f := by
     simp only [id.def]
-    rw [← Subtype.coe_inj, Subtype.coe_mk, Nat.finset.MulAction.finset_apply]
+    rw [← Subtype.coe_inj, Subtype.coe_mk] 
+    simp only [Nat.combination_mulAction.coe_apply']
     rw [Function.Embedding.smul_def]; rw [Finset.smul_finset_def]
     rw [← Finset.map_map]
     rw [Finset.map_eq_image]
@@ -184,32 +179,34 @@ theorem EmbeddingToFinset.map_def (f : Fin n ↪ α) :
   rfl
 #align embedding_to_finset.map_def EmbeddingToFinset.map_def
 
-theorem EmbeddingToFinset.map_surjective : Function.Surjective (EmbeddingToFinset.map α G n) :=
-  by
-  rintro ⟨s, hs⟩
-  have slc : s.to_list.length = n := by change s.card = n at hs ; rw [← hs];
-    exact Finset.length_toList s
-  use fun i => s.to_list.nth_le (↑i) (by rw [slc]; exact i.prop)
-  -- function.injective
-  rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
-  simp only [Fin.mk_eq_mk]
-  apply list.nodup_iff_nth_le_inj.mp s.nodup_to_list
-  exact hij
-  -- image of map = given finset set
-  ext
-  rw [EmbeddingToFinset.map]
-  simp only [EquivariantMap.coe_mk, Subtype.coe_mk, Finset.mem_map, Finset.mem_univ,
-    Function.Embedding.coeFn_mk, exists_true_left]
-  rw [← Finset.mem_toList, List.mem_iff_nthLe, Fin.exists_iff]
-  simp_rw [← slc]
+lemma Finset.exists_fin_enum (s : Finset α) (n : ℕ) (hsn : Finset.card s = n) : 
+    ∃ f : Fin n ↪ α, Finset.univ.map f = s := by
+  have slc : s.toList.length = n := by rw [← hsn, Finset.length_toList]
+  rw [← slc]
+  use ⟨s.toList.get, by rw [← List.nodup_iff_injective_get]; exact Finset.nodup_toList s⟩
+  ext  a
+  simp only [Finset.mem_map, Finset.mem_univ, true_and]
+  rw [← Finset.mem_toList, List.mem_iff_get]
   rfl
+  
+
+  
+theorem EmbeddingToFinset.map_surjective : 
+    Function.Surjective (EmbeddingToFinset.map α G n) := by
+  rintro ⟨s, hs⟩
+  -- have : Set.Finite (s : Set α) := Finset.finite_toSet s
+  rw [Nat.Combination.mem_iff] at hs
+  obtain ⟨f, hf⟩ := s.exists_fin_enum α n hs
+  use { toFun := f, inj' := f.injective }
+  simp only [Function.Embedding.mk_coe, Nat.Combination.eq_iff]
+  exact hf
 #align embedding_to_finset.map_surjective EmbeddingToFinset.map_surjective
 
 variable [Fintype α]
 
-theorem Nat.finset_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) : Nontrivial (n.Finset α) :=
-  by
-  suffices : Nonempty (n.finset α)
+theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
+    Nontrivial (n.Combination α) := by
+  suffices : Nonempty (n.Combination α)
   obtain ⟨s, hs⟩ := this
   change s.card = n at hs 
   let h'1 := id h1
@@ -221,16 +218,23 @@ theorem Nat.finset_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) : Nontrivi
   let t : Finset α := insert b (Finset.erase s a)
   rw [nontrivial_iff]
   use ⟨s, hs⟩
-  use t
-  change t.card = n
-  rw [Finset.card_insert_of_not_mem]
-  rw [Finset.card_erase_of_mem ha]
-  rw [hs]; rw [Nat.sub_add_cancel]; exact h1
-  intro h; apply hb; apply Finset.erase_subset; exact h
-  intro h; rw [Subtype.mk_eq_mk] at h ; apply hb; rw [h]; exact Finset.mem_insert_self b _
-  obtain ⟨s, hs, hs'⟩ := Finset.exists_smaller_set Finset.univ n _
-  use ⟨s, hs'⟩; infer_instance; exact le_of_lt h2
-#align nat.finset_nontrivial Nat.finset_nontrivial
+  use ⟨t, by 
+    rw [Nat.Combination.mem_iff]
+    rw [Finset.card_insert_of_not_mem]
+    rw [Finset.card_erase_of_mem ha]
+    rw [hs]; rw [Nat.sub_add_cancel]; exact h1
+    intro h; apply hb; apply Finset.erase_subset; exact h⟩
+  intro h
+  rw [Subtype.mk_eq_mk] at h
+  apply hb
+  rw [h]
+  exact Finset.mem_insert_self b _
+
+  obtain ⟨s, _, hs'⟩ := Finset.exists_smaller_set (Finset.univ : Finset α) n 
+    (le_of_lt h2)
+  use s
+  exact hs'
+#align nat.finset_nontrivial Nat.Combination_nontrivial
 
 theorem Nat.finset_isPretransitive_of_multiply_pretransitive {G : Type _} [Group G] [MulAction G α]
     (h : IsMultiplyPretransitive G α n) : IsPretransitive G (n.Finset α) :=
