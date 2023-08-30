@@ -553,18 +553,6 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
         exact h1
       simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
   -- Conclusion of the proof : B = ⊤
-  sorry
-
-
-
-theorem Equiv.Perm.extracted_1.{u_1} {α : Type u_1} [inst : DecidableEq α] (s : Set α) (h0 : Set.Nonempty s) [Fintype α]
-    (h1 : Set.Nonempty sᶜ) (hα : Set.ncard s < Set.ncard sᶜ) (G : Subgroup (Perm α)) (hG : stabilizer (Perm α) s < G)
-    (g : Perm α) (hg_swap : IsSwap g) (hg : g ∈ G) (this : IsPretransitive { x // x ∈ G } α)
-    (hB_ne_sc : ∀ (B : Set α), IsBlock { x // x ∈ G } B → ¬B = sᶜ)
-    (hB_not_le_sc : ∀ (B : Set α), IsBlock { x // x ∈ G } B → B ⊆ sᶜ → Set.Subsingleton B)
-    (hB_not_le_s : ∀ (B : Set α), IsBlock { x // x ∈ G } B → B ⊆ s → Set.Subsingleton B) {B : Set α}
-    (hB : IsBlock { x // x ∈ G } B) (hB' : ¬Set.Subsingleton B) (a : α) (ha : a ∈ B) (ha' : a ∈ s) (b : α) (hb : b ∈ B)
-    (hb' : b ∈ sᶜ) (hsc_le_B : sᶜ ⊆ B) : B = ⊤ := by 
   rw [eq_top_iff]
   intro x _
   obtain ⟨b, hb⟩ := h1
