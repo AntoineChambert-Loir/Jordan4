@@ -17,14 +17,14 @@ import Mathlib.Data.Finset.Pointwise
 
 # Various lemmas on stabilizers of sets
 
-* `stabilizer_compl` : the stabilizer of the complement is the stabilizer of the set.
+* `MulAction.stabilizer_compl` : the stabilizer of the complement is the stabilizer of the set.
 
-* `le_stabilizer_iff` : proves inclusion of a *subgroup* `H` in `stabilizer G s`
+* `MulAction.le_stabilizer_iff_smul_le` : proves inclusion of a *subgroup* `H` in `stabilizer G s`
 from inclusions `g • s ⊆ s`  for all `g ∈ H`.
 
 # Instances
 
-* `mul_action.of_stabilizer G s`: the action of `stabilizer G s` on `s`.
+* `MulAction.ofStabilizer G s`: the action of `stabilizer G s` on `s`.
 
 ## TODO
 
