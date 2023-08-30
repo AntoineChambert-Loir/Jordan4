@@ -206,6 +206,8 @@ theorem stabilizer_univ_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G
   simp only [Set.smul_set_univ]
 #align equiv.perm.stabilizer_univ_eq_top Equiv.Perm.stabilizer_univ_eq_top
 
+example : ↑(Nat.card α) ≤ PartENat.card α := by
+  simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
 theorem stabilizer_nonempty_ne_top (α : Type _) (s : Set α) (hs : s.Nonempty) (hs' : sᶜ.Nonempty) :
     stabilizer (Equiv.Perm α) s ≠ ⊤ :=
   by
@@ -225,8 +227,8 @@ theorem stabilizer_nonempty_ne_top (α : Type _) (s : Set α) (hs : s.Nonempty) 
 theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     (hG : stabilizer (Equiv.Perm α) s < G) : 
     ∃ g : Equiv.Perm α, g.IsSwap ∧ g ∈ G := by
-  have : ∀ (t : Set α) (ht : 1 < t.ncard),
-    ∃ (g : Equiv.Perm α), g.IsSwap ∧ g ∈ stabilizer (Equiv.Perm α) t := by
+  have : ∀ (t : Set α) (_ : 1 < t.ncard), ∃ (g : Equiv.Perm α), 
+      g.IsSwap ∧ g ∈ stabilizer (Equiv.Perm α) t := by
     intro t ht
     rw [Set.one_lt_ncard_iff] at ht
     obtain ⟨a, b, ha, hb, h⟩ := ht
@@ -235,41 +237,32 @@ theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     constructor
     rw [swap_isSwap_iff]; exact h
     apply swap_mem_stabilizer ha hb
-  have hs : s.Nonempty := by
-    by_contra h
-    rw [Set.not_nonempty_iff_eq_empty] at h 
-    apply ne_top_of_lt hG
-    rw [h]
-    apply stabilizer_empty_eq_top
-  have hsc : sᶜ.Nonempty := by
-    by_contra h
-    rw [Set.not_nonempty_iff_eq_empty] at h 
-    apply ne_top_of_lt hG
-    rw [← stabilizer_compl]; rw [h]
-    apply stabilizer_empty_eq_top
   cases' lt_or_le 1 (s.ncard) with h1 h1'
   · obtain ⟨g, hg, hg'⟩ := this s h1
     use g; apply And.intro hg
     exact le_of_lt hG hg'
   cases' lt_or_le 1 sᶜ.ncard with h1c h1c'
-  · obtain ⟨g, hg, hg'⟩ := this (sᶜ) (by sorry)
+  · obtain ⟨g, hg, hg'⟩ := this sᶜ h1c
     use g; apply And.intro hg
     rw [stabilizer_compl] at hg'
     exact le_of_lt hG hg'
-  have hs1 : s.ncard = 1 := by
-    apply le_antisymm h1'
-    rw [Nat.succ_le_iff, Set.ncard_pos]
-    exact hs
-  have hsc1 : sᶜ.ncard = 1 := by
-    apply le_antisymm
-    convert h1c'
-    change 0 < _
-    rw [Set.ncard_pos]
-    exact hsc
-  have hα : Fintype.card α = 2 := by 
-    rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s, hs1, hsc1]
+  have hα : Nat.card α = 2 := by 
+    rw [← Set.ncard_add_ncard_compl s] -- , hs1, hsc1]
+    convert Nat.one_add 1
+    · apply le_antisymm
+      assumption
+      rw [Nat.succ_le_iff, Set.ncard_pos, Set.nonempty_iff_ne_empty]
+      intro h
+      apply ne_top_of_lt hG
+      rw [h, stabilizer_empty_eq_top]
+    · apply le_antisymm
+      assumption
+      rw [Nat.succ_le_iff, Set.ncard_pos, Set.nonempty_iff_ne_empty]
+      intro h
+      apply ne_top_of_lt hG
+      rw [← stabilizer_compl, h, stabilizer_empty_eq_top] 
   cases subgroup_of_group_of_order_two (by 
-    rw [Fintype.card_perm, hα]
+    rw [Fintype.card_perm, ← Nat.card_eq_fintype_card, hα]
     simp) G with
   | inl h => 
     exfalso; exact ne_bot_of_gt hG h
@@ -277,12 +270,12 @@ theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     rw [h]
     rw [← stabilizer_univ_eq_top (Equiv.Perm α) α]
     apply this
-    rw [Set.ncard_univ, ← Set.ncard_add_ncard_compl s, hs1, hsc1]
+    rw [Set.ncard_univ, hα]
     norm_num
 #align equiv.perm.has_swap_of_lt_stabilizer Equiv.Perm.has_swap_of_lt_stabilizer
 
 theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
-    (hα : Fintype.card s < Fintype.card (sᶜ : Set α)) :
+    (hα : s.ncard < sᶜ.ncard) :
     Subgroup.IsMaximal (stabilizer (Equiv.Perm α) s) :=
   by
   constructor; constructor
@@ -296,9 +289,9 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
   -- By Jordan's theorem, it suffices to prove that G acts primitively
   apply jordan_swap _ g hg_swap hg
   -- G acts transitively
-  have : is_pretransitive G α :=
+  have : IsPretransitive G α :=
     by
-    apply is_pretransitive.of_partition G s
+    apply Equiv.Perm.IsPretransitive.of_partition G s
     · apply moves_in; exact hG
     · apply moves_in; rw [stabilizer_compl]; exact hG
     · intro h
@@ -310,7 +303,8 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       change (⟨g, hg⟩ : ↥G) • s = s
       rw [← mem_stabilizer_iff]
       change _ ∈ stabilizer (↥G) s
-      rw [h]; exact Subgroup.mem_top ⟨g, hg⟩
+      rw [h]
+      trivial
   apply IsPreprimitive.mk
   -- The proof needs 4 steps 
   /- Step 1 : No block is equal to sᶜ
@@ -318,73 +312,74 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
        In the equality case, fintype.card s = fintype.card sᶜ, it is possible that B = sᶜ,
        then G is the wreath product,
        this is case (b) of the O'Nan-Scott classification of max'l subgroups of the symmetric group -/
-  have hB_ne_sc : ∀ (B : Set α) (hB : is_block G B), ¬B = sᶜ :=
-    by
+  have hB_ne_sc : ∀ (B : Set α) (hB : IsBlock G B), ¬B = sᶜ := by
     intro B hB hBsc
     obtain ⟨b, hb⟩ := h1; rw [← hBsc] at hb 
     obtain ⟨a, ha⟩ := h0
     obtain ⟨k, hk⟩ := exists_smul_eq G b a
-    suffices Fintype.card (B : Set α) ≤ Fintype.card s
-      by
-      apply Nat.lt_irrefl (Fintype.card B)
+    suffices B.ncard ≤ s.ncard by
+      apply Nat.lt_irrefl B.ncard
       apply lt_of_le_of_lt this
-      simp_rw [hBsc]; exact hα
-    rw [← card_smul_eq B k]
-    apply Set.card_le_of_subset
+      rw [hBsc]
+      exact hα
+    rw [← smul_set_ncard_eq k B]
+    apply Set.ncard_le_of_subset _ (Set.toFinite s)
     change k • B ⊆ s
     rw [← Set.disjoint_compl_right_iff_subset, ← hBsc]
-    apply or_iff_not_imp_left.mp (is_block.def_one.mp hB k)
+    apply or_iff_not_imp_left.mp (IsBlock.def_one.mp hB k)
     intro h
     apply Set.not_mem_empty a
     rw [← Set.inter_compl_self s]
     constructor
     exact ha
-    rw [← hk, ← hBsc, ← h, Set.smul_mem_smul_set_iff]; exact hb
+    rw [← hk, ← hBsc, ← h, Set.smul_mem_smul_set_iff]
+    exact hb
   -- Step 2 : A block contained in sᶜ is a subsingleton
-  have hB_not_le_sc : ∀ (B : Set α) (hB : is_block G B) (hBsc : B ⊆ sᶜ), B.Subsingleton :=
-    by
+  have hB_not_le_sc : ∀ (B : Set α) (hB : IsBlock G B) (hBsc : B ⊆ sᶜ), B.Subsingleton := by
     intro B hB hBsc
-    suffices : B = coe '' (coe ⁻¹' B : Set (sᶜ : Set α))
+    suffices : B = Subtype.val '' (Subtype.val ⁻¹' B : Set (sᶜ : Set α))
     rw [this]
     apply Set.Subsingleton.image
-    suffices : is_trivial_block (coe ⁻¹' B : Set (sᶜ : Set α))
+    suffices : IsTrivialBlock (Subtype.val ⁻¹' B : Set (sᶜ : Set α))
     apply Or.resolve_right this
     intro hB'
     apply hB_ne_sc B hB
     apply Set.Subset.antisymm hBsc
     intro x hx
-    rw [← Subtype.coe_mk x hx, ← Set.mem_preimage]
-    rw [hB', Set.top_eq_univ]; apply Set.mem_univ
-    · -- is_trivial_block (coe ⁻¹' B : set (sᶜ : set α)),
+    rw [← Subtype.coe_mk x _, ← Set.mem_preimage, hB', Set.top_eq_univ]
+    apply Set.mem_univ
+    exact hx
+    · -- IsTrivialBlock (Subtype.val ⁻¹' B : Set (sᶜ : Set α)),
       suffices : IsPreprimitive (stabilizer G (sᶜ : Set α)) (sᶜ : Set α)
       refine' IsPreprimitive.has_trivial_blocks this _
       -- is_block (coe ⁻¹' B : set (sᶜ : set α))
-      let φ' : stabilizer G (sᶜ : Set α) → G := coe
+      let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α :=
-        { toFun := coe
+        { toFun := Subtype.val
           map_smul' := fun ⟨m, hm⟩ x => by
-            simp only [φ', has_smul.smul_stabilizer_def, Subgroup.coe_mk] }
-      apply MulAction.isBlock_preimage f' hB
+            simp only [HasSmul.smul_stabilizer_def] }
+      apply MulAction.IsBlock_preimage f' hB
       -- is_preprimitive (stabilizer G (sᶜ : set α)) (sᶜ : set α)
       let φ : stabilizer G (sᶜ : Set α) → Equiv.Perm (sᶜ : Set α) := MulAction.toPerm
       let f : (sᶜ : Set α) →ₑ[φ] (sᶜ : Set α) :=
         { toFun := id
-          map_smul' := fun g x => by simp only [id.def, Equiv.Perm.smul_def, to_perm_apply] }
+          map_smul' := fun g x => by simp only [id.def, Equiv.Perm.smul_def, toPerm_apply] }
       have hf : Function.Bijective f := Function.bijective_id
       rw [isPreprimitive_of_bijective_map_iff _ hf]
-      exact equiv.perm.is_preprimitive ↥(sᶜ)
-      -- function.surjective φ,
+      apply Equiv.Perm.isPreprimitive 
+      -- Function.Surjective φ,
       -- will need to adjust for alternating_group
       intro g
-      suffices : Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) (sᶜ)
-      use Equiv.Perm.ofSubtype g
+      suffices hg : ofSubtype g ∈ stabilizer (Perm α) sᶜ 
+--      rw [Set.coe_eq_subtype] at g
+      use! Equiv.Perm.ofSubtype g
       · apply le_of_lt hG
         rw [← stabilizer_compl]
-        exact this
+        exact hg
       · rw [mem_stabilizer_iff]
         change Equiv.Perm.ofSubtype g • sᶜ = sᶜ
         rw [← mem_stabilizer_iff]
-        exact this
+        exact hg
       · ext ⟨x, hx⟩
         change Equiv.Perm.ofSubtype g • x = _
         simp only [Equiv.Perm.smul_def]
@@ -409,13 +404,12 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       intro x hx
       use ⟨x, hBsc hx⟩
       simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
-      exact Set.image_preimage_subset coe B
+      exact Set.image_preimage_subset Subtype.val B
   -- Step 3 : A block contained in s is a subsingleton
-  have hB_not_le_s : ∀ (B : Set α) (hB : is_block G B), B ⊆ s → B.Subsingleton :=
-    by
+  have hB_not_le_s : ∀ (B : Set α) (hB : IsBlock G B), B ⊆ s → B.Subsingleton := by
     intro B hB hBs
-    suffices hB_coe : B = coe '' (coe ⁻¹' B : Set ↥s)
-    suffices : is_trivial_block (coe ⁻¹' B : Set s)
+    suffices hB_coe : B = Subtype.val '' (Subtype.val ⁻¹' B : Set s)
+    suffices : IsTrivialBlock (Subtype.val ⁻¹' B : Set s)
     cases' this with hB' hB'
     · -- trivial case
       rw [hB_coe]
@@ -425,20 +419,21 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       have hBs' : B = s := by
         apply Set.Subset.antisymm hBs
         intro x hx
-        rw [← Subtype.coe_mk x hx]
+        rw [← Subtype.coe_mk x _]
         rw [← Set.mem_preimage]
         rw [hB']
         rw [Set.top_eq_univ]
         apply Set.mem_univ
+        exact hx
       have : ∃ g' ∈ G, g' • s ≠ s := by
-        by_contra
+        by_contra h
         apply ne_of_lt hG
         push_neg at h 
         apply le_antisymm
         exact le_of_lt hG
         intro g' hg'; rw [mem_stabilizer_iff]; exact h g' hg'
       obtain ⟨g', hg', hg's⟩ := this
-      cases' is_block.def_one.mp hB ⟨g', hg'⟩ with h h
+      cases' IsBlock.def_one.mp hB ⟨g', hg'⟩ with h h
       · -- case g' • B = B : absurd, since B = s and choice of g'
         exfalso
         apply hg's; rw [← hBs']; exact h
@@ -448,42 +443,41 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
         apply Function.Bijective.injective
         apply MulAction.bijective
         apply hB_not_le_sc ((⟨g', hg'⟩ : G) • B)
-        exact is_block_of_block _ hB
+        exact IsBlock_of_block _ hB
         rw [← hBs']
         apply Disjoint.subset_compl_right
         exact h
     -- is_trivial_block (coe ⁻¹' B : set s),
-    suffices : IsPreprimitive (stabilizer G s) (s : Set α)
+    suffices : IsPreprimitive (stabilizer G s) s
     refine' IsPreprimitive.has_trivial_blocks this _
     -- is_block (coe ⁻¹' B : set s)
-    let φ' : stabilizer G s → G := coe
+    let φ' : stabilizer G s → G := Subtype.val
     let f' : s →ₑ[φ'] α :=
-      { toFun := coe
-        map_smul' := fun ⟨m, hm⟩ x => by simp only [φ', has_smul.smul_stabilizer_def] }
-    apply MulAction.isBlock_preimage f' hB
+      { toFun := Subtype.val
+        map_smul' := fun ⟨m, hm⟩ x => by 
+          simp only [HasSmul.smul_stabilizer_def] }
+    apply MulAction.IsBlock_preimage f' hB
     -- is_preprimitive (stabilizer G s) s
     let φ : stabilizer G s → Equiv.Perm s := MulAction.toPerm
     let f : s →ₑ[φ] s :=
       { toFun := id
-        map_smul' := fun g x => by simp only [id.def, Equiv.Perm.smul_def, to_perm_apply] }
+        map_smul' := fun g x => by simp only [id.def, Equiv.Perm.smul_def, toPerm_apply] }
     have hf : Function.Bijective f := Function.bijective_id
     rw [isPreprimitive_of_bijective_map_iff _ hf]
-    exact equiv.perm.is_preprimitive s
+    apply Equiv.Perm.isPreprimitive
     -- function.surjective φ,
     -- will need to adjust for alternating_group
     intro g
-    suffices : Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s
-    use Equiv.Perm.ofSubtype g
-    · apply le_of_lt hG; exact this
-    · rw [mem_stabilizer_iff]
-      change Equiv.Perm.ofSubtype g • s = s
-      rw [← mem_stabilizer_iff]
-      exact this
+    suffices hg : Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s
+    use! Equiv.Perm.ofSubtype g
+    · apply le_of_lt hG 
+      exact hg
+    · exact hg
     · ext ⟨x, hx⟩
       change Equiv.Perm.ofSubtype g • x = _
       simp only [Equiv.Perm.smul_def]
       rw [Equiv.Perm.ofSubtype_apply_of_mem]
-    · -- equiv.perm.of_subtype g ∈ stabilizer (equiv.perm α) s
+    · -- equiv.perm.of_subtype g ∈ stabilizer (equiv.perm α) sz
       rw [mem_stabilizer_iff]
       apply Set.Subset.antisymm
       · intro x
@@ -503,16 +497,16 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       intro x hx
       use ⟨x, hBs hx⟩
       simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
-      exact Set.image_preimage_subset coe B
+      exact Set.image_preimage_subset Subtype.val B
   intro B hB
-  unfold is_trivial_block
+  unfold IsTrivialBlock
   rw [or_iff_not_imp_left]
   intro hB'
   obtain ⟨a, ha, ha'⟩ :=
-    set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_sc B hB) h)
+    Set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_sc B hB) h)
   rw [Set.not_mem_compl_iff] at ha' 
   obtain ⟨b, hb, hb'⟩ :=
-    set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_s B hB) h)
+    Set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_s B hB) h)
   rw [← Set.mem_compl_iff] at hb' 
   have hsc_le_B : sᶜ ⊆ B := by
     intro x hx'
@@ -522,7 +516,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     rw [← hkbx, ← this, Set.smul_mem_smul_set_iff]
     exact hb
     · -- k • B = B,
-      apply or_iff_not_imp_right.mp (is_block.def_one.mp hB ⟨k, _⟩)
+      apply or_iff_not_imp_right.mp (IsBlock.def_one.mp hB ⟨k, _⟩)
       · rw [Set.not_disjoint_iff_nonempty_inter]
         change (k • B ∩ B).Nonempty
         use a
@@ -531,14 +525,13 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
         rw [← hk a ha']
         exact Set.smul_mem_smul_set ha
         exact ha
-      · -- ↑k ∈ G
-        apply le_of_lt hG
-        exact fixing_subgroup_le_stabilizer (Equiv.Perm α) s hk
+        · -- ↑k ∈ G
+          apply le_of_lt hG
+          exact fixingSubgroup_le_stabilizer (Equiv.Perm α) s hk
     · -- ∃ (k : fixing_subgroup (equiv.perm α) s), k • b = x,
       suffices :
-        is_pretransitive (fixingSubgroup (Equiv.Perm α) s)
+        IsPretransitive (fixingSubgroup (Equiv.Perm α) s)
           (SubMulAction.ofFixingSubgroup (Equiv.Perm α) s)
-      skip
       obtain ⟨k, hk⟩ :=
         exists_smul_eq (fixingSubgroup (Equiv.Perm α) s)
           (⟨b, hb'⟩ : SubMulAction.ofFixingSubgroup (Equiv.Perm α) s) ⟨x, hx'⟩
@@ -546,18 +539,32 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       rw [← Subtype.coe_inj, SubMulAction.val_smul] at hk 
       exact hk
       -- is_pretransitive …
-      rw [is_pretransitive_iff_is_one_pretransitive]
+      rw [isPretransitive_iff_is_one_pretransitive]
       apply remaining_transitivity'
-      simp only [PartENat.card_eq_coe_fintype_card]
+      exact Equiv.Perm.isMultiplyPretransitive α (Nat.card α)
+      -- simp only [PartENat.card_eq_coe_fintype_card]
       · rw [add_comm]
-        rw [← Fintype.card_add_compl s]
+        rw [← Set.ncard_add_ncard_compl s]
         simp only [add_le_add_iff_left]
-        change 0 < _
-        rw [Fintype.card_pos_iff]
-        simp only [Set.nonempty_coe_sort]
+        rw [Nat.succ_le_iff, Set.ncard_pos]
+        -- change 0 < _
+        -- rw [Fintype.card_pos_iff]
+        -- simp only [Set.nonempty_coe_sort]
         exact h1
-      exact equiv_perm_is_fully_pretransitive α
+      simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
   -- Conclusion of the proof : B = ⊤
+  sorry
+
+
+
+theorem Equiv.Perm.extracted_1.{u_1} {α : Type u_1} [inst : DecidableEq α] (s : Set α) (h0 : Set.Nonempty s) [Fintype α]
+    (h1 : Set.Nonempty sᶜ) (hα : Set.ncard s < Set.ncard sᶜ) (G : Subgroup (Perm α)) (hG : stabilizer (Perm α) s < G)
+    (g : Perm α) (hg_swap : IsSwap g) (hg : g ∈ G) (this : IsPretransitive { x // x ∈ G } α)
+    (hB_ne_sc : ∀ (B : Set α), IsBlock { x // x ∈ G } B → ¬B = sᶜ)
+    (hB_not_le_sc : ∀ (B : Set α), IsBlock { x // x ∈ G } B → B ⊆ sᶜ → Set.Subsingleton B)
+    (hB_not_le_s : ∀ (B : Set α), IsBlock { x // x ∈ G } B → B ⊆ s → Set.Subsingleton B) {B : Set α}
+    (hB : IsBlock { x // x ∈ G } B) (hB' : ¬Set.Subsingleton B) (a : α) (ha : a ∈ B) (ha' : a ∈ s) (b : α) (hb : b ∈ B)
+    (hb' : b ∈ sᶜ) (hsc_le_B : sᶜ ⊆ B) : B = ⊤ := by 
   rw [eq_top_iff]
   intro x _
   obtain ⟨b, hb⟩ := h1
@@ -566,29 +573,24 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     rw [← hgbx, ← this, Set.smul_mem_smul_set_iff]
     exact hsc_le_B hb
   -- g • B = B,
-  apply or_iff_not_imp_right.mp (is_block.def_one.mp hB ⟨g, hg⟩)
+  apply or_iff_not_imp_right.mp (IsBlock.def_one.mp hB ⟨g, hg⟩)
   rw [Set.not_disjoint_iff_nonempty_inter]
   change (g • B ∩ B).Nonempty
-  apply aux_pigeonhole
+  apply Set.ncard_pigeonhole
   -- card B + card (g • B) = card B + card B
   -- ... ≥ card sᶜ + card sᶜ
   -- ... > card s + card s ᶜ = card α
-  rw [← Fintype.card_add_compl s]
+  rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
+--   rw [← Fintype.card_add_compl s]
   apply Nat.lt_of_lt_of_le
-  · apply Nat.add_lt_add_right _ (Fintype.card (sᶜ : Set α))
-    use Fintype.card (sᶜ : Set α)
-    exact hα
-  apply Nat.add_le_add
-  · apply le_trans (Set.card_le_of_subset hsc_le_B)
-    apply le_of_eq
-    rw [← Set.coe_toFinset B]
-    simp only [← Set.toFinset_card]
-    change _ = ((fun x => g • x) '' ↑B.to_finset).toFinset.card
-    simp_rw [← Finset.coe_image]
-    simp only [Finset.toFinset_coe]
-    rw [Finset.card_image_of_injective _ (MulAction.injective g)]
-  exact Set.card_le_of_subset hsc_le_B
+  rw [Nat.add_lt_add_iff_right _ _ sᶜ.ncard]
+  exact hα
+  rw [MulAction.smul_set_ncard_eq] 
+  simp only [← two_mul]
+  apply Nat.mul_le_mul_left
+  exact Set.ncard_le_of_subset hsc_le_B (Set.toFinite B) 
 #align equiv.perm.is_maximal_stab' Equiv.Perm.isMaximalStab'
+
 
 /-- stabilizer (equiv.perm α) s is a maximal subgroup of equiv.perm α,
 provided s ≠ ⊥, s ≠ ⊤ and fintype.card α ≠ 2 * fintype.card ↥s) -/
