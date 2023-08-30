@@ -12,17 +12,17 @@ variable {G : Type _} [Group G]
 
 open Subgroup
 
-theorem mem_commutatorSet_of_isConj_sq {G : Type _} [Group G] {g : G} (hg : IsConj g (g ^ 2)) :
+theorem mem_commutatorSet_of_isConj_sq 
+    {G : Type _} [Group G] {g : G} (hg : IsConj g (g ^ 2)) :
     g ∈ commutatorSet G := by
-  obtain ⟨h, hg⟩ := hg; rw [SemiconjBy] at hg 
+  obtain ⟨h, hg⟩ := hg
   use ↑h; use g
   rw [commutatorElement_def, hg]
   simp only [IsUnit.mul_inv_cancel_right, Units.isUnit, mul_inv_eq_iff_eq_mul, pow_two]
 #align mem_commutator_set_of_is_conj_sq mem_commutatorSet_of_isConj_sq
 
 theorem Subgroup.map_top_eq_range {G H : Type _} [Group H] [Group G] (f : H →* G) :
-    Subgroup.map f ⊤ = f.range :=
-  by
+    Subgroup.map f ⊤ = f.range := by
   suffices : (map f ⊤ : Set G) = (f.range : Set G)
   refine' SetLike.ext' this
   simp only [coe_map, coe_top, Set.image_univ, MonoidHom.coe_range]
