@@ -312,7 +312,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
        In the equality case, fintype.card s = fintype.card sᶜ, it is possible that B = sᶜ,
        then G is the wreath product,
        this is case (b) of the O'Nan-Scott classification of max'l subgroups of the symmetric group -/
-  have hB_ne_sc : ∀ (B : Set α) (hB : IsBlock G B), ¬B = sᶜ := by
+  have hB_ne_sc : ∀ (B : Set α) (_ : IsBlock G B), ¬B = sᶜ := by
     intro B hB hBsc
     obtain ⟨b, hb⟩ := h1; rw [← hBsc] at hb 
     obtain ⟨a, ha⟩ := h0
@@ -335,7 +335,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     rw [← hk, ← hBsc, ← h, Set.smul_mem_smul_set_iff]
     exact hb
   -- Step 2 : A block contained in sᶜ is a subsingleton
-  have hB_not_le_sc : ∀ (B : Set α) (hB : IsBlock G B) (hBsc : B ⊆ sᶜ), B.Subsingleton := by
+  have hB_not_le_sc : ∀ (B : Set α) (_ : IsBlock G B) (_ : B ⊆ sᶜ), B.Subsingleton := by
     intro B hB hBsc
     suffices : B = Subtype.val '' (Subtype.val ⁻¹' B : Set (sᶜ : Set α))
     rw [this]
@@ -356,7 +356,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α :=
         { toFun := Subtype.val
-          map_smul' := fun ⟨m, hm⟩ x => by
+          map_smul' := fun ⟨m, _⟩ x => by
             simp only [HasSmul.smul_stabilizer_def] }
       apply MulAction.IsBlock_preimage f' hB
       -- is_preprimitive (stabilizer G (sᶜ : set α)) (sᶜ : set α)
@@ -406,7 +406,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
       exact Set.image_preimage_subset Subtype.val B
   -- Step 3 : A block contained in s is a subsingleton
-  have hB_not_le_s : ∀ (B : Set α) (hB : IsBlock G B), B ⊆ s → B.Subsingleton := by
+  have hB_not_le_s : ∀ (B : Set α) (_ : IsBlock G B), B ⊆ s → B.Subsingleton := by
     intro B hB hBs
     suffices hB_coe : B = Subtype.val '' (Subtype.val ⁻¹' B : Set s)
     suffices : IsTrivialBlock (Subtype.val ⁻¹' B : Set s)
@@ -454,7 +454,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     let φ' : stabilizer G s → G := Subtype.val
     let f' : s →ₑ[φ'] α :=
       { toFun := Subtype.val
-        map_smul' := fun ⟨m, hm⟩ x => by 
+        map_smul' := fun ⟨m, _⟩ x => by 
           simp only [HasSmul.smul_stabilizer_def] }
     apply MulAction.IsBlock_preimage f' hB
     -- is_preprimitive (stabilizer G s) s
@@ -583,19 +583,18 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
 /-- stabilizer (equiv.perm α) s is a maximal subgroup of equiv.perm α,
 provided s ≠ ⊥, s ≠ ⊤ and fintype.card α ≠ 2 * fintype.card ↥s) -/
 theorem isMaximalStab (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
-    (hα : Fintype.card α ≠ 2 * Fintype.card ↥s) :
-    Subgroup.IsMaximal (stabilizer (Equiv.Perm α) s) :=
-  by
-  cases' Nat.lt_trichotomy (Fintype.card s) (Fintype.card (sᶜ : Set α)) with hs hs'
+    (hα : Fintype.card α ≠ 2 * s.ncard) :
+    Subgroup.IsMaximal (stabilizer (Equiv.Perm α) s) := by
+  cases' Nat.lt_trichotomy s.ncard sᶜ.ncard with hs hs'
   · exact Equiv.Perm.isMaximalStab' s h0 h1 hs
   cases' hs' with hs hs
   · exfalso; apply hα
-    rw [← Fintype.card_add_compl s, ← hs, ← two_mul]
+    rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s, two_mul, ← hs]
   · rw [← compl_compl s] at h0 
     rw [← stabilizer_compl]
     apply Equiv.Perm.isMaximalStab' (sᶜ) h1 h0
-    simp_rw [compl_compl s]
-    convert hs
+    rw [compl_compl]
+    exact hs
 #align equiv.perm.is_maximal_stab Equiv.Perm.isMaximalStab
 
 end Equiv.Perm
@@ -604,41 +603,46 @@ namespace MulAction
 
 variable {α : Type _} [DecidableEq α] [Fintype α]
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/-- The action of equiv.perm α on the n-element subsets of α is preprimitive
+/-- The action of `Equiv.Perm α` on `n.Combination α` is preprimitive
 provided 1 ≤ n < #α and #α ≠ 2*n -/
-theorem Nat.finset_isPreprimitive_of {n : ℕ} (h_one_le : 1 ≤ n) (hn : n < Fintype.card α)
-    (hα : Fintype.card α ≠ 2 * n) : IsPreprimitive (Equiv.Perm α) (n.Finset α) := by
-  classical
+theorem Nat.Combination_isPreprimitive 
+    {n : ℕ} (h_one_le : 1 ≤ n) (hn : n < Fintype.card α)
+    (hα : Fintype.card α ≠ 2 * n) : 
+    IsPreprimitive (Equiv.Perm α) (n.Combination α) := by
+--  classical
   cases' Nat.eq_or_lt_of_le h_one_le with h_one h_one_lt
   · -- n = 1 :
-    let f : α →[Equiv.Perm α] Nat.finset α 1 :=
+    let f : α →ₑ[@id (Equiv.Perm α)] Nat.Combination α 1 :=
       { toFun := fun x => ⟨{x}, Finset.card_singleton x⟩
         map_smul' := fun g x => rfl }
     rw [← h_one]
     suffices hf : Function.Surjective f
     · apply isPreprimitive_of_surjective_map hf
-      exact equiv.perm.is_preprimitive α
+      exact Equiv.Perm.isPreprimitive α
     rintro ⟨s, hs⟩
     change s.card = 1 at hs 
     rw [Finset.card_eq_one] at hs 
     obtain ⟨a, ha⟩ := hs
     use a
-    simp only [ha, EquivariantMap.coe_mk]; rfl
+    simp only [Subtype.mk.injEq, ha]
   -- h_one_lt : 1 < n
   have : Nontrivial α := by
     rw [← Fintype.one_lt_card_iff_nontrivial]
     exact lt_trans h_one_lt hn
-  haveI ht : is_pretransitive (Equiv.Perm α) (n.finset α) := n.finset_is_pretransitive α
-  haveI : Nontrivial (n.finset α) :=
-    n.finset_nontrivial α (lt_trans (Nat.lt_succ_self 0) h_one_lt) hn
-  obtain ⟨sn : n.finset α⟩ := Nontrivial.to_nonempty
+  haveI ht : IsPretransitive (Equiv.Perm α) (n.Combination α) := 
+    n.Combination_isPretransitive α
+  have : Nontrivial (n.Combination α) :=
+    n.Combination_nontrivial α (lt_trans (Nat.lt_succ_self 0) h_one_lt) hn
+  -- have : Nonempty (n.Combination α) := by 
+  --   exact Nontrivial.to_nonempty
+  obtain ⟨sn : n.Combination α⟩ := this.to_nonempty
+  -- Nontrivial.to_nonempty
   let s := sn.val
   let hs : s.card = n := sn.prop
   -- have hs : (s : finset α).card = n := s.prop,
   rw [← maximal_stabilizer_iff_preprimitive (Equiv.Perm α) sn]
-  have : stabilizer (Equiv.Perm α) sn = stabilizer (Equiv.Perm α) (s : Set α) :=
-    by
+  have : stabilizer (Equiv.Perm α) sn = 
+      stabilizer (Equiv.Perm α) (s : Set α) := by
     ext g
     simp only [mem_stabilizer_iff]
     rw [← Subtype.coe_inj]
@@ -648,13 +652,13 @@ theorem Nat.finset_isPreprimitive_of {n : ℕ} (h_one_le : 1 ≤ n) (hn : n < Fi
   apply Equiv.Perm.isMaximalStab (s : Set α)
   · simp only [Finset.coe_nonempty, ← Finset.card_pos, hs]
     apply lt_trans one_pos h_one_lt
-  · simp only [← Finset.coe_compl, Finset.coe_nonempty, ← Finset.card_compl_lt_iff_nonempty,
-      compl_compl, hs]
+  · simp only [← Finset.coe_compl, Finset.coe_nonempty, 
+      ← Finset.card_compl_lt_iff_nonempty, compl_compl, hs]
     exact hn
-  · simp only [Finset.coe_sort_coe, Fintype.card_coe, hs]
+  · simp only [Set.ncard_coe_Finset, ne_eq]
+    simp only [Finset.coe_sort_coe, Fintype.card_coe, hs]
     exact hα
-  infer_instance
-#align mul_action.nat.finset_is_preprimitive_of MulAction.Nat.finset_isPreprimitive_of
+#align mul_action.nat.finset_is_preprimitive_of MulAction.Nat.Combination_isPreprimitive
 
 end MulAction
 
