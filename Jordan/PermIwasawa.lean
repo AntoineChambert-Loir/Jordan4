@@ -12,7 +12,7 @@ import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Jordan.Mathlib.Set
 import Jordan.Mathlib.GroupTheory.Subgroup.Basic
 import Jordan.Mathlib.Alternating
-import Jordan.MulActionFinset
+import Jordan.MulActionCombination
 import Jordan.Jordan
 import Jordan.PermMaximal
 
@@ -20,7 +20,7 @@ import Jordan.PermMaximal
 # Normal subgroups of the symmetric group
 
 * `Equiv.Perm.normal_subgroups` : a nontrivial normal subgroup of `Equiv.Perm α` contains the alternating group.
-* `Iw2`: the Iwasawa structure for the symmetric group `equiv.perm α` acting on ordered pairs.
+* `iwasawa_two`: the Iwasawa structure for the symmetric group `equiv.perm α` acting on ordered pairs.
 
 -/
 
@@ -34,9 +34,77 @@ open MulAction
 variable {α : Type _} [DecidableEq α] [Fintype α]
 
 def Iwt (s : Finset α) := (Equiv.Perm.ofSubtype : Equiv.Perm (s : Set α) →* Equiv.Perm α)
-def IwT (s : Finset α) : Subgroup (Equiv.Perm α) := (Iwt s).range
+def IwasawaT (s : Finset α) : Subgroup (Equiv.Perm α) := (Iwt s).range
 set_option linter.uppercaseLean3 false in 
-#align equiv.perm.Iw_T Equiv.Perm.IwT
+#align equiv.perm.Iw_T Equiv.Perm.IwasawaT
+
+def IwasawaT' (s : Finset α) := fixingSubgroup (Equiv.Perm α) (sᶜ : Set α)
+
+lemma fixingSubgroup_conj {G α : Type*} [Group G] [MulAction G α] 
+    (s : Set α) (g : G) : 
+    fixingSubgroup G (g • s) = MulAut.conj g • (fixingSubgroup G s) := by
+  ext k
+  simp only [mem_fixingSubgroup_iff, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  rw [Equiv.forall_congr (toPerm g⁻¹)]
+  intro x
+  simp only [toPerm_apply]
+  rw [← Set.mem_smul_set_iff_inv_smul_mem]
+  simp only [MulAut.smul_def, MulAut.conj_inv_apply, mul_smul, smul_inv_smul, smul_left_cancel_iff]
+
+lemma IwasawaT'_isConj (s : Finset α) (g : Equiv.Perm α) : 
+    IwasawaT' (g • s) = MulAut.conj g • (IwasawaT' s) := by
+  ext k
+  unfold IwasawaT'
+  simp only [Finset.coe_smul_finset, mem_fixingSubgroup_iff,
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  rw [Equiv.forall_congr (toPerm g⁻¹)]
+  intro x
+  simp only [toPerm_apply]
+  rw [← Set.mem_smul_set_iff_inv_smul_mem]
+  simp only [Set.mem_compl_iff, Perm.smul_def, smul_compl_set, MulAut.smul_def,
+    MulAut.conj_inv_apply, coe_mul, Function.comp_apply, apply_inv_self,
+    EmbeddingLike.apply_eq_iff_eq]
+
+lemma Equiv.Perm.ofSubtype_range_eq (s : Set α) [DecidablePred fun a ↦ a ∈ s]: 
+  (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α).range =
+    fixingSubgroup (Equiv.Perm α) (sᶜ : Set α) := by
+  ext k
+  simp only [mem_fixingSubgroup_iff, Set.mem_compl_iff, Finset.mem_coe, Perm.smul_def, Finset.coe_sort_coe,
+    MonoidHom.mem_range]
+  constructor
+  · rintro ⟨k, rfl⟩
+    intro y hy
+    rw [ofSubtype_apply_of_not_mem k hy]
+  · intro h
+    have hks : s = k • s := by
+      apply le_antisymm
+      . intro x hx
+        rw [Set.mem_smul_set_iff_inv_smul_mem, Perm.smul_def]
+        by_contra hx'
+        rw [← h _ hx', apply_inv_self] at hx'
+        exact hx' hx
+      · intro a ha 
+        by_contra ha'
+        rw [← h _ ha', ← Perm.smul_def, Set.smul_mem_smul_set_iff] at ha 
+        exact ha' ha
+    suffices hk' : _
+    use Equiv.Perm.subtypePerm k hk'
+    rw [Equiv.Perm.ofSubtype_subtypePerm]
+    simp only [ne_eq, Finset.mem_coe]
+    intro x hx
+    specialize h x
+    rw [not_imp_comm] at h
+    exact h hx 
+    · intro x
+      rw [← Equiv.Perm.smul_def]
+      nth_rewrite 2 [hks]
+      rw [Set.smul_mem_smul_set_iff]
+
+lemma _root_.MulAction.smul_compl_set_eq {G α : Type*} [Group G] [MulAction G α] 
+    (s : Set α) (g : G) :
+    (g • s)ᶜ = g • sᶜ := by
+  ext k
+  simp only [Set.mem_compl_iff, smul_compl_set]
 
 
 lemma this1 (G H : Type*) [Group H] [Group G] (f : H →* G) (g : G) :
@@ -51,9 +119,17 @@ def Equiv.permCongrMul {α β : Type*} (e : α ≃ β) :
     ext b
     simp only [toFun_as_coe_apply, permCongr_apply, coe_mul, Function.comp_apply, symm_apply_apply] }
 
-theorem IwT_is_conj (s : Finset α) (g : Equiv.Perm α) : 
-    IwT (g • s) = MulAut.conj g • (IwT s) := by
-  unfold IwT
+theorem IwasawaT_is_conj' (s : Finset α) (g : Equiv.Perm α) : 
+    IwasawaT (g • s) = MulAut.conj g • (IwasawaT s) := by
+  unfold IwasawaT
+  unfold Iwt
+  simp only [Equiv.Perm.ofSubtype_range_eq]
+  simp only [Finset.coe_smul_finset, ← smul_compl_set]
+  apply Equiv.Perm.fixingSubgroup_conj
+
+theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) : 
+    IwasawaT (g • s) = MulAut.conj g • (IwasawaT s) := by
+  unfold IwasawaT
   
   let kg : s ≃ (g • s) := Equiv.subtypeEquiv g
     (by intro a
@@ -104,18 +180,19 @@ theorem IwT_is_conj (s : Finset α) (g : Equiv.Perm α) :
     simp only [Finset.coe_smul_finset]
     rw [Set.mem_smul_set_iff_inv_smul_mem]
     exact hx
-#align equiv.perm.IwT_is_conj Equiv.Perm.IwT_is_conj
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.IwT_is_conj Equiv.Perm.IwasawaT_is_conj
 
 -- The Iwasawa structure for the symmetric group acting on ordered pairs
-def iw2 : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
-  T s := sorry -- IwT ↑s
-  is_comm s := by
+def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
+  T := fun s ↦ IwasawaT (s.val)
+  is_comm := fun s ↦ by
     apply MonoidHom.range_isCommutative
     rw [← Equiv.Perm.isCommutative_iff]
     apply le_of_eq
-    simp only [coeSort_coeBase, Fintype.card_coe]
+    simp only [Finset.mem_coe, Fintype.card_coe]
     exact s.prop
-  IsConj g s := IwT_is_conj (↑s) g
+  is_conj g := fun s ↦ IwasawaT_is_conj s.val g
   is_generator := by
     rw [eq_top_iff]
     rw [← Equiv.Perm.closure_isSwap]
@@ -123,37 +200,19 @@ def iw2 : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
     intro g hg
     simp only [Set.mem_setOf_eq] at hg 
     obtain ⟨a, b, hab, rfl⟩ := hg
-    let s : Nat.finset α 2 := ⟨{a, b}, Finset.card_doubleton hab⟩
+    let s : Nat.Combination α 2 := ⟨{a, b}, Finset.card_doubleton hab⟩
     apply Subgroup.mem_iSup_of_mem s
-    dsimp [Iw_T, Iw_t]
-    let a' : ↥s :=
-      ⟨a, by
-        change a ∈ ↑s; dsimp [s]
-        exact Finset.mem_insert_self a {b}⟩
-    let b' : ↥s :=
-      ⟨b, by
-        change b ∈ ↑s; dsimp [s]
-        apply Finset.mem_insert_of_mem
-        rw [Finset.mem_singleton]⟩
-    use Equiv.swap a' b'
-    ext
-    have : x ∈ {a, b} ↔ x = a ∨ x = b := by rw [Finset.mem_insert, Finset.mem_singleton]
-    cases' em (x ∈ {a, b}) with hx hx
-    · rw [Equiv.Perm.ofSubtype_apply_of_mem (Equiv.swap a' b') hx]
-      cases' this.mp hx with ha hb
-      · conv_rhs => rw [ha]
-        have ha' : a' = ⟨x, hx⟩; rw [← Subtype.coe_inj]; change a = x; exact ha.symm
-        rw [ha']
-        simp only [Equiv.swap_apply_left]; rfl
-      · conv_rhs => rw [hb]
-        have hb' : b' = ⟨x, hx⟩; rw [← Subtype.coe_inj]; change b = x; exact hb.symm
-        rw [hb']
-        simp only [Equiv.swap_apply_right]; rfl
-    · rw [Equiv.Perm.ofSubtype_apply_of_not_mem (Equiv.swap a' b') hx]
-      rw [Equiv.swap_apply_of_ne_of_ne]
-      · intro ha; apply hx; rw [this]; apply Or.intro_left; exact ha
-      · intro hb; apply hx; rw [this]; apply Or.intro_right; exact hb
-#align equiv.perm.Iw2 Equiv.Perm.iw2
+    unfold IwasawaT
+    unfold Iwt 
+    rw [Equiv.Perm.ofSubtype_range_eq]
+    rw [mem_fixingSubgroup_iff]
+    intro x hx
+    simp only [Finset.mem_singleton, Finset.coe_insert, Finset.coe_singleton, Set.mem_singleton_iff] at hx
+    simp only [Set.mem_singleton_iff, Set.mem_compl_iff, Set.mem_insert_iff] at hx 
+    rw [not_or] at hx
+    apply Equiv.swap_apply_of_ne_of_ne hx.left hx.right
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw2 Equiv.Perm.iwasawa_two
 
 /-
 lemma finset.mem_doubleton_iff (a b x : α) : x ∈ ({a, b} : finset α) ↔ (x = a ∨ x = b) :=
@@ -168,10 +227,10 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
     alternatingGroup α ≤ N :=
   by
   rw [← alternatingGroup.commutator_group_eq hα]
-  refine' commutator_le_iwasawa _ Iw2 hnN _
+  refine' commutator_le_iwasawa _ iwasawa_two hnN _
   · -- quasipreprimitive action
     apply IsPreprimitive.isQuasipreprimitive
-    apply nat.finset_is_preprimitive_of
+    apply Nat.Combination_isPreprimitive
     norm_num
     apply lt_of_lt_of_le _ hα; norm_num
     apply ne_of_gt
@@ -179,15 +238,18 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
   -- N acts nontrivially
   intro h
   obtain ⟨g, hgN, hg_ne⟩ := N.nontrivial_iff_exists_ne_one.mp ntN
-  obtain ⟨s, hs⟩ := Nat.finset.mulAction_faithful 2 _ _ _
+  obtain ⟨s, hs⟩ := Nat.combination.mulAction_faithful 
+    (G := Equiv.Perm α) (α := α) (g := g) 2 
+    (by norm_num) 
+    (by rw [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+        apply le_trans (by norm_num) hα) 
+    (by exact hg_ne)
   apply hs
-  suffices : s ∈ fixed_points N (Nat.finset α 2)
-  rw [mem_fixed_points] at this ; exact this ⟨g, hgN⟩
-  rw [h]; rw [Set.top_eq_univ]; apply Set.mem_univ
-  infer_instance
-  norm_num
-  apply lt_of_lt_of_le _ hα; norm_num
-  convert hg_ne; ext x; rfl
+  suffices : s ∈ fixedPoints N (Nat.Combination α 2)
+  · rw [mem_fixedPoints] at this
+    exact this ⟨g, hgN⟩
+  rw [h, Set.top_eq_univ]
+  apply Set.mem_univ
 #align equiv.perm.equiv.perm.normal_subgroups Equiv.Perm.Equiv.Perm.normal_subgroups
 
 end Equiv.Perm

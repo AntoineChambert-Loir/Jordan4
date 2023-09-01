@@ -17,7 +17,7 @@ import Jordan.Mathlib.Set
 import Jordan.Primitive
 import Jordan.MultipleTransitivity
 import Jordan.Jordan
-import Jordan.MulActionFinset
+import Jordan.MulActionCombination
 
 /-# Maximal subgroups of the symmetric groups
 
