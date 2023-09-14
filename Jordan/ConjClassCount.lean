@@ -16,96 +16,9 @@ import Mathlib.GroupTheory.Perm.Cycle.Concrete
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.Data.Set.Card
-import Jordan.EquivariantMap
 
 open scoped Pointwise
 
-/- instance pi.mul_one_class' {I : Type*} {f : I → Type*} {p : I → Prop}
-[Π (i : I) (pi : p i), mul_one_class (f i)] :
-mul_one_class (Π (i : I) (pi : p i), f i) :=
-begin
-  refine {
-  one := λ i hi, _,
-  mul := λ u v i hi,
-  begin
-    haveI : mul_one_class (f i) := _inst_1 i hi,
-    exact (u i hi) * (v i hi),
-  end,
-  one_mul := λ u, begin
-    ext i hi,
-    dsimp, convert (_inst_1 i hi).one_mul (u i hi),
-    end,
-  mul_one := λ u, begin
-    ext i hi,
-    dsimp, convert (_inst_1 i hi).mul_one (u i hi),
-    end, },
-end
-
-instance pi.group' {I : Type*} {f : I → Type*} {p : I → Prop}
-[Π (i : I) (pi : p i), group (f i)] :
-group (Π (i : I) (pi : p i), f i) :=
-begin
-  refine_struct {
-  mul_assoc := λ u v w,
-  begin
-    ext i hi,
-    haveI : group (f i) := _inst_1 i hi,
-    dsimp,
-
-    exact u i hi * v i hi * w i hi = u i hi * (v i hi * w i hi),
-  end,
-  inv := sorry,
-  mul_left_inv := sorry,
-.. },
-end
-
- -/
-/-
-lemma function.extend_apply_first {α β γ : Type*}
-  (f : α → β) (g : α → γ) (e' : β → γ)
-  (hf : ∀ (a b : α), f a = f b → g a = g b) (a : α) :
-  function.extend f g e' (f a) = g a :=
-begin
-  classical,
-  simp only [function.extend_def, dif_pos, exists_apply_eq_apply],
-  apply hf,
-  exact (classical.some_spec (exists_apply_eq_apply f a)),
-end
-
-lemma function.extend_apply_first {α β γ : Type*}
-  (f : α → β) (g : α → γ) (e' : β → γ)
-  (hf : ∀ (a b : α), f a = f b → g a = g b) (a : α) :
-  function.extend f g e' (f a) = g a := function.factors_through.extend_apply hf e' a
-
-
--/
-/-
-def subgroup.mul_equiv {α β : Type*} [group α] [group β] (e : mul_equiv α β)
-  {G : subgroup α} {H : subgroup β} (h : ∀ g, g ∈ G ↔ e g ∈ H) :
-  mul_equiv G H :=
-{ to_fun := subtype.map e.to_fun (λ g hg, (h g).mp hg), -- λ ⟨g, hg⟩, ⟨e g, h.mp hg⟩,
-  inv_fun := subtype.map e.inv_fun (λ k hk,
-    by simp only [h, mul_equiv.inv_fun_eq_symm, mul_equiv.apply_symm_apply, hk]),
-  left_inv := λ ⟨g, hg⟩,
-  begin
-    rw ← subtype.coe_inj,
-    simp only [subtype.map_coe],
-    simp only [mul_equiv.to_fun_eq_coe, mul_equiv.inv_fun_eq_symm, mul_equiv.symm_apply_apply],
-  end,
-  right_inv := λ ⟨k, hk⟩,
-  begin
-    rw ← subtype.coe_inj,
-    simp only [subtype.map_coe],
-    simp only [mul_equiv.inv_fun_eq_symm, mul_equiv.to_fun_eq_coe, mul_equiv.apply_symm_apply],
-  end,
-  map_mul' := λ ⟨g, hg⟩ ⟨k, hk⟩,
-  begin
-    simp only [← subtype.coe_inj],
-    rw subgroup.coe_mul,
-    simp only [subtype.map_coe],
-    simp only [mul_mem_class.mk_mul_mk, subgroup.coe_mk, mul_equiv.to_fun_eq_coe, map_mul],
-  end, }
--/
 section Lists
 
 variable {α β : Type _}
@@ -136,8 +49,6 @@ theorem List.disjoint_pmap {p : α → Prop} (f : ∀ a : α, p a → β) (s t :
   exact ha'
 #align list.disjoint_pmap List.disjoint_pmap
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 def List.mkSubtype {p : α → Prop} : ∀ (l : List α) (_ : ∀ a ∈ l, p a), List (Subtype p)
   | [] => fun _ => List.nil
   | a::l => fun hl =>
@@ -172,20 +83,6 @@ theorem List.coe_mk' {p : α → Prop} (l : List α) (hl : ∀ a ∈ l, p a) :
   simp only [Subtype.coe_mk, id.def]
 #align list.coe_mk' List.coe_mk'
 
-example [DecidableEq α] (p : α → Prop) [DecidablePred p] (s : Finset α) (hs : ∀ a ∈ s, p a) :
-    Finset.image Subtype.val (Finset.subtype p s) = s := by
-  ext a
-  simp only [Finset.mem_image, Finset.mem_subtype, Subtype.exists, exists_and_left, exists_prop]
-  constructor
-  · rintro ⟨a, ha, _, rfl⟩; exact ha
-  · intro ha; exact ⟨a, ha, hs a ha, rfl⟩
-
-example (f : α → β) (hf : Function.Injective f) (l : List (Set α)) (hl : List.Pairwise Disjoint l) :
-    List.Pairwise Disjoint (List.map (Set.image f) l) := by
-  rw [List.pairwise_map]
-  simp_rw [Set.disjoint_image_iff hf]
-  exact hl
-
 end Lists
 
 theorem Equiv.Perm.disjoint_iff_support_disjoint 
@@ -197,41 +94,6 @@ theorem Equiv.Perm.disjoint_iff_support_disjoint
     ← Finset.compl_eq_univ_iff, ← Finset.eq_univ_iff_forall]
 #align equiv.perm.disjoint_iff_support_disjoint Equiv.Perm.disjoint_iff_support_disjoint
 
-/-
-section stabilizers
-
-variables {G : Type*} [group G] {X : Type*} [mul_action G X] (s : set X)
-
-open_locale pointwise
-
-variables (G s)
-def sub_mul_action_of_stabilizer : sub_mul_action (mul_action.stabilizer G s) X :=
-{ carrier := s,
-  smul_mem' := λ g x hx,
-  begin
-    have h : g • x ∈ g • s := ⟨x, hx, rfl⟩,
-    let hg := g.prop, rw mul_action.mem_stabilizer_iff at hg,
-    change g • s = s at hg,
-    rw hg at h, exact h,
-  end}
-
-instance mul_action_of_stabilizer : mul_action (mul_action.stabilizer G s) s :=
-  (sub_mul_action_of_stabilizer G s).mul_action
-
-variables {G s}
-def sub_mul_action_of_stabilizer_hom : mul_action.stabilizer G s →* equiv.perm s :=
-  mul_action.to_perm_hom (mul_action.stabilizer G s) s
-
-lemma sub_mul_action_of_stabilizer_hom_def
-  (g : G) (hg : g ∈ mul_action.stabilizer G s) (x : X) (hx : x ∈ s) :
-  ↑(sub_mul_action_of_stabilizer_hom (⟨g, hg⟩ : mul_action.stabilizer G s) (⟨x, hx⟩ : s)) = g • x :=
-begin
-  simp only [sub_mul_action_of_stabilizer_hom],
-  simp only [mul_action.to_perm_hom_apply, mul_action.to_perm_apply],
-  refl,
-end
-
-end stabilizers -/
 section Ranges
 
 def List.ranges : List ℕ → List (List ℕ)
@@ -239,7 +101,6 @@ def List.ranges : List ℕ → List (List ℕ)
   | a::l => List.range a::List.map (List.map (Nat.add a)) (List.ranges l)
 #align list.ranges List.ranges
 
--- #eval list.ranges [2,5,4]
 theorem List.ranges_disjoint (l : List ℕ) : 
   List.Pairwise List.Disjoint (List.ranges l) := by
   induction' l with a l hl
@@ -260,8 +121,8 @@ theorem List.ranges_disjoint (l : List ℕ) :
     exact fun u v => Nat.add_left_cancel
 #align list.ranges_disjoint List.ranges_disjoint
 
-theorem List.ranges_nodup (l : List ℕ) : ∀ s ∈ List.ranges l, List.Nodup s :=
-  by
+theorem List.ranges_nodup (l : List ℕ) : 
+    ∀ s ∈ List.ranges l, List.Nodup s := by
   induction' l with a l hl
   · -- nil
     intro s hs
@@ -279,8 +140,8 @@ theorem List.ranges_nodup (l : List ℕ) : ∀ s ∈ List.ranges l, List.Nodup s
     refine' List.Nodup.map (fun u v => Nat.add_left_cancel) (hl t ht)
 #align list.ranges_nodup List.ranges_nodup
 
-theorem List.ranges_length (l : List ℕ) : List.map List.length l.ranges = l :=
-  by
+theorem List.ranges_length (l : List ℕ) : 
+    List.map List.length l.ranges = l := by
   induction' l with a l hl
   -- nil
   simp only [List.ranges, List.map_nil]
@@ -321,6 +182,7 @@ section CycleTypes
 
 variable (α : Type _) [DecidableEq α] [Fintype α]
 
+/-- The `Finset (Equiv.Perm α)` of permutations with cycle type `c`-/
 def Equiv.permWithCycleType (c : Multiset ℕ) :=
   Finset.filter (fun g : Equiv.Perm α => Equiv.Perm.cycleType g = c) Finset.univ
 #align equiv.perm_with_cycle_type Equiv.permWithCycleType
@@ -353,19 +215,9 @@ theorem List.exists_pw_disjoint_with_card {c : List ℕ} (hc : c.sum ≤ Fintype
   have hl :  ∀ (a : List ℕ) (ha : a ∈ c.ranges), 
     List.map Fin.valEmbedding (klift' a (hc'_lt a ha)) = a := by
     intro a ha
-    -- rw [klift', klift]
-    conv_rhs => rw [← List.map_id a]
-    
+    conv_rhs => rw [← List.map_id a]    
     rw [List.map_pmap]
     simp only [Fin.valEmbedding_apply, Fin.val_mk, List.pmap_eq_map, List.map_id'', List.map_id]
-  -- have hl' : List.map (List.map Fin.valEmbedding) l = List.ranges c := by
-  --   conv_rhs => rw [← List.map_id (List.ranges c)]
-  --   rw [← List.pmap_eq_map _ id (List.ranges c) hc'_lt]
-  --   -- simp only [l]
-  --   rw [List.map_pmap]
-  --   apply List.pmap_congr
-  --   intro a ha _ _ 
-  --   simp only [hl a ha, id.def]
   use List.map (List.map (Fintype.equivFin α).symm) l
   constructor
   · -- length
@@ -487,9 +339,6 @@ theorem Equiv.Perm.mem_cycleFactors_conj (g k c : Equiv.Perm α) :
     simp only [Equiv.Perm.smul_def, Equiv.Perm.apply_inv_self]
 #align equiv.perm.mem_cycle_factors_conj Equiv.Perm.mem_cycleFactors_conj
 
-example {β : Type _} (e : Equiv α β) (a : α) (b : β) : e a = b ↔ a = e.symm b := by
-  refine' Equiv.apply_eq_iff_eq_symm_apply e
-
 theorem Equiv.Perm.conj_support_eq (k : ConjAct (Equiv.Perm α)) (g : Equiv.Perm α) (a : α) :
     a ∈ (k • g).support ↔ ConjAct.ofConjAct k⁻¹ a ∈ g.support :=
   by
@@ -521,15 +370,6 @@ theorem Equiv.Perm.mem_cycleFactors_conj' (k : ConjAct (Equiv.Perm α)) (g c : E
       simpa using hc' _ ha
 #align equiv.perm.mem_cycle_factors_conj' Equiv.Perm.mem_cycleFactors_conj'
 
--- open_locale classical
-example (g : Equiv.Perm α) (x : α) (hx : x ∈ g.support) :
-    ∃ (c : Equiv.Perm α) (_ : c ∈ g.cycleFactorsFinset), x ∈ c.support := by
-  use g.cycleOf x
-  simp only [Equiv.Perm.mem_support, Equiv.Perm.cycleOf_apply_self, ne_eq, 
-    exists_prop, Equiv.Perm.cycleOf_mem_cycleFactorsFinset_iff, and_self]
-  rw [Equiv.Perm.mem_support] at hx
-  exact hx
-
 theorem Equiv.Perm.mem_cycle_factors_conj_eq (k : ConjAct (Equiv.Perm α)) (g : Equiv.Perm α) :
     Equiv.Perm.cycleFactorsFinset (k • g) = k • Equiv.Perm.cycleFactorsFinset g :=
   by
@@ -538,15 +378,6 @@ theorem Equiv.Perm.mem_cycle_factors_conj_eq (k : ConjAct (Equiv.Perm α)) (g : 
   simp only [inv_smul_smul]
   exact Finset.inv_smul_mem_iff
 #align equiv.perm.mem_cycle_factors_conj_eq Equiv.Perm.mem_cycle_factors_conj_eq
-
-example {α : Type _} (s : Finset α) (a b : α) (h : a = b) : a ∈ s ↔ b ∈ s := by
-  exact Iff.of_eq (congrFun (congrArg Membership.mem h) s)
-
-example (k : Equiv.Perm α) : MulEquiv.symm (MulAut.conj k) = MulAut.conj k⁻¹ :=
-  by
-  -- simp only [map_inv],
-  ext g x
-  rw [map_inv, MulAut.conj_symm_apply, MulAut.conj_inv_apply]
 
 theorem is_conj_iff_inv_is_conj {G : Type _} [Group G] (a b k : G) :
     k * a * k⁻¹ = b ↔ a = k⁻¹ * b * k := by
@@ -580,76 +411,10 @@ theorem MulAction.ConjAct.mem_stabilizer_iff' {G : Type _} [Group G] (k : ConjAc
 
 open scoped Pointwise
 
-example (g : Equiv.Perm α) : SubMulAction (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) (Equiv.Perm α) := {
-  carrier := g.cycleFactorsFinset
-  smul_mem' := fun ⟨k, hk⟩ c hc ↦ by
-    simp only [Finset.mem_coe] at hc ⊢
-    change k • c ∈ _
-    simp only [ConjAct.smul_def, MulAction.mem_stabilizer_iff] at hk
-    rw [ConjAct.smul_def, ← hk, ← Equiv.Perm.mem_cycleFactors_conj]
-    exact hc }
-
-/-
-def equiv.perm.mul_action_conj_cycle_factors' (g : equiv.perm α) :=
-  sub_mul_action_of_stabilizer (conj_act (equiv.perm α)) (equiv.perm α) (g.cycle_factors_finset)
-
--/
-/-
-instance equiv.perm.cycle_factors_smul' {g : equiv.perm α} :
-  has_smul (mul_action.stabilizer (conj_act (equiv.perm α)) g) (g.cycle_factors_finset) :=
-{ smul := λ ⟨k, hk⟩ ⟨c, hc⟩, ⟨k • c,
-  begin
-    simp only [has_smul.smul],
-    convert (equiv.perm.mem_cycle_factors_conj g k c).mp hc,
-    apply symm,
-    exact (mul_action.conj_act.mem_stabilizer_iff k g).mp hk,
-  end⟩}
--/
-
 lemma ConjAct.SMul_eq {g : Equiv.Perm α} {k : ConjAct (Equiv.Perm α)} 
   (_ : k ∈ MulAction.stabilizer (ConjAct (Equiv.Perm α)) g)
   {c : Equiv.Perm α} (_ : c ∈ g.cycleFactorsFinset) :
     k • c = ConjAct.ofConjAct k * c * ConjAct.ofConjAct k⁻¹ := rfl
-    
-
--- theorem Equiv.Perm.cycleFactors_conj_smul_eq {g : Equiv.Perm α}
---     (k : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) (c : g.cycleFactorsFinset) :
---     (k • (c : Equiv.Perm α)) = ConjAct.ofConjAct (k : ConjAct (Equiv.Perm α)) * (c : Equiv.Perm α) * ConjAct.ofConjAct k⁻¹ :=
---   rfl
--- #align equiv.perm.cycle_factors_conj_smul_eq Equiv.Perm.cycle_factors_conj_smul_eq
-
-/-
-instance equiv.perm.cycle_factors_mul_action' (g : equiv.perm α) :
-  mul_action (mul_action.stabilizer (conj_act (equiv.perm α)) g) (g.cycle_factors_finset) :=
-{ one_smul := λ c, sorry,
-  mul_smul := λ ⟨h, hh⟩ ⟨k, hk⟩ ⟨c, hc⟩,
-  begin
-    rw ← subtype.coe_inj,
-    simp only [submonoid.mk_mul_mk],
-
-    let hzz := equiv.perm.cycle_factors_smul'_eq ⟨k, hk⟩ ⟨c, hc⟩,
-
-
-      sorry,
-
-  end, },
-
-def equiv.perm.cycle_factors_smul' (g : equiv.perm α) :
-  mul_action (subgroup.zpowers g).centralizer (g.cycle_factors_finset) :=
-{ one_smul := λ c, by simp only [one_mul, finset.mk_coe, subgroup.coe_one, inv_one, mul_one,
-      equiv.coe_fn_mk, equiv.perm.coe_one, id.def],
-  mul_smul := λ h k c, by simp only [subtype.coe_mk,
-      subgroup.coe_mul, mul_inv_rev, equiv.coe_fn_mk,
-      equiv.perm.coe_mul, subtype.mk_eq_mk, ← mul_assoc],
-  to_has_smul := { smul :=  λ k c, ⟨k * c * k⁻¹,
-    begin
-      convert (equiv.perm.mem_cycle_factors_conj g k c).mp c.prop,
-      simp only [← (subgroup.mem_centralizer_iff.mp k.prop) g (subgroup.mem_zpowers g),
-    mul_inv_cancel_right],
-    end⟩ } } -/
--- open_locale classical
-example {G : Type _} [Group G] (g k : G) : g⁻¹ * k = k * g⁻¹ ↔ k * g = g * k := by
-  rw [inv_mul_eq_iff_eq_mul, ← mul_assoc, ← mul_inv_eq_iff_eq_mul, inv_inv]
 
 theorem Group.commute_iff_mem_centralizer_zpowers {G : Type _} [Group G] (g k : G) :
     Commute g k ↔ k ∈ Subgroup.centralizer (Subgroup.zpowers g) :=
@@ -665,25 +430,6 @@ theorem Group.commute_iff_mem_centralizer_zpowers {G : Type _} [Group G] (g k : 
     simp only [Commute, SemiconjBy, H g (Subgroup.mem_zpowers g)]
 #align group.commute_iff_mem_centralizer_zpowers Group.commute_iff_mem_centralizer_zpowers
 
-/-
-example (g : equiv.perm α) : mul_action.stabilizer (conj_act (equiv.perm α)) g
-≃* subgroup.centralizer (subgroup.zpowers g) :=
-  subgroup.mul_equiv (conj_act.of_conj_act)
-  (begin
-    intro k,
-    rw mul_action.mem_stabilizer_iff,
-    simp only [has_smul.smul],
-    rw mul_inv_eq_iff_eq_mul,
-    rw ← group.commute_iff_mem_centralizer_zpowers,
-    simp only [commute, semiconj_by],
-    conv_lhs { rw eq_comm, },
-  end)
-
-example {α β : Type*} [decidable_eq α] [decidable_eq β] [group α] [mul_action α β]
-  (s : finset β) (g : α) : coe (g • s)  = g • (s : set β) :=
-finset.coe_smul_finset g s
--/
--- open_locale classical
 theorem Equiv.Perm.commute_of_mem_cycleFactorsFinset_commute (k g : Equiv.Perm α)
     (hk : ∀ c ∈ g.cycleFactorsFinset, Commute k c) : 
     Commute k g := by
@@ -795,8 +541,7 @@ theorem Equiv.Perm.mem_support_of_commute {g c : Equiv.Perm α} (hgc : g * c = c
 theorem Equiv.Perm.centralizer_of_cycle_on' (g c : Equiv.Perm α) (hc : c.IsCycle) :
     g * c = c * g ↔
       ∃ hc' : ∀ x : α, x ∈ c.support ↔ g x ∈ c.support,
-        Equiv.Perm.subtypePerm g hc' ∈ Subgroup.zpowers c.subtypePermOfSupport :=
-  by
+        Equiv.Perm.subtypePerm g hc' ∈ Subgroup.zpowers c.subtypePermOfSupport := by
   constructor
   · intro hgc
     let hgc' := Equiv.Perm.mem_support_of_commute hgc
@@ -845,37 +590,10 @@ theorem Equiv.Perm.centralizer_of_cycle_on' (g c : Equiv.Perm α) (hc : c.IsCycl
       exact hix.symm
 #align equiv.perm.centralizer_of_cycle_on' Equiv.Perm.centralizer_of_cycle_on'
 
-example (g c : Equiv.Perm α) (hc' : ∀ x : α, x ∈ c.support ↔ g x ∈ c.support) :
-    Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm g hc') ∈ Subgroup.zpowers c ↔
-      Equiv.Perm.subtypePerm g hc' ∈ Subgroup.zpowers c.subtypePermOfSupport := by
-  simp only [Subgroup.mem_zpowers_iff]
-  apply exists_congr
-  intro n
-  constructor
-  · intro h; ext ⟨x, hx⟩; let h' := Equiv.Perm.congr_fun h x
-    simp only [h', Equiv.Perm.subtypePermOfSupport, Equiv.Perm.subtypePerm_apply_zpow_of_mem,
-      Subtype.coe_mk, Equiv.Perm.subtypePerm_apply]
-    rw [Equiv.Perm.ofSubtype_apply_of_mem]
-    simp only [Subtype.coe_mk, Equiv.Perm.subtypePerm_apply]
-    exact hx
-  · intro h; ext x
-    rw [← h]
-    by_cases hx : x ∈ c.support
-    · rw [Equiv.Perm.ofSubtype_apply_of_mem]
-      simp only [Equiv.Perm.subtypePermOfSupport, Equiv.Perm.subtypePerm_apply_zpow_of_mem,
-        Equiv.Perm.subtypePerm_zpow, Equiv.Perm.subtypePerm_apply]
-      exact hx
-    · rw [Equiv.Perm.ofSubtype_apply_of_not_mem]
-      rw [← Equiv.Perm.not_mem_support]
-      intro hx'; apply hx
-      apply Equiv.Perm.support_zpow_le; exact hx'
-      exact hx
-
 theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff' (g c : Equiv.Perm α)
     (hc' : ∀ x, x ∈ c.support ↔ g x ∈ c.support) (n : ℤ) :
     c ^ n = Equiv.Perm.ofSubtype (g.subtypePerm hc') ↔
-      c.subtypePermOfSupport ^ n = g.subtypePerm hc' :=
-  by
+      c.subtypePermOfSupport ^ n = g.subtypePerm hc' := by
   constructor
   · intro h; ext ⟨x, hx⟩; let h' := Equiv.Perm.congr_fun h x
     simp only [h', Equiv.Perm.subtypePermOfSupport, Equiv.Perm.subtypePerm_apply_zpow_of_mem,
@@ -899,8 +617,7 @@ theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff' (g c : Equiv.Perm α)
 theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff (g c : Equiv.Perm α) (s : Finset α)
     (hg : ∀ x, x ∈ s ↔ g x ∈ s) (hc : c.support ⊆ s) (n : ℤ) :
     c ^ n = Equiv.Perm.ofSubtype (g.subtypePerm hg) ↔
-      c.subtypePerm (Equiv.Perm.le_support_is_invariant hc) ^ n = g.subtypePerm hg :=
-  by
+      c.subtypePerm (Equiv.Perm.le_support_is_invariant hc) ^ n = g.subtypePerm hg := by
   constructor
   · intro h; ext ⟨x, hx⟩; let h' := Equiv.Perm.congr_fun h x
     simp only [h', Equiv.Perm.subtypePerm_apply_zpow_of_mem, Subtype.coe_mk,
@@ -925,8 +642,7 @@ theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff (g c : Equiv.Perm α) (s : 
 theorem Equiv.Perm.centralizer_of_cycle_on (g c : Equiv.Perm α) (hc : c.IsCycle) :
     g * c = c * g ↔
       ∃ hc' : ∀ x : α, x ∈ c.support ↔ g x ∈ c.support,
-        Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm g hc') ∈ Subgroup.zpowers c :=
-  by
+        Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm g hc') ∈ Subgroup.zpowers c := by
   constructor
   · intro hgc
     let hgc' := Equiv.Perm.mem_support_of_commute hgc
@@ -1020,47 +736,6 @@ theorem Equiv.Perm.centralizer_mem_cycle_factors_iff (g k : Equiv.Perm α) (c : 
   exact hc.1
 #align equiv.perm.centralizer_mem_cycle_factors_iff Equiv.Perm.centralizer_mem_cycle_factors_iff
 
-/- -- The axiom of choice…
-example (ι : Type*) (α : Π (i : ι), Type*) (f : Π i, set (α i))
-  (h :∀ i, (f i).nonempty)  : ∃ (a : Π i, α i), (∀ i, a i ∈ f i) :=
-begin
-  suffices : nonempty (Π i, (f i)),
-  obtain a := this.some,
-  use λ i, ↑(a i),
-  intro i, refine subtype.mem (a i),
-  rw ← not_is_empty_iff ,
-  intro h',
-  rw is_empty_pi at h',
-  obtain ⟨i, hi⟩ := h',
-  rw ← not_nonempty_iff  at hi,
-  apply hi,
-  simp only [set.nonempty_coe_sort],
-  exact h i,
-end
-
--- Finite choices
-example (ι : Type*) (α : Π (i : ι), Type*) (f : Π (i : ι), finset (α i))
-  (h :∀  i, (f i).nonempty) (s : finset ι) : ∃ (a : Π (i : s), α i), (∀ i : s, a i ∈ f i) :=
-begin
-  apply finset.induction_on s,
-  { -- empty s
-    apply exists.intro,
-    intro i, exfalso, exact finset.not_mem_empty _ i.prop,
-    intro i, exfalso, exact finset.not_mem_empty _ i.prop, },
-  { -- insert
-    intros k s hks hrec,
-    obtain ⟨a, ha⟩ := hrec,
-    apply exists.intro,
-    rintro ⟨i,hi⟩,
-    rw finset.mem_insert at hi,
-    cases hi with hi hi,
-
-
-
-    sorry, },
-end
- -/
-
 theorem Equiv.Perm.zpow_mod_card_support_cycleOf_self_apply [Fintype α]
     (f : Equiv.Perm α) (n : ℤ) (x : α) : 
     (f ^ (n % ((Equiv.Perm.cycleOf f x).support.card) : ℤ) : Equiv.Perm α) x = (f ^ n) x :=
@@ -1072,15 +747,11 @@ theorem Equiv.Perm.zpow_mod_card_support_cycleOf_self_apply [Fintype α]
       ← (f.isCycle_cycleOf hx).orderOf, ← zpow_eq_mod_orderOf]
 #align equiv.perm.zpow_mod_card_support_cycle_of_self_apply Equiv.Perm.zpow_mod_card_support_cycleOf_self_apply
 
-example (n : ℤ) (hn : 0 ≤ n) : ∃ nn : ℕ, n = nn :=
-  Int.eq_ofNat_of_zero_le hn
-
 theorem Equiv.Perm.cycle_zpow_mem_support_iff {g : Equiv.Perm α} (hg : g.IsCycle) {n : ℤ} {x : α}
     (hx : g x ≠ x) : (g ^ n) x = x ↔ n % g.support.card = 0 := by
   let q := n / g.support.card; let r := n % g.support.card
   change _ ↔ r = 0
-  have div_euc : r + g.support.card * q = n ∧ 0 ≤ r ∧ r < g.support.card :=
-    by
+  have div_euc : r + g.support.card * q = n ∧ 0 ≤ r ∧ r < g.support.card := by
     rw [← Int.ediv_emod_unique _]
     constructor; rfl; rfl
     simp only [Int.coe_nat_pos]
@@ -1119,236 +790,6 @@ theorem Equiv.Perm.zpow_eq_zpow_on_iff (g : Equiv.Perm α) (m n : ℤ) (x : α) 
   · simp only [Equiv.Perm.mem_support, Equiv.Perm.cycleOf_apply_self]; exact hx
 #align equiv.perm.zpow_eq_zpow_on_iff Equiv.Perm.zpow_eq_zpow_on_iff
 
-example (p q : Prop) : p ∧ q → p :=
-  And.left
-
-example (g c : Equiv.Perm α) (hc : c ∈ g.cycleFactorsFinset) (x y : α) (hx : x ∈ c.support) :
-    g.SameCycle x y ↔ y ∈ c.support :=
-  by
-  have hx' : g.cycleOf x = c := (Equiv.Perm.cycle_is_cycleOf hx hc).symm
-  have hx'' : x ∈ g.support := by
-    apply Equiv.Perm.support_cycleOf_le g x
-    rw [hx']; exact hx
-  constructor
-  · intro hxy
-    rw [← hx']
-    rw [Equiv.Perm.mem_support_cycleOf_iff]
-    exact ⟨hxy, hx''⟩
-  · intro hy
-    apply And.left
-    rw [← Equiv.Perm.mem_support_cycleOf_iff]
-    rw [hx']; exact hy
-
-/-  -- SUPPRIMÉ AU PROFIT DE DÉFINITIONS PLUS GÉNÉRALES QUI PROUVENT LE PRODUIT SEMI DIRECT
-/- Ici, on utilise a, k, et les propriétés 2 et 3
- - dans conj_class2, on utilise tout -/
-lemma is_surjective_aux (g : equiv.perm α) (τ: equiv.perm (g.cycle_factors_finset))
-  (H : ∀ c : g.cycle_factors_finset, (c : equiv.perm α).support.card = ((τ c) : equiv.perm α).support.card) :
-  ∃ (a : g.cycle_factors_finset → α) (k : equiv.perm α),
-    (∀ (c : g.cycle_factors_finset), a c ∈ (c : equiv.perm α).support)
-    ∧ (g * k = k * g)
-    ∧ (∀ (c : g.cycle_factors_finset), (conj_act.to_conj_act k) • (c : equiv.perm α) = τ c)
-    ∧ k ∘ a = a ∘ τ
-    ∧ k.support ⊆ g.support :=
-begin
-  have hsupp_ne : ∀ c : g.cycle_factors_finset, (c : equiv.perm α).support.nonempty,
-  { intro c,
-    exact equiv.perm.support_of_cycle_nonempty
-      (equiv.perm.mem_cycle_factors_finset_iff.mp c.prop).1, },
-  let a : g.cycle_factors_finset → α := λc, (hsupp_ne c).some,
-  use a,
-  let ha' : ∀ (c : g.cycle_factors_finset), g.cycle_of (a c) = (c : equiv.perm α) :=
-  λ c,  (equiv.perm.cycle_is_cycle_of (hsupp_ne c).some_spec c.prop).symm,
-  have ha : ∀ c : g.cycle_factors_finset, g (a c) ≠ (a c),
-  { intro c,
-    rw ← equiv.perm.mem_support,
-    rw ← equiv.perm.cycle_of_mem_cycle_factors_finset_iff ,
-    rw ha' c, exact c.prop, },
-  have ha'': ∀ (c : g.cycle_factors_finset) (i : ℤ), g.cycle_of ((g ^ i) (a c)) = c,
-  { intros c i, rw equiv.perm.cycle_of_self_apply_zpow, rw ha', },
-
-  let Kf : equiv.perm (g.cycle_factors_finset) → (g.cycle_factors_finset) × ℤ → α :=
-    λ e ⟨c, i⟩, (g ^ i) (a (e c)),
-  have Kf_apply : ∀ {e : equiv.perm (g.cycle_factors_finset)} {c : g.cycle_factors_finset} {i : ℤ},
-    Kf e ⟨c, i⟩ = (g ^ i) (a (e c)) := λ e c i, rfl,
-  let k := function.extend (Kf 1) (Kf τ) id,
-
-  have haK : ∀ (e : equiv.perm (g.cycle_factors_finset)) (c : g.cycle_factors_finset) (i : ℤ),
-  g.cycle_of (Kf e ⟨c, i⟩) = (e c : equiv.perm α),
-  { intros e c i, rw Kf_apply,
-    rw equiv.perm.cycle_of_self_apply_zpow, rw ha', },
-  have ha2 : ∀ (e : equiv.perm (g.cycle_factors_finset)) (c : g.cycle_factors_finset) (i : ℤ),
-   g (Kf e ⟨c,i⟩) = Kf e ⟨c, i + 1⟩,
-  { intros e c i,
-    simp only [Kf_apply],
-    rw ← equiv.perm.mul_apply, rw ← zpow_one_add, rw add_comm 1 i, },
-  have ha3 :  ∀ (e : equiv.perm (g.cycle_factors_finset)) (c d : g.cycle_factors_finset) (i : ℤ),
-   (d = e c) → (d : equiv.perm α) (Kf e ⟨c,i⟩) = Kf e ⟨c, i + 1⟩,
--- Kf e ⟨c, i⟩ = (g ^ i) (a (e c)) appartient au cycle de e c
-  { intros e c d i h,
-    rw h,
-    rw ← haK e c i,
-    rw equiv.perm.cycle_of_apply_self,
-    apply ha2, },
-  have ha4 : ∀ (e : equiv.perm (g.cycle_factors_finset)) (c d : g.cycle_factors_finset) (i : ℤ),
-   (d ≠ e c) → (d : equiv.perm α) (Kf e ⟨c,i⟩) = Kf e ⟨c, i⟩,
-  { intros e c d i h,
-    suffices hdc : (d : equiv.perm α).disjoint (e c : equiv.perm α),
-    { apply or.resolve_right (equiv.perm.disjoint_iff_eq_or_eq.mp hdc (Kf e ⟨c, i⟩)),
-      -- intro hd,
-      rw ← haK e c i,
-      rw equiv.perm.cycle_of_apply_self ,
-      rw ← equiv.perm.cycle_of_eq_one_iff,
-      rw haK e c i,
-      apply equiv.perm.is_cycle.ne_one ,
-      refine (equiv.perm.mem_cycle_factors_finset_iff.mp _).1,
-      exact g,
-      exact (e c).prop, },
-    apply g.cycle_factors_finset_pairwise_disjoint d.prop (e c).prop,
-    rw function.injective.ne_iff (subtype.coe_injective), exact h, },
-  have ha5 : ∀ (x : α) (hx : ¬ (∃ (cj : g.cycle_factors_finset × ℤ), Kf 1 cj = x)),
-    k x = x,
-  { intros x hx,
-    simp only [k, function.extend_apply' _ _ _ hx, id.def], },
-  have ha6 : ∀ (x : α) (hx : ¬ (∃ (cj : g.cycle_factors_finset × ℤ), Kf 1 cj = x))
-    (c : g.cycle_factors_finset), (c : equiv.perm α) x = x,
-  { intros x hx c,
-    by_contradiction, apply hx,
-    rw [← ne.def, ← equiv.perm.mem_support] at h,
-    suffices : g.same_cycle (a c) x,
-    { obtain ⟨i, hi⟩ := this,
-      use ⟨c, i⟩,
-      rw [Kf_apply, ← hi, equiv.perm.coe_one, id.def], },
-
-    apply and.left,
-    rw ← equiv.perm.mem_support_cycle_of_iff,
-    rw ha' c, exact h, },
-  have hkfg : ∀ (e e' : equiv.perm (g.cycle_factors_finset))
-    (hee' : ∀ (c : g.cycle_factors_finset), (e c : equiv.perm α).support.card = (e' c : equiv.perm α).support.card),
-    (Kf e').factors_through (Kf e), --    Kf e ci = Kf e dj → Kf e' ci = Kf e' dj,
-  { rintros e e' Hee' ⟨c, i⟩ ⟨d, j⟩ He,
-    change (g ^ i) (a (e c)) = (g ^ j) (a (e d)) at He,
-    change (g ^ i) (a (e' c)) = (g ^ j) (a (e' d)),
-    suffices hcd : c = d,
-    { rw hcd at He ⊢,
-      rw [g.zpow_eq_zpow_on_iff i j, ha'] at He,
-      rw [g.zpow_eq_zpow_on_iff, ha', ← Hee' d],
-      exact He,
-      { exact ha (e' d), },
-      { exact ha (e d), }, },
-    { -- d = c
-        apply equiv.injective e,
-        rw [← subtype.coe_inj, ← ha'' (e c) i, ← ha'' (e d) j, He], }, },
-
-  have k_apply : ∀ (c : g.cycle_factors_finset) (i : ℤ), k (Kf 1 ⟨c,i⟩) = Kf τ ⟨c,i⟩,
-  { intros c i,
-    simp only [k],
-    rw function.factors_through.extend_apply (hkfg 1 τ _) id ⟨c,i⟩,
-    -- rw function.extend_apply_first (Kf 1) (Kf τ) id _ ⟨c,i⟩,
-    { intro c, simp only [← H c, equiv.perm.coe_one, id.def], }, },
-  have k_apply' : ∀ (x : α), x ∉ g.support → k x = x,
-  { intros x hx,
-    simp only [k],
-    rw function.extend_apply',
-    simp only [id.def],
-    intro hyp,
-    obtain ⟨⟨c, i⟩, rfl⟩ := hyp,
-    apply hx,
-    change (g ^ i) (a c) ∈ g.support,
-    rw equiv.perm.zpow_apply_mem_support ,
-    rw equiv.perm.mem_support,
-    exact ha c, },
-  have hk_bij : function.bijective k,
-  { rw fintype.bijective_iff_injective_and_card,
-    refine and.intro _ rfl,
-    intros x y hxy,
-    by_cases hx : ∃ (a : (g.cycle_factors_finset) × ℤ), Kf 1 a = x,
-    { obtain ⟨⟨c, i⟩, rfl⟩ := hx,
-      simp only [k_apply] at hxy,
-      by_cases hy : ∃ (b : (g.cycle_factors_finset) × ℤ), Kf 1 b = y,
-      { -- x = Kf 1 a, y = Kf 1 b
-        obtain ⟨⟨d, j⟩, rfl⟩ := hy,
-        simp only [k_apply] at hxy,
-        refine @hkfg τ 1 _ ⟨c,i⟩ ⟨d,j⟩ hxy,
-        { intros c, simp only [equiv.perm.coe_one, id.def, H c], }, },
-      { -- x = kf a, y non
-        exfalso, apply hy,
-        rw ha5 y hy at hxy,
-        use (⟨τ c, i⟩ : g.cycle_factors_finset × ℤ),
-        rw ← hxy, refl, }, },
-    { rw ha5 x hx at hxy,
-      by_cases hy : ∃ (b : (g.cycle_factors_finset) × ℤ), Kf 1 b = y,
-      { -- x pas kfa, -- y = kf b,
-        obtain ⟨⟨d, j⟩, rfl⟩ := hy,
-        exfalso, apply hx,
-        simp only [k_apply] at hxy,
-        use ⟨τ d, j⟩, rw hxy, refl, },
-      { -- x pas kf a, y non plus
-        rw ha5 y hy at hxy,
-        exact hxy, }, }, },
-    use equiv.of_bijective k hk_bij,
-    split,
-    { exact λ c, (hsupp_ne c).some_spec, },
-    split,
-    { -- commutation
-      ext x,
-      simp only [equiv.perm.coe_mul, function.comp_app, equiv.of_bijective_apply],
-      by_cases hx : ∃ (a : (g.cycle_factors_finset) × ℤ), Kf 1 a = x,
-      { obtain ⟨⟨c, i⟩, rfl⟩ := hx,
-        simp only [ha2, k_apply], },
-      { have hx' : ¬ (∃ dj : (g.cycle_factors_finset) × ℤ, Kf 1 dj = g x),
-        { intro hx', apply hx,
-          obtain ⟨⟨d, j⟩, hx'⟩ := hx',
-          use ⟨d, j-1⟩,
-          apply equiv.injective g,
-          simp only [← hx', ha2, sub_add_cancel], },
-        rw ha5 x hx, rw ha5 _ hx', }, },
-    split,
-    { -- action on g.cycle_factors_finset
-      intro c,
-      rw conj_act.smul_def,
-      rw mul_inv_eq_iff_eq_mul,
-      simp only [conj_act.of_conj_act_to_conj_act],
-      ext x,
-      simp,
-      by_cases hx : ∃ (a : (g.cycle_factors_finset) × ℤ), Kf 1 a = x,
-      { obtain ⟨⟨d, j⟩, rfl⟩ := hx,
-        by_cases hcd : d = c,
-        { -- d = c
-          rw hcd,
-          rw ha3, simp only [k_apply],
-          rw ha3,
-          exact rfl,
-          simp only [equiv.perm.coe_one, id.def], },
-        { -- d ≠ c
-          rw ha4, simp only [k_apply], rw ha4,
-          rw function.injective.ne_iff (equiv.injective τ), exact ne.symm hcd,
-          simp only [equiv.perm.coe_one, id.def, ne.def], exact ne.symm hcd, }, },
-      { simp only [ha5 x hx, ha6 x hx], }, },
-    split,
-    { -- k ∘ a = a ∘ τ
-      ext c,
-      simp only [function.comp_app, equiv.of_bijective_apply],
-      suffices : a c = Kf 1 (c, 0),
-      rw [this, k_apply],
-      all_goals { simp only [Kf_apply, zpow_zero, equiv.perm.coe_one, id.def], }, },
-    { -- k.support ⊆ g.support
-      intro x,
-      simp only [equiv.perm.mem_support, ne.def],
-      intros hxk hxg, apply hxk,
-      apply k_apply',
-      rw equiv.perm.not_mem_support, exact hxg, },
-end
- -/
-example (j : ℤ) : j = 1 + (j - 1) :=
-  eq_add_of_sub_eq' rfl
-
-example (g : Equiv.Perm α) (i j : ℤ) (x : α) : (g ^ i) x = (g ^ j) x ↔ (g ^ (j - i)) x = x :=
-  by
-  conv_lhs => rw [← sub_add_cancel j i, add_comm, zpow_add, Equiv.Perm.mul_apply]
-  simp only [EmbeddingLike.apply_eq_iff_eq]
-  exact comm
-
 instance MulAction.decidableMemFixedBy {α β : Type _} [Monoid α] [DecidableEq β] [MulAction α β]
     (a : α) : DecidablePred fun b : β => b ∈ MulAction.fixedBy α β a :=
   by
@@ -1384,52 +825,9 @@ def Equiv.permConjStabilizerFun (g : Equiv.Perm α) :
       exact g.cycleFactorsFinset_mem_commute hc hd h
 #align equiv.perm_conj_stabilizer_fun Equiv.permConjStabilizerFun
 
-example (g : Equiv.Perm α) (u : Equiv.Perm (MulAction.fixedBy (Equiv.Perm α) α g))
-    (v : ∀ c ∈ g.cycleFactorsFinset, Subgroup.zpowers (c : Equiv.Perm α)) :
-    ConjAct.toConjAct (Equiv.permConjStabilizerFun g ⟨u, v⟩) ∈
-      MulAction.stabilizer (ConjAct (Equiv.Perm α)) g :=
-  by
-  simp only [Equiv.permConjStabilizerFun, map_mul]
-  apply Subgroup.mul_mem
-  · rw [MulAction.mem_stabilizer_iff]
-    rw [ConjAct.smul_def]
-    rw [mul_inv_eq_iff_eq_mul]
-    ext x
-    simp only [Equiv.Perm.coe_mul, Function.comp_apply, ConjAct.ofConjAct_toConjAct]
-    by_cases hx : x ∈ MulAction.fixedBy _ α g
-    · simp only [MulAction.mem_fixedBy, Equiv.Perm.smul_def] at hx 
-      rw [hx]
-      apply symm
-      rw [← Equiv.Perm.smul_def, ← MulAction.mem_fixedBy]
-      exact (Equiv.Perm.mem_iff_ofSubtype_apply_mem u x).mp hx
-    · rw [Equiv.Perm.ofSubtype_apply_of_not_mem u hx]
-      apply Equiv.Perm.ofSubtype_apply_of_not_mem u
-      intro hx'; apply hx
-      simp only [MulAction.mem_fixedBy, Equiv.Perm.smul_def] at hx' ⊢
-      simp only [EmbeddingLike.apply_eq_iff_eq] at hx' ; exact hx'
-  · rw [MulAction.mem_stabilizer_iff]
-    rw [ConjAct.smul_def]
-    rw [mul_inv_eq_iff_eq_mul]
-    simp only [ConjAct.ofConjAct_toConjAct]
-    change Commute _ _
-    rw [Commute.symm_iff]
-    apply Finset.noncommProd_commute
-    intro c hc
-    rw [dif_pos hc]
-    obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp (v c hc).prop
-    rw [← hm]
-    change Commute g (c ^ m)
-    apply Commute.zpow_right
-    rw [Commute.symm_iff]
-    exact Equiv.Perm.self_mem_cycle_factors_commute g c hc
-
-example {G : Type _} [Group G] (x : G) (hx : x ∈ (⊥ : Subgroup G)) : x = 1 := by
-  refine' Subgroup.mem_bot.mp hx
-
 theorem commute_ofSubtype_disjoint {p q : α → Prop} [DecidablePred p] [DecidablePred q]
     (hpq : ∀ a, ¬(p a ∧ q a)) (x : Equiv.Perm (Subtype p)) (y : Equiv.Perm (Subtype q)) :
-    Commute (Equiv.Perm.ofSubtype x) (Equiv.Perm.ofSubtype y) :=
-  by
+    Commute (Equiv.Perm.ofSubtype x) (Equiv.Perm.ofSubtype y) := by
   apply Equiv.Perm.Disjoint.commute
   intro a
   by_cases hx : p a
@@ -1439,15 +837,6 @@ theorem commute_ofSubtype_disjoint {p q : α → Prop} [DecidablePred p] [Decida
   · rw [Equiv.Perm.ofSubtype_apply_of_not_mem x hx]
     apply Or.intro_left; rfl
 #align commute_of_subtype_disjoint commute_ofSubtype_disjoint
-
-example {ι : Type _} (p : ι → Prop) (f : ∀ i, p i → Type _) (i j : ι) (hi : p i) (hj : p j)
-    (h : i = j) : f i hi = f j hj := by simp_rw [h]
-
-example {ι : Type _} [DecidableEq ι] (p : α → ι) (s : Finset ι)
-    (f : ∀ i : ι, i ∈ s → Equiv.Perm {a : α | p a = i}) (i j : ι) (hi : i ∈ s) (hj : j ∈ s)
-    (h : i = j) : Equiv.Perm.ofSubtype (f j hj) = Equiv.Perm.ofSubtype (f i hi) := by 
-  subst h
-  rfl
 
 def Equiv.Perm.ofPartitionFun {ι : Type _} [DecidableEq ι] (p : α → ι) (s : Finset ι) :
     (∀ i ∈ s, Equiv.Perm {a | p a = i}) → Equiv.Perm α := fun f =>
@@ -1634,24 +1023,16 @@ variable {α : Type _} [DecidableEq α] [Fintype α] (g : Equiv.Perm α)
 
 theorem centralizer_le_stab_cycle_fact :
     MulAction.stabilizer (ConjAct (Equiv.Perm α)) g ≤
-      MulAction.stabilizer (ConjAct (Equiv.Perm α)) (g.cycleFactorsFinset : Set (Equiv.Perm α)) :=
-  by
+      MulAction.stabilizer (ConjAct (Equiv.Perm α)) (g.cycleFactorsFinset : Set (Equiv.Perm α)) := by
   intro k
   simp only [MulAction.mem_stabilizer_iff]
   intro hk
   rw [← Finset.coe_smul_finset k _, ← Equiv.Perm.mem_cycle_factors_conj_eq, hk]
 #align on_cycle_factors.centralizer_le_stab_cycle_fact OnCycleFactors.centralizer_le_stab_cycle_fact
 
-/- instance mul_action_on_cycle_factors
-/-   mul_action (mul_action.stabilizer (conj_act (equiv.perm α)) g)
-  ((g.cycle_factors_finset) : set (equiv.perm α)) -/
-:= (sub_mul_action_of_stabilizer
-  (conj_act (equiv.perm α))
-  ((g.cycle_factors_finset) : set (equiv.perm α))).mul_action
--/
+/-- The action by conjugation of `ConjAct (Equiv.Perm α) on the cycles of a given permutation -/
 def subMulActionOnCycleFactors :
-    SubMulAction (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) (Equiv.Perm α)
-    where
+    SubMulAction (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) (Equiv.Perm α) where
   carrier := (g.cycleFactorsFinset : Set (Equiv.Perm α))
   smul_mem' k c hc := by
     have := Equiv.Perm.mem_cycle_factors_conj_eq (↑k) g
@@ -1682,40 +1063,6 @@ theorem φ_eq' (k : Equiv.Perm α)
     (φ g ⟨ConjAct.toConjAct k, hk⟩ ⟨c, hc⟩ : Equiv.Perm α) = k * c * k⁻¹ :=  rfl
 #align on_cycle_factors.φ_eq' OnCycleFactors.φ_eq'
 
-/-
-lemma mem_range_φ (k : equiv.perm (g.cycle_factors_finset)) :
-  k ∈ (φ g).range ↔ ∀ (c : g.cycle_factors_finset), (k c: equiv.perm α).support.card = (c : equiv.perm α).support.card :=
-begin
-  split,
-  { simp only [monoid_hom.coe_range, monoid_hom.mem_range],
-    rintro ⟨⟨k, hk⟩, rfl⟩,
-    rintro ⟨c, hc⟩,
-    simp only [function.comp_app, φ_eq, subtype.coe_mk],
-    simp_rw conj_act.smul_def,
-    simp only [equiv.perm.support_conj, finset.card_map], },
-  { intro hk,
-    obtain ⟨a, k1, _, hk1, hk2, _⟩ := is_surjective_aux g k _,
-    use k1,
-    { -- mem_stabilizer
-      simp only [mul_action.mem_stabilizer_iff],
-      simp only [has_smul.smul],
-      change k1 * g * k1⁻¹ = g,
-      simp only [← hk1, mul_inv_cancel_right], },
-    { ext ⟨c, hc⟩ x,
-      rw [φ_eq, ← hk2 ⟨c, hc⟩],
-      refl, },
-    exact λ c, (hk c).symm, },
-end
- -/
-/- lemma hφ_range : ((φ g).range : set (equiv.perm (g.cycle_factors_finset :
-  set (equiv.perm α)))) = { k : equiv.perm (g.cycle_factors_finset) |
-  ∀ (c : g.cycle_factors_finset), (k c: equiv.perm α).support.card = (c : equiv.perm α).support.card } :=
-begin
-  ext k,
-  simp only [set_like.mem_coe, mem_range_φ],
-  refl,
-end
- -/
 variable {g}
 
 variable (a : g.cycleFactorsFinset → α)
@@ -1851,26 +1198,6 @@ theorem haK6 (x : α) (hx : x ∉ g.support) (c : g.cycleFactorsFinset) :
 set_option linter.uppercaseLean3 false in
 #align on_cycle_factors.haK6 OnCycleFactors.haK6
 
-/-
-lemma haK6 (x : α)
-  (hx : ¬ (∃ (cj : g.cycle_factors_finset × ℤ), Kf a 1 cj = x))
-  (c : g.cycle_factors_finset) : c x = x :=
-begin
-  by_contradiction, apply hx,
-  suffices h' : x ∈ (c : equiv.perm α).support,
-  suffices : g.same_cycle (a c) x,
-  { obtain ⟨i, hi⟩ := this,
-    use ⟨c, i⟩,
-    rw [Kf_apply, ← hi, equiv.perm.coe_one, id.def], },
-
-  apply and.left,
-  rw ← equiv.perm.mem_support_cycle_of_iff,
-  rw ha' ha c,
-  exact h',
-
-  rw equiv.perm.mem_support, exact h,
-end
--/
 theorem hKfg (e e' : Equiv.Perm g.cycleFactorsFinset)
     (hee' : ∀ c : g.cycleFactorsFinset,
         (e c : Equiv.Perm α).support.card = (e' c : Equiv.Perm α).support.card) :
@@ -2155,69 +1482,6 @@ theorem coe_φ' {τ} (hτ) : k a τ = ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : 
   rfl
 #align on_cycle_factors.coe_φ' OnCycleFactors.coe_φ'
 
-example (τ) (hτ) : Commute (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α))) g :=
-  by
-  rw [Commute, SemiconjBy]
-  --  simp only [φ', φ'_fun],
-  --  simp only [subgroup.coe_mk, monoid_hom.coe_mk, conj_act.of_conj_act_to_conj_act],
-  -- simp only [equiv.perm.mul_def],
-  rw [← Equiv.coe_inj]
-  --  simp only [equiv.coe_trans],
-  -- change (k a τ) ∘ g = g ∘ (k a τ),
-  exact k_commute ha hτ
-
-example (τ) (hτ) : 
-    Commute (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α))) g := by
-  rw [Commute, SemiconjBy, ← mul_inv_eq_iff_eq_mul]
-  exact ((φ' ha) ⟨τ, hτ⟩).prop
-
-example (τ) (hτ) :
-    (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α))).support ≤ g.support := by
-  intro x
-  simp only [Equiv.Perm.mem_support, φ'_apply]
-  intro hx' hx; apply hx'
-  rw [← Equiv.Perm.not_mem_support] at hx 
-  exact k_apply_of_not_mem_support ha x hx
-
-example (τ) (hτ) : ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α)) ∘ a = a ∘ τ :=
-  by
-  ext c
-  exact k_apply ha c 0 hτ
-
-example (τ) (hτ) :
-    ∀ c : g.cycleFactorsFinset,
-      ConjAct.toConjAct (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α))) •
-          (c : Equiv.Perm α) =
-        τ c := by
-  intro c
-  rw [ConjAct.toConjAct_ofConjAct]
-  simp only [φ', φ'Fun]
-  simp only [Subgroup.coe_mk, MonoidHom.coe_mk]
-  rw [ConjAct.smul_def]
-  simp only [ConjAct.ofConjAct_toConjAct]
-  rw [mul_inv_eq_iff_eq_mul]
-  ext x
-  exact k_cycle_apply ha hτ c x
-
-example (u v : Equiv.Perm α) (x : α) : u (v x) = (u * v) x := by rfl
-
-example (τ) (hτ) (c : g.cycleFactorsFinset) (m n : ℕ) :
-    (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α)) ^ m)
-        ((g ^ n : Equiv.Perm α) (a c)) =
-      (g ^ n) (a ((τ ^ m) c)) := by
-  suffices :
-    ∀ m n : ℕ, Commute (ConjAct.ofConjAct (φ' ha ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α)) ^ m) (g ^ n)
-  simp only [Commute, SemiconjBy] at this 
-  rw [← Equiv.Perm.mul_apply, this, Equiv.Perm.mul_apply, EmbeddingLike.apply_eq_iff_eq]
-  induction' m with m hrec
-  · simp only [pow_zero, Equiv.Perm.coe_one, id.def]
-  · rw [pow_succ, Equiv.Perm.mul_apply, hrec, φ'_apply ha hτ, 
-      k_apply_base ha _ hτ, pow_succ, Equiv.Perm.coe_mul, Function.comp_apply]
-  apply Commute.pow_pow
-  rw [Commute, SemiconjBy, ← mul_inv_eq_iff_eq_mul]
-  -- rw [← MulAction.ConjAct.mem_stabilizer_iff]
-  exact ((φ' ha) ⟨τ, hτ⟩).prop
-
 variable (g)
 
 theorem exists_base_points :
@@ -2278,20 +1542,6 @@ theorem hφ_range_card' :
   simp_rw [← hφ_range']
   rfl
 #align on_cycle_factors.hφ_range_card' OnCycleFactors.hφ_range_card'
-
-example (l : List ℕ) (n : ℕ) (hn : ∀ i ∈ l, i < n) :
-    ((Finset.range n).prod fun i => (List.count i l).factorial) =
-      (List.map (fun i : ℕ => (List.count i l).factorial) l.dedup).prod := by
-  rw [← List.prod_toFinset]
-  apply symm
-  apply Finset.prod_subset_one_on_sdiff
-  · intro i hi; rw [Finset.mem_range]; apply hn i
-    simpa only [List.mem_toFinset, List.mem_dedup] using hi
-  · intro i hi
-    simp only [Finset.mem_sdiff, Finset.mem_range, List.mem_toFinset, List.mem_dedup] at hi 
-    rw [List.count_eq_zero_of_not_mem hi.2]; exact Nat.factorial_zero
-  · intro i _; rfl
-  exact List.nodup_dedup l
 
 theorem _root_.Set.ncard_filter_eq_count {ι κ : Type*} [DecidableEq ι] [DecidableEq κ] 
   (f : ι → κ) (s : Finset ι) (k : κ) :
@@ -2450,22 +1700,6 @@ theorem hφ_mem_ker_iff' (z : Equiv.Perm α) :
     · simp only [Subgroup.coeSubtype, Subgroup.coe_mk]
 #align on_cycle_factors.hφ_mem_ker_iff' OnCycleFactors.hφ_mem_ker_iff'
 
-/-
-lemma hφ_mem_ker_iff' (z : equiv.perm α) :
-  conj_act.to_conj_act z ∈
-    subgroup.map (mul_action.stabilizer (conj_act (equiv.perm α)) g).subtype (φ g).ker
-  ↔  ∀ (s : equiv.perm α) (hs : s ∈ g.cycle_factors_finset),
-    ∃ (hs' : ∀ (x : α), x ∈ s.support ↔ z x ∈ s.support),
-      equiv.perm.subtype_perm z hs' ∈ subgroup.zpowers (equiv.perm.subtype_perm g (equiv.perm.mem_cycle_factors_finset_support g s hs)) :=
-begin
-  rw hφ_mem_ker_iff,
-  split,
-  { intros H c hc,
-    exact (equiv.perm.centralizer_mem_cycle_factors_iff g z c hc).mp (H c hc), },
-  { intros H c hc,
-    exact (equiv.perm.centralizer_mem_cycle_factors_iff g z c hc).mpr (H c hc), },
-end
- -/
 -- un groupe symétrique x produit de groupes cycliques
 theorem hφ_mem_ker_iff (z : Equiv.Perm α) :
     ConjAct.toConjAct z ∈
@@ -2527,22 +1761,6 @@ theorem hψ_1 (uv)
   exact hx'
 #align on_cycle_factors.hψ_1 OnCycleFactors.hψ_1
 
-/- -- Useless
-lemma hψ_2_aux {ι : Type*} [decidable_eq ι] (f : ι → equiv.perm α)
-  (s : finset ι)
-  (hs : ∀ (i ∈ s) (j ∈ s), commute (f i) (f j))
-  (hs' : ∀ (i ∈ s) (j ∈ s), (f i).disjoint (f j))
-  (a : α) (ha : ∀ (j ∈ s), a ∉ (f j).support) :
-  s.noncomm_prod (λ i, f i) hs a = a :=
-begin
-  rw ← equiv.perm.smul_def,
-  rw ← mul_action.mem_stabilizer_iff,
-  apply subgroup.noncomm_prod_mem,
-  intros i hi,
-  rw mul_action.mem_stabilizer_iff, rw equiv.perm.smul_def,
-  rw ← equiv.perm.not_mem_support,
-  exact ha i hi,
-end -/
 theorem hψ_2 (uv) (x : α) (c : Equiv.Perm α) (hc : c ∈ g.cycleFactorsFinset)
     (hx : c = g.cycleOf x) : ψ g uv x = (uv.snd c hc : Equiv.Perm α) x :=
   by
@@ -2767,11 +1985,7 @@ theorem hφ_ker_eq_ψ_range (z : Equiv.Perm α) :
 
 theorem hψ_range_card' : Fintype.card (Set.range (ψ g)) = Fintype.card (φ g).ker := by
   classical
-  let u :
-    ↥(Set.range (ψ g)) →
-      ↥(φ
-            g).ker :=-- (subgroup.map (mul_action.stabilizer (conj_act (equiv.perm α)) g).subtype (φ g).ker)
-  fun ⟨z, hz⟩ => by
+  let u : (Set.range (ψ g)) → (φ g).ker := fun ⟨z, hz⟩ => by
     rw [← hφ_ker_eq_ψ_range g] at hz 
     suffices : ConjAct.toConjAct z ∈ MulAction.stabilizer (ConjAct (Equiv.Perm α)) g
     use ⟨ConjAct.toConjAct z, this⟩
@@ -3040,8 +2254,6 @@ theorem AlternatingGroup.card_of_cycleType_mul_eq (m : Multiset ℕ) :
         (Fintype.card α).factorial 0 :=
   by
   split_ifs with hm 
-  -- by_cases hm : (m.sum ≤ fintype.card α ∧ ∀ a ∈ m, 2 ≤ a),
-  -- cases nat.even_or_odd (m.sum + m.card) with hm' hm',
   · -- m is an even cycle_type
     rw [← Finset.card_map]
     rw [AlternatingGroup.of_cycleType_eq]
@@ -3074,11 +2286,8 @@ theorem AlternatingGroup.card_of_cycleType (m : Multiset ℕ) :
         (Fintype.card α).factorial /
           ((Fintype.card α - m.sum).factorial *
             (m.prod * (m.dedup.map fun n : ℕ => (m.count n).factorial).prod))
-      else 0 :=
-  by
+      else 0 := by
   split_ifs with hm
-  -- by_cases hm : (m.sum ≤ fintype.card α ∧ ∀ a ∈ m, 2 ≤ a),
-  -- cases nat.even_or_odd (m.sum + m.card) with hm' hm',
   · -- m is an even cycle_type
     rw [← Finset.card_map]
     rw [AlternatingGroup.of_cycleType_eq]
@@ -3105,83 +2314,6 @@ theorem AlternatingGroup.card_of_cycleType (m : Multiset ℕ) :
 
 variable {α}
 
-/- TODO !
-Lorsque G est un groupe fini, H un sous-groupe d'indice 2,
-la classe de conjugaison dans G d'un élément g ∈ H
-C_H(g) ⬝ Z_H(g) = card H
-C_G(g) ⬝ Z_G(g) = card G = 2 card H
-Si Z_G(g) ≤ H, alors Z_H(g) = Z_G(g), donc C_G(g) = 2 ⬝ C_H(g)
-sinon, Z_H(g) est d'indice 2 dans Z_G(g) et C_G(g) = C_H(g)
--/
-/-
-/-- Cardinality of a centralizer in `alternating_group α` of a given `cycle_type`-/
-theorem alternating_group.conj_stabilizer_card (g : alternating_group α) (m : multiset ℕ)
-  (hg : (g : equiv.perm α).cycle_type = m) :
-  nat.card (mul_action.stabilizer (conj_act (alternating_group α)) g) =
-    (((fintype.card α - m.sum).factorial
-    * (fintype.card α - m.sum).factorial
-    * m.prod * (m.dedup.map (λ (n : ℕ), (m.count n).factorial)).prod))
-    / (ite ((∀ i ∈ m, odd i) ∧ m.sum + 1 ≥ fintype.card α) 2 1) := sorry
--/
-/-
-
-lemma sign_of_lift (g : equiv.perm α) (τ: equiv.perm (g.cycle_factors_finset))
-  (H : ∀ c : g.cycle_factors_finset, (c : equiv.perm α).support.card = ((τ c) : equiv.perm α).support.card)
-  (a : g.cycle_factors_finset → α) (k : equiv.perm α)
-    (ha : ∀ (c : g.cycle_factors_finset), a c ∈ (c : equiv.perm α).support)
-    (hgk : g * k = k * g)
-    (hkc : ∀ (c : g.cycle_factors_finset), (conj_act.to_conj_act k) • (c : equiv.perm α) = τ c)
-    (hka : k ∘ a = a ∘ τ) :
-  let hτ_supp_ne : ∀ (d : equiv.perm (g.cycle_factors_finset)) (hd : d ∈ τ.cycle_factors_finset), d.support.nonempty := λ d hd, equiv.perm.support_of_cycle_nonempty (equiv.perm.mem_cycle_factors_finset_iff.mp hd).left
-  in let fτn : equiv.perm (g.cycle_factors_finset) → ℕ := λ d, dite (d ∈ τ.cycle_factors_finset) (λ hd, (hτ_supp_ne d hd).some.val.support.card) (λ hd, 0)
-  in k.sign = τ.cycle_factors_finset.prod (λ d, d.sign ^ (fτn d)) :=
-  begin
-  /- chaque cycle de τ donne lieu à des cycles de k en nombre égal au cardinal du support commun des éléments du cycle
-
-    cycle (c1 ... cr), où les ci sont des cycles de g
-   -/
-  intros hτ_supp_ne fτn,
-  /- let fτg : τ.cycle_factors_finset → g.cycle_factors_finset := λ d, (hτ_supp_ne d).some,
-  let fgn : g.cycle_factors_finset → ℕ := λ c, c.val.support.card,
-  let fτn := fgn ∘ fτg, -/
-  have : ∀ (d : equiv.perm g.cycle_factors_finset) (hd : d ∈ τ.cycle_factors_finset)
-    (c : g.cycle_factors_finset) (hc: c ∈ d.support), c.val.support.card = fτn d,
-  begin
-  { intros d hd c hc,
-    suffices : ∃ (k : ℕ), (d ^ k) (hτ_supp_ne d hd).some = c,
-    obtain ⟨k, rfl⟩ := this,
-    rw equiv.perm.pow_apply_mem_support at hc,
-    induction k with k hk,
-    { dsimp only [fτn],
-      rw dif_pos,
-      simp only [subtype.val_eq_coe, pow_zero, equiv.perm.coe_one, id.def], },
-    { rw [pow_succ, equiv.perm.mul_apply],
-      suffices : d _ = τ _,
-      rw this,
-      rw ← hk,
-      apply symm, exact H _,
-      convert equiv.perm.cycle_of_apply_self _ _,
-      refine equiv.perm.cycle_is_cycle_of _ hd,
-      rw equiv.perm.pow_apply_mem_support, exact hc, },
-    apply equiv.perm.is_cycle.exists_pow_eq ,
-    exact (equiv.perm.mem_cycle_factors_finset_iff.mp hd).left,
-    exact equiv.perm.mem_support.mp (hτ_supp_ne d hd).some_spec,
-    exact equiv.perm.mem_support.mp hc, },
-  end,
-
-  sorry,
-end
-
--/
-example (g c : Equiv.Perm α) (hc : c ∈ g.cycleFactorsFinset) (a : α) (ha : a ∈ g.support) :
-    a ∈ c.support ↔ c = g.cycleOf a := by
-  constructor
-  · intro ha'
-    exact Equiv.Perm.cycle_is_cycleOf ha' hc
-  · intro hc
-    rw [hc, Equiv.Perm.mem_support, Equiv.Perm.cycleOf_apply_self]
-    simpa only [Equiv.Perm.mem_support] using ha
-
 theorem sign_ψ (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset)
     (uv : Equiv.Perm (MulAction.fixedBy (Equiv.Perm α) α g))
     (k : ∀ c ∈ s, Subgroup.zpowers (c : Equiv.Perm α)) :
@@ -3197,4 +2329,3 @@ theorem sign_ψ (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset)
 #align on_cycle_factors.sign_ψ OnCycleFactors.sign_ψ
 
 end OnCycleFactors
-
