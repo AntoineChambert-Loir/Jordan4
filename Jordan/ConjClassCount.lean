@@ -17,6 +17,25 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.Data.Set.Card
 
+/-# Centralizer of a permutation and cardinality of conjugacy classes 
+
+Let `α : Type` and `g : Equiv.Perm α`. 
+The centralizer of `g` is the subgroup of `Equiv.Perm α` consisting
+of permutations which commute with `g`. It is accessed here as 
+`MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`.
+We compute this subgroup as follows.
+* If `h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`, then the action of `h` by conjugation on `Equiv.Perm α` stabilizes `g.cycleFactorsFinset`. That induces an action of MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`  on `g.cycleFactorsFinset` which is defined via `OnCycleFactors.subMulActionOnCycleFactors `
+* This action defines a group morphism `φ g` from `MulAction.stabilizer (ConjAct (Equiv.Perm α)) g` to `Equiv.Perm (g.cycleFactorsFinset)`
+* `Iφ_eq_range` shows that the range of `φ g` is the subgroup `Iφ g` of `Equiv.Perm (g.cycleFactorsFinset)` consisting of permutations `τ` which preserve the length of the cycles. This is showed by constructing a right inverse `φ'` in `hφ'_is_rightInverse`.
+* `hφ_range_card` computes the cardinality of `range (φ g)` as a product of factorials. This comes from a lengthy analysis of the subgroup of permutations which preserve a partition as a product type, starting with `Equiv.Perm.ofPartition`.
+* For n element `z : Equiv.Perm α`, we then prove in `hφ_mem_ker_iff` that `ConjAct.toConjAct z` belongs to the kernel of `φ g` if and only if it permutes `g.fixedPoints` and it acts on each cycle of `g` as a power of that cycle. This gives a description of the kernel of `φ g` as the product of a symmetric group and of a product of cyclic groups. 
+This starts with the morphism `ψ`, its injectivity `hφ_inj`, its range `hφ_ker_eq_psi_range`, and  its cardinality `hψ_range_card`.
+* `Equiv.Perm.conj_stabilizer_card g` computes the cardinality of the centralizer of `g` 
+* `Equiv.Perm.conj_class_card_mul_eq g` computes the cardinality of the conjugacy class of `g`.
+* `Equiv.Perm.card_of_cycleType_mul_eq m` and `Equiv.Perm.card_of_cycleType m` compute the cardinality of the set of permutations `g` such that `g.cycleType = m`.
+* `AlternatingGroup.of_cycleType_eq m`, `AlternatingGroup.of_cycleType_eq m` and `AlternatingGroup.card_of_cycleType m` give the same result for in `alternatingGroup α`
+* `sign_ψ` computes the signature of the permutation induced given by `ψ`, this is used in another file (to be imported here) to compute the cardinality of the centralizer in the alternating group. 
+-/
 open scoped Pointwise
 
 section Lists
@@ -2074,6 +2093,7 @@ theorem hψ_range_card (m : Multiset ℕ) (hg : g.cycleType = m) :
 #align on_cycle_factors.hψ_range_card OnCycleFactors.hψ_range_card
 
 -- Should one parenthesize the product ?
+-- should we delete the unnecessary additional arguments `m` and `hg`?
 /-- Cardinality of a centralizer in `equiv.perm α` of a given `cycle_type` -/
 theorem Equiv.Perm.conj_stabilizer_card (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g.cycleType = m) :
     Fintype.card (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) =

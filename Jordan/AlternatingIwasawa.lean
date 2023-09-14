@@ -5,15 +5,15 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module alternating_iwasawa
 -/
-import Mathbin.GroupTheory.GroupAction.SubMulAction
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Oneshot.ForMathlib.Alternating
-import Oneshot.IndexNormal
-import Oneshot.Primitive
-import Oneshot.MultipleTransitivity
-import Oneshot.PermIwasawa
-import Oneshot.AlternatingMaximal
-import Oneshot.V4
+import Mathlib.GroupTheory.GroupAction.SubMulAction
+import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Jordan.Mathlib.Alternating
+import Jordan.IndexNormal
+import Jordan.Primitive
+import Jordan.MultipleTransitivity
+import Jordan.PermIwasawa
+import Jordan.AlternatingMaximal
+import Jordan.V4
 
 -- import tactic.basic tactic.group
 -- import group_theory.solvable
