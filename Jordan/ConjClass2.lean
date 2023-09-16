@@ -59,16 +59,16 @@ theorem mem_zpowers_centralizer_iff (h k : G) :
 
 theorem Subgroup.relindex_of_index_two (K : Subgroup G) (hH : H.index = 2) :
     ¬K ≤ H → H.relindex K = 2 := by
-  intro hK
-  haveI : Subgroup.Normal H := Subgroup.normal_of_index_eq_two hH
-  suffices : H.relindex K = 1 ∨ H.relindex K = 2
-  cases' this with h1 h2
-  · exfalso; apply hK; rw [← Subgroup.relindex_eq_one]; exact h1
-  · exact h2
-  apply Nat.Prime.eq_one_or_self_of_dvd Nat.prime_two
-  rw [← Subgroup.relindex_sup_left]
-  rw [← hH]
-  refine' Subgroup.relindex_dvd_index_of_normal H (H ⊔ K)
+  suffices : H.relindex K ∣ 2
+  · intro hK
+    apply Or.resolve_left (Nat.Prime.eq_one_or_self_of_dvd Nat.prime_two _ this)
+    intro h
+    apply hK
+    rw [← Subgroup.relindex_eq_one]
+    exact h
+  · have : Subgroup.Normal H := Subgroup.normal_of_index_eq_two hH
+    rw [← Subgroup.relindex_sup_left, ← hH]
+    refine' Subgroup.relindex_dvd_index_of_normal H (H ⊔ K)
 #align subgroup.relindex_of_index_two Subgroup.relindex_of_index_two
 
 theorem MulAction.card_orbit_eq_stabilizer_index {G : Type _} [Group G] [Fintype G] {X : Type _}
@@ -84,86 +84,64 @@ theorem MulAction.card_orbit_eq_stabilizer_index {G : Type _} [Group G] [Fintype
   refine' Fintype.card_pos
 #align mul_action.card_orbit_eq_stabilizer_index MulAction.card_orbit_eq_stabilizer_index
 
-theorem MulAction.card_orbit_of_subgroup {G : Type _} [Group G] [Fintype G] {X : Type _} [Fintype X]
-    [MulAction G X] (H : Subgroup G) (x : X) :
+theorem MulAction.card_orbit_of_subgroup 
+    {G : Type*} [Group G] [Fintype G] {X : Type*} [Fintype X][MulAction G X] (H : Subgroup G) (x : X) :
     (Subgroup.map (Subgroup.subtype H) (MulAction.stabilizer H x)).relindex
           (MulAction.stabilizer G x) *
         Nat.card (MulAction.orbit G x) =
-      H.index * Nat.card (MulAction.orbit H x) :=
-  by
+      H.index * Nat.card (MulAction.orbit H x) := by
   classical
   simp only [MulAction.card_orbit_eq_stabilizer_index]
-  rw [Subgroup.relindex_mul_index]
-  rw [mul_comm]
-  rw [Subgroup.index_map]
+  rw [Subgroup.relindex_mul_index, mul_comm, Subgroup.index_map]
   simp only [Subgroup.ker_subtype, sup_bot_eq, Subgroup.subtype_range]
   rw [Subgroup.map_le_iff_le_comap]
   intro h
-  rw [Subgroup.mem_comap]
-  simp only [MulAction.mem_stabilizer_iff]
+  rw [Subgroup.mem_comap] 
   exact id
 #align mul_action.card_orbit_of_subgroup MulAction.card_orbit_of_subgroup
 
-theorem MulAction.card_orbit_of_equivariant {G : Type _} [Group G] [Fintype G] {X : Type _}
-    [Fintype X] [MulAction G X] {H : Type _} [Group H] [Fintype H] {Y : Type _} [Fintype Y]
-    [MulAction H Y] (φ : H →* G) (f : Y →ₑ[φ] X) (y : Y) (hy : φ.ker ≤ MulAction.stabilizer H y) :
-    (Subgroup.map φ (MulAction.stabilizer H y)).relindex (MulAction.stabilizer G (f y)) *
+theorem MulAction.card_orbit_of_equivariant 
+    {G : Type _} [Group G] [Fintype G] 
+    {X : Type _} [Fintype X] [MulAction G X] 
+    {H : Type _} [Group H] [Fintype H] 
+    {Y : Type _} [Fintype Y] [MulAction H Y] 
+    (φ : H →* G) (f : Y → X) (hf : ∀ h y, f (h • y) = φ h • (f y)) 
+    (y : Y) (hy : φ.ker ≤ MulAction.stabilizer H y) :
+    (Subgroup.map φ (MulAction.stabilizer H y)).relindex 
+      (MulAction.stabilizer G (f y)) *
         Nat.card (MulAction.orbit G (f y)) =
-      φ.range.index * Nat.card (MulAction.orbit H y) :=
-  by
+      φ.range.index * Nat.card (MulAction.orbit H y) := by
   classical
   simp only [MulAction.card_orbit_eq_stabilizer_index]
-  rw [Subgroup.relindex_mul_index]
-  rw [mul_comm]
-  rw [Subgroup.index_map]
+  rw [Subgroup.relindex_mul_index, mul_comm, Subgroup.index_map]
   simp only [Subgroup.ker_subtype, sup_bot_eq, Subgroup.subtype_range, sup_of_le_left hy]
   rw [Subgroup.map_le_iff_le_comap]
   intro h
-  rw [Subgroup.mem_comap]
-  simp only [MulAction.mem_stabilizer_iff]
-  intro h'
-  rw [← f.map_smul h y, h']
+  simp only [Subgroup.mem_comap, MulAction.mem_stabilizer_iff, ← hf]
+  exact congrArg f
 #align mul_action.card_orbit_of_equivariant MulAction.card_orbit_of_equivariant
-
-/- 
-example [Fintype G] (hH : H.index = 2) (K : Subgroup (ConjAct G)) :
-    (H.map (ConjAct.toConjAct.toMonoidHom : G →* ConjAct G)).relindex K = 1 := by
-  
-  rw [← Subgroup.map_comap_eq_self_of_surjective _ K]
-  --  suffices : K = subgroup.map conj_act.to_conj_act.to_monoid_hom (subgroup.comap conj_act.of_conj_act.to_monoid_hom K),
-  -- rw this,
-  rw [← Subgroup.relindex_comap]
-  rw [Subgroup.comap_map_eq_self_of_injective]
-  rw [Subgroup.relindex_eq_one]
-  sorry
-  exact conj_act.to_conj_act.injective
-  exact conj_act.of_conj_act.surjective -/
 
 theorem Subgroup.conj_class_card_of_index [Fintype G] (g : H) :
     (H.map (ConjAct.toConjAct.toMonoidHom : G →* ConjAct G)).relindex
           (MulAction.stabilizer (ConjAct G) (g : G)) *
         Nat.card (MulAction.orbit (ConjAct G) (g : G)) =
-      H.index * Nat.card (MulAction.orbit (ConjAct H) g) :=
-  by
+      H.index * Nat.card (MulAction.orbit (ConjAct H) g) := by
   classical
   let φ : ConjAct H →* ConjAct G :=
     (ConjAct.toConjAct.toMonoidHom.comp H.subtype).comp ConjAct.ofConjAct.toMonoidHom
-  let f : H →ₑ[φ] G :=
-    { toFun := H.subtype.toFun
-      map_smul' := fun m a => by 
-        simp only [ConjAct.smul_def, OneHom.toFun_eq_coe, 
-          MonoidHom.toOneHom_coe, map_mul, coeSubtype, map_inv, 
-          MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, 
-          Function.comp_apply, ConjAct.ofConjAct_toConjAct] }
+  let f : H → G := H.subtype.toFun
+  have hf : ∀ m a, f (m • a) = φ m • (f a) := by
+    intro m a
+    simp only [OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe, coeSubtype,
+      ConjAct.smul_def, Submonoid.coe_mul, coe_toSubmonoid, 
+      SubgroupClass.coe_inv, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom,
+      Function.comp_apply, ConjAct.ofConjAct_toConjAct]
   suffices hφ : φ.range.index = H.index
-  rw [← hφ]
-  rw [← MulAction.card_orbit_of_equivariant φ f g _]
-  apply congr_arg₂ (· * ·) _ rfl
-  -- dsimp [f]
-  rw [← Subgroup.inf_relindex_right]
-  apply congr_arg₂ Subgroup.relindex _ rfl
-  · rw [← ConjAct.stabilizer_eq_comap]
-  --  dsimp only [φ]
+  · rw [← hφ]
+    rw [← MulAction.card_orbit_of_equivariant φ f hf _]
+    rw [← Subgroup.inf_relindex_right]
+    congr
+    simp only [← ConjAct.stabilizer_eq_comap]
     simp only [← Subgroup.map_map, ← Subgroup.comap_comap]
     rw [Subgroup.map_comap_eq]
     apply le_antisymm
@@ -177,16 +155,14 @@ theorem Subgroup.conj_class_card_of_index [Fintype G] (g : H) :
       rw [Subgroup.mem_map]
       use! h
       constructor
-      rw [Subgroup.mem_inf]
-      constructor
-      rw [MonoidHom.mem_range]
-      use ConjAct.toConjAct (⟨h, hH⟩ : H)
-      simp only [MulAction.mem_stabilizer_iff] at hk' ⊢
-      simp only [MulEquiv.coe_toMonoidHom, ConjAct.ofConjAct_toConjAct]
-      simp only [Subgroup.comap_subtype]
-      rw [Subgroup.mem_subgroupOf]
-      rw [Subgroup.mem_comap]
-      exact hk'
+      · rw [Subgroup.mem_inf]
+        constructor
+        · rw [MonoidHom.mem_range]
+          use ConjAct.toConjAct (⟨h, hH⟩ : H)
+          simp only [MulAction.mem_stabilizer_iff] at hk' ⊢
+          simp only [MulEquiv.coe_toMonoidHom, ConjAct.ofConjAct_toConjAct]
+        · simp only [Subgroup.comap_subtype, Subgroup.mem_subgroupOf, Subgroup.mem_comap]
+          exact hk'
       rfl
     · intro k hk
       rw [Subgroup.mem_map] at hk 
@@ -200,84 +176,24 @@ theorem Subgroup.conj_class_card_of_index [Fintype G] (g : H) :
         Subgroup.coe_map, Set.mem_image, SetLike.mem_coe, MulEquiv.apply_eq_iff_eq, exists_eq_right,
         SetLike.coe_mem]
       exact hk.2
-  suffices : φ.ker = ⊥
-  rw [this]
-  exact bot_le
-  rw [MonoidHom.ker_eq_bot_iff, MonoidHom.coe_comp]
-  rw [Function.Injective.of_comp_iff _]
-  exact ConjAct.ofConjAct.injective
-  simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, coeSubtype, EmbeddingLike.comp_injective]
-  exact H.subtype_injective
-  -- dsimp only [φ]
-  rw [MonoidHom.range_eq_map, ← Subgroup.map_map, Subgroup.index_map]
-  rw [Subgroup.map_top_of_surjective _ ConjAct.toConjAct.surjective]
-  simp only [top_sup_eq, Subgroup.index_top, one_mul]
-  rw [MonoidHom.range_eq_map, ← Subgroup.map_map, Subgroup.index_map]
-  rw [← mul_one H.index]
-  apply congr_arg₂ (· * ·)
-  apply congr_arg
-  have : H = H ⊔ ⊥ := by rw [sup_bot_eq]
-  conv_rhs => rw [this]
-  apply congr_arg₂ (· ⊔ ·)
-  rw [← MonoidHom.range_eq_map]
-  exact Subgroup.subtype_range H
-  rw [MonoidHom.ker_eq_bot_iff]
-  exact ConjAct.toConjAct.injective
-  rw [Subgroup.index_eq_one, MonoidHom.range_top_iff_surjective]
-  exact ConjAct.toConjAct.surjective
+    · rw [(MonoidHom.ker_eq_bot_iff φ).mpr ?_]
+      exact bot_le
+      simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, coeSubtype,
+        EmbeddingLike.comp_injective, EquivLike.injective_comp]
+      exact H.subtype_injective
+
+  · rw [MonoidHom.range_eq_map, ← Subgroup.map_map, Subgroup.index_map]
+    rw [Subgroup.map_top_of_surjective _ ConjAct.toConjAct.surjective]
+    simp only [top_sup_eq, Subgroup.index_top, one_mul]
+    rw [MonoidHom.range_eq_map, ← Subgroup.map_map, Subgroup.index_map]
+    convert mul_one _
+    · rw [Subgroup.index_eq_one, MonoidHom.range_top_iff_surjective]
+      exact ConjAct.toConjAct.surjective
+    · rw [← MonoidHom.range_eq_map, Subgroup.subtype_range]
+      rw [(MonoidHom.ker_eq_bot_iff _).mpr ConjAct.toConjAct.injective]
+      rw [sup_bot_eq]
 #align subgroup.conj_class_card_of_index Subgroup.conj_class_card_of_index
 
--- open scoped Classical
-
-/- example (hH : H.index = 2) [Fintype G] (g : H) :
-    (if MulAction.stabilizer (ConjAct G) (g : G) ≤ H then 2 else 1) *
-        Fintype.card (MulAction.orbit (ConjAct H) g) =
-      Fintype.card (MulAction.orbit (ConjAct G) (g : G)) :=
-  by
-  suffices :
-    Fintype.card (MulAction.stabilizer (ConjAct G) (g : G)) =
-      ite (MulAction.stabilizer (ConjAct G) (g : G) ≤ H) 1 2 *
-        Fintype.card (MulAction.stabilizer (ConjAct H) g)
-  rw [← mul_left_inj' _]
-  -- nat.eq_of_mul_eq_mul_left  _,
-  rw [mul_assoc]
-  rw [MulAction.card_orbit_mul_card_stabilizer_eq_card_group _ (g : G)]
-  rw [this]
-  simp only [mul_assoc]; rw [mul_comm]; rw [← mul_assoc]
-  rw [ConjAct.card]
-  rw [← Subgroup.index_mul_card H]
-  rw [hH]
-  simp only [← mul_assoc]; rw [mul_comm]
-  nth_rw 3 [mul_comm]
-  simp only [mul_assoc]
-  -- rw mul_comm (fintype.card ↥(mul_action.stabilizer (conj_act ↥H) g)),
-  rw [MulAction.card_orbit_mul_card_stabilizer_eq_card_group]
-  -- rw mul_comm,
-  simp only [← mul_assoc]
-  apply congr_arg₂ _ _ rfl
-  by_cases hg : MulAction.stabilizer (ConjAct G) (g : G) ≤ H
-  · simp only [if_pos hg, mul_one]
-  · simp only [if_neg hg, one_mul]
-  exact Fintype.card_ne_zero
-  simp_rw [ConjAct.stabilizer_eq_centralizer]
-  rw [← Nat.card_eq_fintype_card]
-  rw [Subgroup.Nat.card_eq_mul' H]
-  apply congr_arg₂
-  · split_ifs with hK
-    rw [Subgroup.relindex_eq_one]; exact hK
-    exact Subgroup.relindex_of_index_two _ _ hH hK
-  · rw [Nat.card_eq_fintype_card]
-    apply Fintype.card_congr'
-    apply congr_arg coeSort
-    · ext k
-      rw [Subgroup.mem_subgroupOf]
-      simp only [mem_zpowers_centralizer_iff]
-      simp only [← Subgroup.coe_mul]; rw [Subtype.coe_inj]
-  rw [zero_lt_iff]; exact Subgroup.index_ne_zero_of_finite
-
-example (u : ℤˣ) : - u = 1 ↔ u = -1 := by
-  exact neg_eq_iff_eq_neg
- -/
 variable {α : Type _} [Fintype α] [DecidableEq α]
 
 variable (g : Equiv.Perm α)
@@ -406,8 +322,9 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
       simp only [Multiset.sum_replicate, Algebra.id.smul_eq_mul, Multiset.card_replicate]
       rw [Odd.neg_one_pow]
       rw [Nat.odd_add']
-      simp only [h_odd c.support.card
-          (by rw [← hg, Equiv.Perm.cycleType_def, Multiset.mem_map]; exact ⟨c, hc, rfl⟩),
+      simp only [odd_of_mem_kerφ g m hg h c.support.card
+          (by rw [← hg, Equiv.Perm.cycleType_def, Multiset.mem_map]
+              exact ⟨c, hc, rfl⟩),
         true_iff_iff]
       rw [mul_comm]; apply even_two_mul
     -- on_cycle_count.same_cycle_of_mem_support
@@ -433,11 +350,15 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
     suffices ∀ i ∈ k.cycleType, i = 2 by
       rw [← Multiset.eq_replicate_card] at this 
       rw [this]
-      apply congr_arg₂ _ _ rfl
-      have this' := Equiv.Perm.sum_cycleType k
+      congr
+      -- 
+      suffices this' : Multiset.sum (Equiv.Perm.cycleType k) = Finset.card (Equiv.Perm.support k)
+
+      -- have this' := Equiv.Perm.sum_cycleType k
       rw [this] at this' 
       simp only [Multiset.sum_replicate, Algebra.id.smul_eq_mul] at this' 
-      rw [← mul_left_inj']; rw [this']
+      rw [← mul_left_inj']
+      rw [this']
       suffices this2 : k.support = c.support ∪ d.support
       rw [this2]; rw [Finset.card_union_eq _]
       suffices this3 : d.support.card = c.support.card
@@ -481,7 +402,8 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
             intro h; rw [← Subtype.coe_inj] at h ; apply hm'; exact h
         · intro hx
           -- obtain ⟨cx, hcx, hcx'⟩ := hsame_cycle x _,
-          obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha (x := x) _
+          suffices hx' : Equiv.Perm.cycleOf g x = c ∨ Equiv.Perm.cycleOf g x = d
+          obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha (x := x) ?_
           have hcx' := OnCycleFactors.SameCycle.is_cycleOf ha cx hcx
           obtain ⟨n, hn, hnx⟩ := Equiv.Perm.SameCycle.exists_pow_eq' hcx
           specialize hk_apply cx 1
@@ -489,8 +411,7 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
           rw [← hnx, Equiv.Perm.mem_support, hk_apply]
           rw [Function.Injective.ne_iff (Equiv.injective _)]
           intro haτcx_eq_acx; dsimp at haτcx_eq_acx 
-          have : ¬Equiv.Perm.Disjoint (cx : Equiv.Perm α) (τ cx : Equiv.Perm α) :=
-            by
+          have : ¬Equiv.Perm.Disjoint (cx : Equiv.Perm α) (τ cx : Equiv.Perm α) := by
             rw [Equiv.Perm.disjoint_iff_support_disjoint]
             rw [Finset.not_disjoint_iff]
             use a cx
@@ -506,18 +427,28 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
           apply this'
           simp only [← Subtype.coe_inj, Subtype.coe_mk, ← hcx']
           rw [Finset.mem_union] at hx 
-          cases' hx with hx hx
-          · apply Or.intro_left
-            exact (Equiv.Perm.cycle_is_cycleOf hx hc).symm
-          · apply Or.intro_right
-            exact (Equiv.Perm.cycle_is_cycleOf hx hd).symm
+          exact hx'
           · intro h
             simp only [← Subtype.coe_inj, Subtype.coe_mk] at h 
             exact hm' h
-          -- · rw [Finset.mem_union] at hx ; cases' hx with hx hx
-          --   exact Equiv.Perm.mem_cycleFactorsFinset_support_le hc hx
-          --   exact Equiv.Perm.mem_cycleFactorsFinset_support_le hd hx
-      norm_num
+              
+          · simp only [Finset.mem_union] at hx 
+            cases hx with
+            | inl hx => 
+              apply Or.intro_left
+              exact (Equiv.Perm.cycle_is_cycleOf hx hc).symm
+            | inr hx => 
+              apply Or.intro_right
+              exact (Equiv.Perm.cycle_is_cycleOf hx hd).symm
+        
+      · norm_num
+      · apply Equiv.Perm.sum_cycleType
+    · rw [← Equiv.Perm.cycleOf_mem_cycleFactorsFinset_iff]
+      cases' hx' with hxc hxd
+      · rw [hxc]
+        exact hc
+      · rw [hxd]
+        exact hd
     -- ∀ i ∈ k.cycle_type, i = 2
     suffices hk2 : orderOf k = 2
     · have hk2' : Nat.Prime (orderOf k); rw [hk2]; exact Nat.prime_two
@@ -531,9 +462,9 @@ theorem count_le_one_of_mem_kerφ (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g
       simp only [Equiv.Perm.coe_one, id.def]
       by_cases hx : x ∈ g.support
       · -- obtain ⟨cx, hcx, hcx'⟩ := hsame_cycle x hx,
-        obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha x hx
+        obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha hx
         -- have hcx' := on_cycle_factors.same_cycle.is_cycle_of ha cx hcx,
-        obtain ⟨n, hn, rfl⟩ := hcx.exists_pow_eq'
+        obtain ⟨n, _, rfl⟩ := hcx.exists_pow_eq'
         rw [hk_apply cx 2 n]
         apply congr_arg
         apply congr_arg
