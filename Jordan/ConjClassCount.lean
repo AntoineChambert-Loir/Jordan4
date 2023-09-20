@@ -42,29 +42,60 @@ which commute with `g`. It is accessed here as
 
 We compute this subgroup as follows.
 
-* If `h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`, then the action of `h` by conjugation on `Equiv.Perm α` stabilizes `g.cycleFactorsFinset`. That induces an action of MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`  on `g.cycleFactorsFinset` which is defined via `OnCycleFactors.subMulActionOnCycleFactors `
+* If `h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`, then the action 
+  of `h` by conjugation on `Equiv.Perm α` stabilizes `g.cycleFactorsFinset`. 
+  That induces an action of MulAction.stabilizer (ConjAct (Equiv.Perm α)) g`  
+  on `g.cycleFactorsFinset` which is defined via 
+  `OnCycleFactors.subMulActionOnCycleFactors `
 
-* This action defines a group morphism `OnCycleFactors.φ g` from `MulAction.stabilizer (ConjAct (Equiv.Perm α)) g` to `Equiv.Perm (g.cycleFactorsFinset)`
+* This action defines a group morphism `OnCycleFactors.φ g` from 
+  `MulAction.stabilizer (ConjAct (Equiv.Perm α)) g` 
+  to `Equiv.Perm (g.cycleFactorsFinset)`
 
-* `OnCycleFactors.Iφ_eq_range` shows that the range of `OnCycleFactors.φ g` is the subgroup `Iφ g` of `Equiv.Perm (g.cycleFactorsFinset)` consisting of permutations `τ` which preserve the length of the cycles. This is showed by constructing a right inverse `OnCycleFactors.φ'` in `OnCycleFactors.hφ'_is_rightInverse`.
+* `OnCycleFactors.Iφ_eq_range` shows that the range of `OnCycleFactors.φ g` 
+  is the subgroup `Iφ g` of `Equiv.Perm (g.cycleFactorsFinset)` 
+  consisting of permutations `τ` which preserve the length of the cycles. 
+  This is showed by constructing a right inverse `OnCycleFactors.φ'` 
+  in `OnCycleFactors.hφ'_is_rightInverse`.
 
-* `OnCycleFactors.hφ_range_card` computes the cardinality of `range (OnCycleFactors.φ g)` as a product of factorials. This comes from a lengthy analysis of the subgroup of permutations which preserve a partition as a product type, starting with `Equiv.Perm.ofPartition`.
-(For the moment, this latter analysis should be done in greater generality.)
+* `OnCycleFactors.hφ_range_card` computes the cardinality of 
+  `range (OnCycleFactors.φ g)` as a product of factorials. 
+  This comes from a lengthy analysis of the subgroup of permutations 
+  which preserve a partition as a product type, 
+  starting with `Equiv.Perm.ofPartition`.
+  (For the moment, this latter analysis requires `Fintype α`, 
+  but it should be done in greater generality.)
 
-* For n element `z : Equiv.Perm α`, we then prove in `OnCycleFactors.hφ_mem_ker_iff` that `ConjAct.toConjAct z` belongs to the kernel of `OnCycleFactors.φ g` if and only if it permutes `g.fixedPoints` and it acts on each cycle of `g` as a power of that cycle. This gives a description of the kernel of `OnCycleFactors.φ g` as the product of a symmetric group and of a product of cyclic groups. 
-This starts with the morphism `OnCycleFactors.ψ`, its injectivity `OnCycleFactors.hψ_inj`, its range `OnCycleFactors.hφ_ker_eq_psi_range`, and  its cardinality `OnCycleFactors.hψ_range_card`.
+* For n element `z : Equiv.Perm α`, we then prove in 
+  `OnCycleFactors.hφ_mem_ker_iff` that `ConjAct.toConjAct z` belongs to 
+  the kernel of `OnCycleFactors.φ g` if and only if it permutes `g.fixedPoints` 
+  and it acts on each cycle of `g` as a power of that cycle. 
+  This gives a description of the kernel of `OnCycleFactors.φ g` as the product 
+  of a symmetric group and of a product of cyclic groups. 
+  This starts with the morphism `OnCycleFactors.ψ`, 
+  its injectivity `OnCycleFactors.hψ_inj`, 
+  its range `OnCycleFactors.hφ_ker_eq_psi_range`, 
+  and  its cardinality `OnCycleFactors.hψ_range_card`.
 
-* `Equiv.Perm.conj_stabilizer_card g` computes the cardinality of the centralizer of `g` 
+* `Equiv.Perm.conj_stabilizer_card g` computes the cardinality 
+  of the centralizer of `g` 
 
-* `Equiv.Perm.conj_class_card_mul_eq g` computes the cardinality of the conjugacy class of `g`.
+* `Equiv.Perm.conj_class_card_mul_eq g` computes the cardinality 
+  of the conjugacy class of `g`.
 
-* `Equiv.Perm.card_of_cycleType_mul_eq m` and `Equiv.Perm.card_of_cycleType m` compute the cardinality of the set of permutations `g` such that `g.cycleType = m`.
+* `Equiv.Perm.card_of_cycleType_mul_eq m` and `Equiv.Perm.card_of_cycleType m` 
+  compute the cardinality of the set of permutations `g` such that `g.cycleType = m`.
 
-* `AlternatingGroup.of_cycleType_eq m`, `AlternatingGroup.of_cycleType_eq m` and `AlternatingGroup.card_of_cycleType m` give the same result for in `alternatingGroup α`
+* `AlternatingGroup.of_cycleType_eq m`, `AlternatingGroup.of_cycleType_eq m` 
+  and `AlternatingGroup.card_of_cycleType m` give the same result 
+  in the subgroup `alternatingGroup α`
 
 * `sign_ψ` computes the signature of the permutation induced given by `ψ`.
 
-* We finally compute on which condition the centralizer of an even permutation is contained in `alternatingGroup α` and deduce the formula for the cardinality of the centralizers and conjugacy classes in `alternatingGroup α`.
+* We finally compute on which condition the centralizer of an even permutation 
+  is contained in `alternatingGroup α` and deduce the formula 
+  for the cardinality of the centralizers and conjugacy classes 
+  in `alternatingGroup α`.
 
 -/
 
@@ -842,7 +873,7 @@ theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff {g c : Equiv.Perm α} (s : 
 
 /-- A permutation `g` commutes with a cycle `c` if and only if 
   `c.support` is invariant under `g`, and `g` acts on it as a power of `c`. -/
-theorem Equiv.Perm.IsCycle.commute_iff (g c : Equiv.Perm α) (hc : c.IsCycle) :
+theorem Equiv.Perm.IsCycle.commute_iff {g c : Equiv.Perm α} (hc : c.IsCycle) :
     Commute g c ↔
       ∃ hc' : ∀ x : α, x ∈ c.support ↔ g x ∈ c.support,
         Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm g hc') ∈ Subgroup.zpowers c := by
@@ -1681,7 +1712,6 @@ def Iφ : Subgroup (Equiv.Perm g.cycleFactorsFinset) where
     simp only [Subtype.forall, Set.mem_setOf_eq]
     simp only [Subtype.forall, Set.mem_setOf_eq] at hσ 
     intro c hc
-    simp only
     rw [← hσ ]
     simp only [Finset.coe_mem, Subtype.coe_eta, Equiv.Perm.apply_inv_self]
     simp only [Finset.coe_mem]
@@ -1817,8 +1847,6 @@ theorem hφ_range_card (m : Multiset ℕ) (hg : g.cycleType = m) :
     simpa only [Multiset.mem_toFinset, Multiset.mem_dedup] using hi
   · intro i hi
     simp only [Finset.mem_sdiff, Finset.mem_range, Multiset.mem_toFinset, Multiset.mem_dedup] at hi
-      ;
-    simp only
     rw [Multiset.count_eq_zero_of_not_mem hi.2]
     exact Nat.factorial_zero
   · exact fun i _ ↦ rfl 
@@ -1894,17 +1922,17 @@ theorem hφ_mem_ker_iff' (z : Equiv.Perm α) :
 
 -- un groupe symétrique x produit de groupes cycliques
 theorem hφ_mem_ker_iff (z : Equiv.Perm α) :
-    ConjAct.toConjAct z ∈
-      Subgroup.map (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g).subtype (φ g).ker ↔
+    ConjAct.toConjAct z ∈ Subgroup.map 
+      (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g).subtype (φ g).ker ↔
     ∀ s ∈ g.cycleFactorsFinset, ∃ (hs' : ∀ x : α, x ∈ s.support ↔ z x ∈ s.support),
-        Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm z hs') ∈ Subgroup.zpowers s := by
+        Equiv.Perm.ofSubtype 
+          (Equiv.Perm.subtypePerm z hs') ∈ Subgroup.zpowers s := by
   rw [hφ_mem_ker_iff']
   apply forall_congr'
   intro c
   apply imp_congr_right
   intro hc
-  rw [Equiv.Perm.commute_of_mem_cycleFactorsFinset_iff hc]
-  rw [Equiv.Perm.subtypePerm_on_cycleFactorsFinset hc]
+  rw [Equiv.Perm.IsCycle.commute_iff (Equiv.Perm.mem_cycleFactorsFinset_iff.mp hc).1]
 #align on_cycle_factors.hφ_mem_ker_iff OnCycleFactors.hφ_mem_ker_iff
 
 def ψAux (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
@@ -2325,8 +2353,7 @@ theorem Equiv.Perm.conj_class_card (g : Equiv.Perm α) (m : Multiset ℕ) (hg : 
     Fintype.card {h : Equiv.Perm α | IsConj g h} =
       (Fintype.card α).factorial /
         ((Fintype.card α - m.sum).factorial * m.prod *
-          (m.dedup.map fun n : ℕ => (m.count n).factorial).prod) :=
-  by
+          (m.dedup.map fun n : ℕ => (m.count n).factorial).prod) := by
   rw [← Equiv.Perm.conj_class_card_mul_eq g m hg]
   rw [Nat.div_eq_of_eq_mul_left _]
   simp only [← mul_assoc]
@@ -2344,7 +2371,7 @@ theorem Equiv.Perm.card_of_cycleType_mul_eq (m : Multiset ℕ) :
       ite (m.sum ≤ Fintype.card α ∧ ∀ a ∈ m, 2 ≤ a) (Fintype.card α).factorial 0 := by
   split_ifs with hm 
   · -- nonempty case
-    obtain ⟨g, hg⟩ := Equiv.permWithCycleType_nonempty_iff.mp hm
+    obtain ⟨g, hg⟩ := Equiv.permWithCycleType_nonempty_iff.mpr hm
     suffices :
       (Finset.univ.filter fun h : Equiv.Perm α => h.cycleType = m) =
         Finset.univ.filter fun h : Equiv.Perm α => IsConj g h
@@ -2370,9 +2397,10 @@ theorem Equiv.Perm.card_of_cycleType_mul_eq (m : Multiset ℕ) :
     rw [← not_nonempty_iff]
     intro h; apply hm
     simp only [Finset.nonempty_coe_sort] at h 
-    rw [Equiv.permWithCycleType_nonempty_iff]
+    rw [← Equiv.permWithCycleType_nonempty_iff]
     exact h
-#align on_cycle_factors.equiv.perm.card_of_cycle_type_mul_eq OnCycleFactors.Equiv.Perm.card_of_cycleType_mul_eq
+#align on_cycle_factors.equiv.perm.card_of_cycle_type_mul_eq 
+  OnCycleFactors.Equiv.Perm.card_of_cycleType_mul_eq
 
 /-- Cardinality of the set of `equiv.perm α` of given `cycle_type` -/
 theorem Equiv.Perm.card_of_cycleType (m : Multiset ℕ) :
@@ -2385,7 +2413,7 @@ theorem Equiv.Perm.card_of_cycleType (m : Multiset ℕ) :
   by
   split_ifs with hm 
   · -- nonempty case
-    obtain ⟨g, hg⟩ := Equiv.permWithCycleType_nonempty_iff.mp hm
+    obtain ⟨g, hg⟩ := Equiv.permWithCycleType_nonempty_iff.mpr hm
     simp only [Equiv.permWithCycleType, Finset.mem_filter] at hg 
     rw [← Equiv.Perm.conj_class_card_mul_eq g m hg.2]
     simp only [mul_assoc]
@@ -2402,8 +2430,10 @@ theorem Equiv.Perm.card_of_cycleType (m : Multiset ℕ) :
     simp only [← mul_assoc]
     rw [← Equiv.Perm.conj_stabilizer_card g m hg.2]
     refine' Fintype.card_pos
-  · rw [Finset.card_eq_zero, ← Finset.isEmpty_coe_sort, ← not_nonempty_iff]
-    simpa only [Finset.nonempty_coe_sort, Equiv.permWithCycleType_nonempty_iff] using hm
+  · rw [Finset.card_eq_zero, ← Finset.isEmpty_coe_sort, ← not_nonempty_iff, 
+      Finset.nonempty_coe_sort]
+    rw [← Equiv.permWithCycleType_nonempty_iff] at hm 
+    exact hm
 #align on_cycle_factors.equiv.perm.card_of_cycle_type OnCycleFactors.Equiv.Perm.card_of_cycleType
 
 theorem AlternatingGroup.of_cycleType_eq (m : Multiset ℕ) :
@@ -2572,11 +2602,12 @@ theorem odd_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) (h : MulActio
     rw [Finset.singleton_subset_iff]
     exact hc
 
-theorem card_le_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) (h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g ≤ alternatingGroup α) : Fintype.card α ≤ m.sum + 1 := by
+theorem card_le_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) 
+    (h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g ≤ alternatingGroup α) : 
+    Fintype.card α ≤ m.sum + 1 := by
   rw [← not_lt]
   intro hm
-  rw [Nat.lt_iff_add_one_le] at hm 
-  rw [add_assoc] at hm 
+  rw [Nat.lt_iff_add_one_le, add_assoc] at hm 
   change m.sum + 2 ≤ _ at hm 
   suffices 1 < Fintype.card (MulAction.fixedBy (Equiv.Perm α) α g) by
     obtain ⟨a, b, hab⟩ := Fintype.exists_pair_of_one_lt_card this
@@ -2604,7 +2635,9 @@ theorem card_le_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) (h : MulA
     exact hm
     rw [← hg, Equiv.Perm.sum_cycleType]; exact Finset.card_le_univ _
 
-theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) (h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g ≤ alternatingGroup α) : ∀ i, m.count i ≤ 1 := by
+theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) 
+    (h : MulAction.stabilizer (ConjAct (Equiv.Perm α)) g ≤ alternatingGroup α) : 
+    ∀ i, m.count i ≤ 1 := by
   rw [← Multiset.nodup_iff_count_le_one, ← hg, Equiv.Perm.cycleType_def]
   rw [Multiset.nodup_map_iff_inj_on g.cycleFactorsFinset.nodup]
   simp only [Function.comp_apply, ← Finset.mem_def]
@@ -2693,13 +2726,14 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m) (h :
         ext x
         constructor
         · intro hx
-          obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha (x := x) (hksup hx)
-          have hxcx : x ∈ (cx : Equiv.Perm α).support :=
-            by
-            rw [← OnCycleFactors.SameCycle.is_cycleOf ha cx hcx]
+          obtain ⟨cx, hcx⟩ := Equiv.Perm.sameCycle_of_mem_support (hksup hx)
+          have hxcx : x ∈ (cx : Equiv.Perm α).support := by
+            rw [Equiv.Perm.SameCycle.eq_cycleOf cx (hcx _ _)] --  cx hcx]
+            
             -- rw ← (on_cycle_factors.same_cycle_of_mem_support' ha cx (hksup hx)).mpr hcx,
             rw [Equiv.Perm.mem_support_cycleOf_iff]
             constructor; rfl; exact hksup hx
+
           suffices : c = cx ∨ d = cx
           rw [Finset.mem_union]
           cases' this with hccx hdcx
