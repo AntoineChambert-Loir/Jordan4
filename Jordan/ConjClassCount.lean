@@ -873,7 +873,7 @@ theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff {g c : Equiv.Perm α} (s : 
 
 /-- A permutation `g` commutes with a cycle `c` if and only if 
   `c.support` is invariant under `g`, and `g` acts on it as a power of `c`. -/
-theorem Equiv.Perm.IsCycle.commute_iff (g c : Equiv.Perm α) (hc : c.IsCycle) :
+theorem Equiv.Perm.IsCycle.commute_iff {g c : Equiv.Perm α} (hc : c.IsCycle) :
     Commute g c ↔
       ∃ hc' : ∀ x : α, x ∈ c.support ↔ g x ∈ c.support,
         Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm g hc') ∈ Subgroup.zpowers c := by
@@ -1947,8 +1947,7 @@ theorem hφ_mem_ker_iff (z : Equiv.Perm α) :
   intro c
   apply imp_congr_right
   intro hc
-  rw [Equiv.Perm.commute_of_mem_cycleFactorsFinset_iff hc]
-  rw [Equiv.Perm.subtypePerm_on_cycleFactorsFinset hc]
+  exact Equiv.Perm.IsCycle.commute_iff (Equiv.Perm.mem_cycleFactorsFinset_iff.mp hc).1
 #align on_cycle_factors.hφ_mem_ker_iff OnCycleFactors.hφ_mem_ker_iff
 
 def ψAux (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
@@ -2725,7 +2724,6 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m)
       -- 
       suffices this' : Multiset.sum (Equiv.Perm.cycleType k) = Finset.card (Equiv.Perm.support k)
 
-      -- have this' := Equiv.Perm.sum_cycleType k
       rw [this] at this' 
       simp only [Multiset.sum_replicate, Algebra.id.smul_eq_mul] at this' 
       rw [← mul_left_inj']
@@ -2744,18 +2742,15 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m)
         · intro hx
           obtain ⟨cx, hcx⟩ := Equiv.Perm.sameCycle_of_mem_support (hksup hx)
           have hxcx : x ∈ (cx : Equiv.Perm α).support := by
-            rw [Equiv.Perm.SameCycle.eq_cycleOf cx (hcx _ _)] --  cx hcx]
-            
-            -- rw ← (on_cycle_factors.same_cycle_of_mem_support' ha cx (hksup hx)).mpr hcx,
+            rw [Equiv.Perm.SameCycle.eq_cycleOf cx (hcx (a cx) (ha cx)) (ha cx)] 
             rw [Equiv.Perm.mem_support_cycleOf_iff]
             constructor; rfl; exact hksup hx
-
           suffices : c = cx ∨ d = cx
           rw [Finset.mem_union]
           cases' this with hccx hdcx
           · apply Or.intro_left; rw [hccx]; exact hxcx
           · apply Or.intro_right; rw [hdcx]; exact hxcx
-          · obtain ⟨n, _, hnx⟩ := hcx.exists_pow_eq'
+          · obtain ⟨n, _, hnx⟩ := (hcx (a cx) (ha cx)).exists_pow_eq'
             rw [Equiv.Perm.mem_support, ← hnx] at hx 
             specialize hk_apply cx 1
             simp only [pow_one] at hk_apply 
@@ -2775,14 +2770,14 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m)
         · intro hx
           -- obtain ⟨cx, hcx, hcx'⟩ := hsame_cycle x _,
           suffices hx' : Equiv.Perm.cycleOf g x = c ∨ Equiv.Perm.cycleOf g x = d
-          obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha (x := x) ?_
-          have hcx' := OnCycleFactors.SameCycle.is_cycleOf ha cx hcx
-          obtain ⟨n, _, hnx⟩ := Equiv.Perm.SameCycle.exists_pow_eq' hcx
+          obtain ⟨cx, hcx⟩ := Equiv.Perm.sameCycle_of_mem_support (x := x) ?_
+          have hcx' := Equiv.Perm.SameCycle.eq_cycleOf cx (hcx (a cx) (ha cx)) (ha cx)
+          obtain ⟨n, _, hnx⟩ := Equiv.Perm.SameCycle.exists_pow_eq' (hcx (a cx) (ha cx))
           specialize hk_apply cx 1
           simp only [pow_one] at hk_apply 
           rw [← hnx, Equiv.Perm.mem_support, hk_apply]
           rw [Function.Injective.ne_iff (Equiv.injective _)]
-          intro haτcx_eq_acx; dsimp at haτcx_eq_acx 
+          intro haτcx_eq_acx
           have : ¬Equiv.Perm.Disjoint (cx : Equiv.Perm α) (τ cx : Equiv.Perm α) := by
             rw [Equiv.Perm.disjoint_iff_support_disjoint]
             rw [Finset.not_disjoint_iff]
@@ -2799,6 +2794,7 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m)
           apply this'
           simp only [← Subtype.coe_inj, Subtype.coe_mk, ← hcx']
           rw [Finset.mem_union] at hx 
+          rw [hcx']
           exact hx'
           · intro h
             simp only [← Subtype.coe_inj, Subtype.coe_mk] at h 
@@ -2834,9 +2830,9 @@ theorem count_le_one_of_mem_kerφ (m : Multiset ℕ) (hg : g.cycleType = m)
       simp only [Equiv.Perm.coe_one, id.def]
       by_cases hx : x ∈ g.support
       · -- obtain ⟨cx, hcx, hcx'⟩ := hsame_cycle x hx,
-        obtain ⟨cx, hcx⟩ := OnCycleFactors.sameCycle_of_mem_support ha hx
+        obtain ⟨cx, hcx⟩ := Equiv.Perm.sameCycle_of_mem_support hx
         -- have hcx' := on_cycle_factors.same_cycle.is_cycle_of ha cx hcx,
-        obtain ⟨n, _, rfl⟩ := hcx.exists_pow_eq'
+        obtain ⟨n, _, rfl⟩ := (hcx (a cx) (ha cx)).exists_pow_eq'
         rw [hk_apply cx 2 n]
         apply congr_arg
         apply congr_arg
@@ -2866,7 +2862,7 @@ theorem kerφ_le_alternating_iff (m : Multiset ℕ) (hg : g.cycleType = m) :
       (∀ i ∈ m, Odd i) ∧ 
         Fintype.card α ≤ m.sum + 1 ∧ ∀ i, m.count i ≤ 1 :=  by
   rw [SetLike.le_def]
-  simp_rw [Equiv.Perm.mem_alternatingGroup]
+  -- simp_rw [Equiv.Perm.mem_alternatingGroup]
   constructor
   · intro h
     constructor
@@ -2874,14 +2870,12 @@ theorem kerφ_le_alternating_iff (m : Multiset ℕ) (hg : g.cycleType = m) :
     constructor
     exact card_le_of_mem_kerφ m hg h
     exact count_le_one_of_mem_kerφ m hg h
-    
   · rintro ⟨h_odd, h_fixed, h_count⟩ x hx
     suffices hx' : x ∈ Set.range (OnCycleFactors.ψ g)
     obtain ⟨⟨y, uv⟩, rfl⟩ := Set.mem_range.mp hx'
     rw [OnCycleFactors.ψ, Equiv.Perm.mem_alternatingGroup, OnCycleFactors.sign_ψ]
     -- simp only [OnCycleFactors.ψ, OnCycleFactors.ψAux]
     simp only [Equiv.Perm.sign_mul, Equiv.Perm.sign_ofSubtype]
-    simp only
     convert mul_one _
     · apply Finset.prod_eq_one
       intro c hc
@@ -2924,7 +2918,8 @@ theorem kerφ_le_alternating_iff (m : Multiset ℕ) (hg : g.cycleType = m) :
     apply Equiv.ext
     intro c
     rw [← Multiset.nodup_iff_count_le_one, ← hg, Equiv.Perm.cycleType_def,
-      Multiset.nodup_map_iff_inj_on (Equiv.Perm.cycleFactorsFinset g).nodup] at h_count 
+      Multiset.nodup_map_iff_inj_on (Equiv.Perm.cycleFactorsFinset g).nodup] 
+      at h_count 
     rw [Equiv.Perm.coe_one, id.def, ← Subtype.coe_inj]
     exact h_count (z c) (z c).prop c c.prop (hz c)
 #align kerφ_le_alternating_iff OnCycleFactors.kerφ_le_alternating_iff
