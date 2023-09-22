@@ -2063,7 +2063,8 @@ def ψAux (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
         exact g.cycleFactorsFinset_mem_commute (hs hc) (hs hd) h
 #align on_cycle_factors.ψ_aux OnCycleFactors.ψAux
 
-example {α : Type u_3} [DecidableEq α] {β : Type u_4} [Monoid β] 
+lemma _root_.Finset.noncommProd_eq_one 
+    {α : Type u_3} [DecidableEq α] {β : Type u_4} [Monoid β] 
     (s : Finset α) (f : α → β) 
     (comm : Set.Pairwise ↑s fun a b => Commute (f a) (f b)) 
     (hf : ∀ a ∈ s, f a = 1) :
@@ -2072,7 +2073,10 @@ example {α : Type u_3} [DecidableEq α] {β : Type u_4} [Monoid β]
   | empty => simp only [Finset.noncommProd_empty]
   | insert ha hs => 
       rw [Finset.noncommProd_insert_of_not_mem _ _ _ _ ha]
-      rw [hf _ (Finset.mem_insert _ _), one_mul]
+      rw [hf _ (Finset.mem_insert_self _ _), one_mul]
+      apply hs 
+      intro a ha
+      exact hf _ (Finset.mem_insert_of_mem ha)
 
 
 
@@ -2096,8 +2100,15 @@ def ψAux' (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
   map_one' := by
     simp only [Prod.fst_one, map_one, Prod.snd_one, Pi.one_apply, 
       OneMemClass.coe_one, dite_eq_ite, ite_self, one_mul]
+    apply Finset.noncommProd_eq_one
+    exact fun _ _ ↦ rfl
+  map_mul' := by
+    rintro ⟨g1, g2⟩ ⟨h1, h2⟩
+    simp only [Prod.mk_mul_mk, map_mul, Pi.mul_apply, Submonoid.coe_mul, Subgroup.coe_toSubmonoid]
+    dsimp
     
-  map_mul' := sorry
+
+    sorry
 
 variable (g)
 
