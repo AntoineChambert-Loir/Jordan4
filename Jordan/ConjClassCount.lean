@@ -939,6 +939,17 @@ theorem Equiv.Perm.IsCycle.commute_iff {g c : Equiv.Perm α} (hc : c.IsCycle) :
     exact ha
     exact fun b => False.elim (ha b)
 
+theorem Equiv.Perm.IsCycle.forall_commute_iff (g z : Equiv.Perm α) :
+    (∀ c ∈ g.cycleFactorsFinset, Commute z c) ↔ 
+      ∀ c ∈ g.cycleFactorsFinset, 
+      ∃ (hc : ∀ x : α, x ∈ c.support ↔ z x ∈ c.support),
+        Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm z hc) ∈ Subgroup.zpowers c := by
+  apply forall_congr'
+  intro c
+  apply imp_congr_right
+  intro hc
+  exact Equiv.Perm.IsCycle.commute_iff (Equiv.Perm.mem_cycleFactorsFinset_iff.mp hc).1
+
 /- 
 /-- A permutation `g` commutes with a cycle `c` if and only if `g``
   stabilizes `c.support` and acts on it as a power of `c`. -/
@@ -1905,8 +1916,7 @@ set_option linter.uppercaseLean3 false in
 
 theorem hφ_mem_range_iff {τ} :
     τ ∈ (φ g).range ↔ 
-      ∀ c, (τ c : Equiv.Perm α).support.card = 
-        (c : Equiv.Perm α).support.card := by
+      ∀ c, (τ c : Equiv.Perm α).support.card = (c : Equiv.Perm α).support.card := by
   simp only [← Iφ_eq_range, mem_Iφ_iff]
   rfl
 #align on_cycle_factors.hφ_mem_range_iff OnCycleFactors.hφ_mem_range_iff
@@ -1939,20 +1949,17 @@ theorem hφ_range' :
 #align on_cycle_factors.hφ_range' OnCycleFactors.hφ_range'
 
 theorem hφ_range_card' : 
-    Fintype.card (φ g).range = 
+    Nat.card (φ g).range = 
       Fintype.card {k : Equiv.Perm g.cycleFactorsFinset | fsc ∘ k = fsc} := by
-  simp_rw [← hφ_range']
+  simp_rw [← hφ_range', Nat.card_eq_fintype_card]
   rfl
 #align on_cycle_factors.hφ_range_card' OnCycleFactors.hφ_range_card'
 
 theorem hφ_range_card (m : Multiset ℕ) (hg : g.cycleType = m) :
-    Fintype.card (φ g).range = 
+    Nat.card (φ g).range = 
       (m.dedup.map fun n : ℕ => (m.count n).factorial).prod := by
-  rw [hφ_range_card']
-  rw [Equiv.Perm.of_partition_card]
-  suffices hlc :
-    ∀ n : Fin (Fintype.card α + 1),
-      Fintype.card {a : g.cycleFactorsFinset | fsc a = n} = m.count ↑n
+  rw [hφ_range_card', Equiv.Perm.of_partition_card]
+  suffices hlc : ∀ n, Fintype.card {a : g.cycleFactorsFinset | fsc a = n} = m.count ↑n
   suffices hl_lt : ∀ i ∈ m, i < Fintype.card α + 1
   simp_rw [hlc]
   rw [Finset.top_eq_univ]
@@ -2003,7 +2010,7 @@ theorem hφ_range_card (m : Multiset ℕ) (hg : g.cycleType = m) :
 
 /-- A permutation `z : Equiv.Perm α` belongs to the kernel of `φ g` iff
   it commutes with each cycle of `g` -/
-theorem hφ_mem_ker_iff' (z : Equiv.Perm α) :
+theorem hφ_mem_ker_iff (z : Equiv.Perm α) :
     ConjAct.toConjAct z ∈ (φ g).ker.map 
       (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g).subtype  ↔
         ∀ t ∈ g.cycleFactorsFinset, Commute z t := by
@@ -2035,25 +2042,9 @@ theorem hφ_mem_ker_iff' (z : Equiv.Perm α) :
       rw [H c hc]
       simp only [mul_inv_cancel_right, Equiv.Perm.coe_one, id.def, Subtype.coe_mk]
     · simp only [Subgroup.coeSubtype, Subgroup.coe_mk]
-#align on_cycle_factors.hφ_mem_ker_iff' OnCycleFactors.hφ_mem_ker_iff'
-
-/- USELESS, CERTAINLY… -/
--- un groupe symétrique x produit de groupes cycliques
-theorem hφ_mem_ker_iff (z : Equiv.Perm α) :
-    ConjAct.toConjAct z ∈ (φ g).ker.map 
-      (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g).subtype ↔ 
-    ∀ s ∈ g.cycleFactorsFinset, 
-      ∃ (hs' : ∀ x : α, x ∈ s.support ↔ z x ∈ s.support),
-        Equiv.Perm.ofSubtype (Equiv.Perm.subtypePerm z hs') ∈ 
-          Subgroup.zpowers s := by
-  rw [hφ_mem_ker_iff']
-  apply forall_congr'
-  intro c
-  apply imp_congr_right
-  intro hc
-  exact Equiv.Perm.IsCycle.commute_iff (Equiv.Perm.mem_cycleFactorsFinset_iff.mp hc).1
 #align on_cycle_factors.hφ_mem_ker_iff OnCycleFactors.hφ_mem_ker_iff
 
+/-- A general function used to describe the kernel of `OnCycleFactors.φ g` -/
 def ψAux (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
     (Equiv.Perm (MulAction.fixedBy (Equiv.Perm α) α g) ×
         ∀ c ∈ s, Subgroup.zpowers (c : Equiv.Perm α)) →
@@ -2072,17 +2063,52 @@ def ψAux (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
         exact g.cycleFactorsFinset_mem_commute (hs hc) (hs hd) h
 #align on_cycle_factors.ψ_aux OnCycleFactors.ψAux
 
+example {α : Type u_3} [DecidableEq α] {β : Type u_4} [Monoid β] 
+    (s : Finset α) (f : α → β) 
+    (comm : Set.Pairwise ↑s fun a b => Commute (f a) (f b)) 
+    (hf : ∀ a ∈ s, f a = 1) :
+    s.noncommProd f comm = 1 := by
+  induction s using Finset.induction_on with
+  | empty => simp only [Finset.noncommProd_empty]
+  | insert ha hs => 
+      rw [Finset.noncommProd_insert_of_not_mem _ _ _ _ ha]
+      rw [hf _ (Finset.mem_insert _ _), one_mul]
+
+
+
+
+/-- A general function used to describe the kernel of `OnCycleFactors.φ g` -/
+def ψAux' (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) :
+    (Equiv.Perm (Function.fixedPoints g)  ×
+        ((c : s) → Subgroup.zpowers (c : Equiv.Perm α))) →* Equiv.Perm α where
+  toFun := fun uv =>
+    Equiv.Perm.ofSubtype uv.fst *
+      s.noncommProd 
+        (fun (c : Equiv.Perm α) => if hc : c ∈ s then uv.snd ⟨c, hc⟩ else 1) 
+        (fun c hc d hd h => by
+          simp only [Finset.mem_coe] at hc hd 
+          simp [dif_pos hc, dif_pos hd]
+          obtain ⟨m, hc'⟩ := Subgroup.mem_zpowers_iff.mp (uv.snd ⟨c, hc⟩).prop
+          obtain ⟨n, hd'⟩ := Subgroup.mem_zpowers_iff.mp (uv.snd ⟨d, hd⟩).prop
+          rw [← hc', ← hd']
+          apply Commute.zpow_zpow
+          exact g.cycleFactorsFinset_mem_commute (hs hc) (hs hd) h)
+  map_one' := by
+    simp only [Prod.fst_one, map_one, Prod.snd_one, Pi.one_apply, 
+      OneMemClass.coe_one, dite_eq_ite, ite_self, one_mul]
+    
+  map_mul' := sorry
+
 variable (g)
 
+/-- The description of the kernel of `OnCycleFactors.φ g` -/
 def ψ := ψAux g.cycleFactorsFinset (Finset.Subset.refl g.cycleFactorsFinset)
 #align on_cycle_factors.ψ OnCycleFactors.ψ
 
 variable {g}
 
-theorem hψ_1 (uv)
-    -- (uv : (equiv.perm ((mul_action.fixed_by (equiv.perm α) α g))  × Π (c ∈ g.cycle_factors_finset), subgroup.zpowers (c : equiv.perm α)))
-    (x : α)
-    (hx : x ∈ MulAction.fixedBy _ α g) : ψ g uv x = uv.fst ⟨x, hx⟩ := by
+theorem hψ_1 (uv) (x : α) (hx : x ∈ MulAction.fixedBy _ α g) : 
+    ψ g uv x = uv.fst ⟨x, hx⟩ := by
   simp only [ψ, ψAux, Equiv.Perm.mul_apply]
   rw [← Equiv.Perm.ofSubtype_apply_coe]
   apply congr_arg
@@ -2102,8 +2128,8 @@ theorem hψ_1 (uv)
 #align on_cycle_factors.hψ_1 OnCycleFactors.hψ_1
 
 theorem hψ_2 (uv) (x : α) (c : Equiv.Perm α) (hc : c ∈ g.cycleFactorsFinset)
-    (hx : c = g.cycleOf x) : ψ g uv x = (uv.snd c hc : Equiv.Perm α) x :=
-  by
+    (hx : c = g.cycleOf x) : 
+    ψ g uv x = (uv.snd c hc : Equiv.Perm α) x := by
   revert uv x c hc hx
   suffices : ∀ (s : Finset (Equiv.Perm α)) (hs : s ⊆ g.cycleFactorsFinset) (uvs) 
     (x : α) (c : Equiv.Perm α) (_ : c ∈ g.cycleFactorsFinset) (_ : c = g.cycleOf x),
@@ -2218,8 +2244,7 @@ theorem hφ_ker_eq_ψ_range (z : Equiv.Perm α) :
     ConjAct.toConjAct z ∈
         Subgroup.map (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g).subtype (φ g).ker ↔
       z ∈ Set.range (ψ g) := by
-  rw [hφ_mem_ker_iff] 
-  rw [Set.mem_range]
+  rw [hφ_mem_ker_iff, Equiv.Perm.IsCycle.forall_commute_iff, Set.mem_range]
   constructor
   · intro Hz
     have hu : ∀ x : α,
@@ -2462,7 +2487,7 @@ theorem Multiset.prod_pos {R : Type _} [StrictOrderedCommSemiring R] [Nontrivial
         (ih fun a ha => h a <| Multiset.mem_cons_of_mem ha)
 #align on_cycle_factors.multiset.prod_pos OnCycleFactors.Multiset.prod_pos
 
-/-- Cardinality of a conjugacy class in `equiv.perm α` of a given `cycle_type` -/
+/-- Cardinality of a conjugacy class in `Equiv.Perm α` of a given `cycleType` -/
 theorem Equiv.Perm.conj_class_card (g : Equiv.Perm α) (m : Multiset ℕ) (hg : g.cycleType = m) :
     Fintype.card {h : Equiv.Perm α | IsConj g h} =
       (Fintype.card α).factorial /
