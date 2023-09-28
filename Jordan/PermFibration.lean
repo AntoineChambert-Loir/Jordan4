@@ -1,5 +1,53 @@
 import Mathlib.GroupTheory.Subgroup.Basic
 import Mathlib.GroupTheory.GroupAction.Basic
+import Mathlib.Data.Set.Card
+
+/-  Subgroup of `Equiv.Perm α` preserving a fibration `p : α → ι` , by Junyan Xu -/
+
+variable {α ι : Type*} {p : α → ι}
+
+open Equiv MulAction
+
+local instance  : MulAction (Equiv.Perm α) (α → ι) := arrowAction
+
+lemma arrowAction.mem_stabilizer_iff {g : Perm α} :
+    g ∈ stabilizer (Perm α) p ↔ p ∘ g = p := by rw [eq_comm, ← g.comp_symm_eq]; rfl
+
+def φ_invFun (g : ∀ i, Perm {a | p a = i}) (a : α) : α := g (p a) ⟨a, rfl⟩
+
+lemma φ_invFun_eq (g : ∀ i, Perm {a | p a = i}) {a : α} {i : ι} (h : p a = i) :
+    φ_invFun g a = g i ⟨a, h⟩ := by subst h; rfl
+
+lemma comp_φ_invFun (g : ∀ i, Perm {a | p a = i}) (a : α) : p (φ_invFun g a) = p a :=
+  (g (p a) ⟨a, rfl⟩).prop
+
+def φ_invFun_equiv (g : ∀ i, Perm {a | p a = i}) : Perm α where
+  toFun := φ_invFun g
+  invFun := φ_invFun (fun i ↦ (g i).symm)
+  left_inv a := by
+    rw [φ_invFun_eq _ (comp_φ_invFun g a)]
+    exact congr_arg Subtype.val ((g <| p a).left_inv _)
+  right_inv a := by
+    rw [φ_invFun_eq _ (comp_φ_invFun _ a)]
+    exact congr_arg Subtype.val ((g <| p a).right_inv _)
+
+variable (p)
+
+def Φ : stabilizer (Perm α) p ≃* (∀ i, Perm {a | p a = i}) where
+  toFun g i := Perm.subtypePerm g fun a ↦ by
+    simp only [Set.mem_setOf_eq]
+    rw [← Function.comp_apply (f := p), arrowAction.mem_stabilizer_iff.mp g.prop]
+  invFun g := ⟨φ_invFun_equiv g, by
+    ext a; exact comp_φ_invFun (fun i ↦ (g i).symm) a⟩
+  left_inv g := rfl
+  right_inv g := by ext i a; apply φ_invFun_eq
+  map_mul' g h := rfl
+
+#exit
+
+
+import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.GroupTheory.GroupAction.Basic
 
 /-  Subgroup of `Equiv.Perm α` preserving a fibration `p : α → ι` -/
 

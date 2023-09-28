@@ -17,6 +17,7 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.Data.Set.Card
 import Jordan.NoncommCoprod
+import Jordan.PermFibration
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 
 
@@ -87,7 +88,8 @@ We compute this subgroup as follows.
   of the conjugacy class of `g`.
 
 * `Equiv.Perm.card_of_cycleType_mul_eq m` and `Equiv.Perm.card_of_cycleType m`
-  compute the cardinality of the set of permutations `g` such that `g.cycleType = m`.
+  compute the cardinality of the set of permutations `g` such that 
+  `g.cycleType = m`.
 
 * `AlternatingGroup.of_cycleType_eq m`, `AlternatingGroup.of_cycleType_eq m`
   and `AlternatingGroup.card_of_cycleType m` give the same result
@@ -902,11 +904,11 @@ lemma Equiv.Perm.ofSubtype_eq_iff {g c : Equiv.Perm α} {s : Finset α}
       exact hx
 #align equiv.perm.zpow_eq_of_subtype_subtype_perm_iff' Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff'
  -/
-theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff {g c : Equiv.Perm α} (s : Finset α)
+theorem Equiv.Perm.zpow_eq_ofSubtype_subtypePerm_iff 
+    {g c : Equiv.Perm α} {s : Finset α}
     (hg : ∀ x, x ∈ s ↔ g x ∈ s) (hc : c.support ⊆ s) (n : ℤ) :
     c ^ n = Equiv.Perm.ofSubtype (g.subtypePerm hg) ↔
-      c.subtypePerm (Equiv.Perm.isInvariant_of_support_le hc) ^ n =
-        g.subtypePerm hg := by
+      c.subtypePerm (Equiv.Perm.isInvariant_of_support_le hc) ^ n = g.subtypePerm hg := by
   constructor
   · intro h; ext ⟨x, hx⟩; let h' := Equiv.Perm.congr_fun h x
     simp only [h', Equiv.Perm.subtypePerm_apply_zpow_of_mem, Subtype.coe_mk,
@@ -1174,7 +1176,7 @@ theorem commute_ofSubtype_disjoint {p q : α → Prop} [DecidablePred p] [Decida
   · rw [Equiv.Perm.ofSubtype_apply_of_not_mem x hx]
     apply Or.intro_left; rfl
 #align commute_of_subtype_disjoint commute_ofSubtype_disjoint
-
+/- 
 example (f : Equiv.Perm α) (a : α): f.symm (f a) = a := by
   exact Equiv.symm_apply_apply f a
 
@@ -1329,9 +1331,39 @@ theorem Equiv.Perm.ofPartition_range
       nth_rewrite 1 [← h]
       simp only [Function.comp_apply]
 #align equiv.perm.of_partition_range Equiv.Perm.ofPartition_range
+ -/
+
+local instance {ι : Type*} : 
+    MulAction (Equiv.Perm α) (α → ι) := 
+  arrowAction
 
 /-- The cardinality of the subgroup of partitions preserving a fibration -/
-theorem Equiv.Perm.of_partition_card
+theorem Equiv.Perm.of_partition_card {ι : Type*} [Fintype ι] [DecidableEq ι] (p : α → ι) :
+    Fintype.card {f : Equiv.Perm α | p ∘ f = p} =
+      Finset.univ.prod 
+        fun i => (Fintype.card {a | p a = i}).factorial := by
+  suffices : ∀ x : Equiv.Perm α, (x ∈ MulAction.stabilizer (Equiv.Perm α) p ↔ p ∘ x = p)
+  simp_rw [← this]
+  suffices : Fintype.card {f | f ∈ MulAction.stabilizer (Equiv.Perm α) p} = Fintype.card (MulAction.stabilizer (Equiv.Perm α) p)
+  rw [this, Fintype.card_congr (Φ p).toEquiv]
+  simp only [Set.coe_setOf, Set.mem_setOf_eq, Fintype.card_pi]
+  apply Finset.prod_congr rfl
+  intro i _
+  exact Fintype.card_perm
+  · rw [Fintype.card_ofFinset, ← Fintype.subtype_card]
+    intro x
+    simp only [MulAction.mem_stabilizer_iff, Set.mem_setOf_eq, Finset.mem_univ, forall_true_left, ne_eq,
+      Finset.mem_filter, true_and]
+  · intro x 
+    simp only [MulAction.mem_stabilizer_iff]
+    suffices : ∀ x : Equiv.Perm α, (x • p = p ↔ p ∘ x = p)
+    simp_rw [this]
+    intro x
+    change p ∘ (x⁻¹ : Equiv.Perm α) = p ↔ p ∘ x = p
+    rw [Equiv.Perm.inv_def, Equiv.comp_symm_eq, eq_comm]
+
+/- /-- The cardinality of the subgroup of partitions preserving a fibration -/
+theorem Equiv.Perm.of_partition_card'
     {ι : Type _} [Fintype ι] [DecidableEq ι] (p : α → ι) :
     Fintype.card {f : Equiv.Perm α | p ∘ f = p} =
       Finset.prod (⊤ : Finset ι) fun i => (Fintype.card {a | p a = i}).factorial := by
@@ -1363,6 +1395,7 @@ theorem Equiv.Perm.of_partition_card
         exact ha
     apply Fintype.card_congr (Equiv.ofBijective φ' hφ')
 #align equiv.perm.of_partition_card Equiv.Perm.of_partition_card
+ -/
 
 end CycleTypes
 
@@ -1982,7 +2015,6 @@ theorem hφ_range_card :
     ∀ n, Fintype.card {a : g.cycleFactorsFinset | fsc a = n} = g.cycleType.count ↑n
   suffices hl_lt : ∀ i ∈ g.cycleType, i < Fintype.card α + 1
   simp_rw [hlc]
-  rw [Finset.top_eq_univ]
   rw [← Finset.prod_range fun i => (g.cycleType.count i).factorial]
   rw [← Multiset.prod_toFinset]
   apply symm
