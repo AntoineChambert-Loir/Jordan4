@@ -194,6 +194,8 @@ theorem Subgroup.conj_class_card_of_index [Fintype G] (g : H) :
       rw [sup_bot_eq]
 #align subgroup.conj_class_card_of_index Subgroup.conj_class_card_of_index
 
+namespace OnCycleFactors
+
 variable {α : Type _} [Fintype α] [DecidableEq α]
 
 variable (g : Equiv.Perm α)

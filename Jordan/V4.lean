@@ -4,14 +4,14 @@ Authors: ACL
 
 ! This file was ported from Lean 3 source module V4
 -/
-import Mathbin.Tactic.Default
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Mathbin.GroupTheory.Abelianization
-import Mathbin.GroupTheory.Sylow
-import Oneshot.MultipleTransitivity
-import Oneshot.MultiplePrimitivity
-import Oneshot.IndexNormal
-import Oneshot.ConjClassCount
+import Mathlib.Tactic.Default
+import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Mathlib.GroupTheory.Abelianization
+import Mathlib.GroupTheory.Sylow
+import Jordan.MultipleTransitivity
+import Jordan.MultiplePrimitivity
+import Jordan.IndexNormal
+import Jordan.ConjClassCount
 
 -- import logic.equiv.basic
 -- import logic.equiv.basic
