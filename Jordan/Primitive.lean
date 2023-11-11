@@ -116,10 +116,10 @@ the only blocks are the trivial ones -/
   has_trivial_blocks' : ∀ {B : Set X}, IsBlock G B → IsTrivialBlock B
 #align is_preprimitive IsPreprimitive
 
-/-- A `mul_action` of a group is quasipreprimitive if any normal subgroup 
+/-- A `mul_action` of a group is quasipreprimitive if any normal subgroup
   that has no fixed point acts pretransitively -/
 class IsQuasipreprimitive [Group G] [MulAction G X] extends IsPretransitive G X : Prop where
-/-- A `mul_action` of a group is quasipreprimitive if any normal subgroup 
+/-- A `mul_action` of a group is quasipreprimitive if any normal subgroup
   that has no fixed point acts pretransitively -/
   pretransitive_of_normal :
     ∀ {N : Subgroup G} (_ : N.Normal), fixedPoints N X ≠ ⊤ → MulAction.IsPretransitive N X
@@ -165,7 +165,7 @@ open scoped BigOperators Pointwise
 theorem isTrivialBlock_of_block {B : Set X} (g : G) (hB : IsTrivialBlock B) :
     IsTrivialBlock (g • B) := by
   cases hB with
-  | inl hB => 
+  | inl hB =>
     left
     apply Set.Subsingleton.image hB
   | inr hB =>
@@ -211,7 +211,7 @@ theorem IsPreprimitive.mk_mem' (a : X) (ha : a ∉ fixedPoints G X)
     apply IsPretransitive.mk_base a
     cases' H (orbit G a) (mem_orbit_self a) (IsBlock_of_orbit a) with H H
     · exfalso; apply ha
-      rw [Set.subsingleton_iff_singleton (mem_orbit_self a)] at H 
+      rw [Set.subsingleton_iff_singleton (mem_orbit_self a)] at H
       simp only [mem_fixedPoints]
       intro g
       rw [← Set.mem_singleton_iff]; rw [← H]
@@ -221,7 +221,7 @@ theorem IsPreprimitive.mk_mem' (a : X) (ha : a ∉ fixedPoints G X)
   intro B hB
   cases Set.eq_empty_or_nonempty B with
   | inl h => left; rw [h]; exact Set.subsingleton_empty
-  | inr h => 
+  | inr h =>
     obtain ⟨b, hb⟩ := h
     obtain ⟨g, hg⟩ := exists_smul_eq G b a
     rw [isTrivialBlock_of_block_iff g]
@@ -351,8 +351,8 @@ theorem Block.mem_is_nontrivial_order_of_nontrivial [Nontrivial X] (a : X) :
   use (Block.boundedOrderOfMem G a).bot
   use (Block.boundedOrderOfMem G a).top
   intro h
-  rw [← Subtype.coe_inj] at h 
-  simp only [Block.boundedOrderOfMem.top_eq, Block.boundedOrderOfMem.bot_eq] at h 
+  rw [← Subtype.coe_inj] at h
+  simp only [Block.boundedOrderOfMem.top_eq, Block.boundedOrderOfMem.bot_eq] at h
   obtain ⟨b, hb⟩ := exists_ne a
   apply hb
   rw [← Set.mem_singleton_iff]
@@ -372,7 +372,7 @@ theorem isPreprimitive_iff_isSimpleOrder_blocks [htGX : IsPretransitive G X] [No
     rintro ⟨B, haB, hB⟩
     simp only [← Subtype.coe_inj, Subtype.coe_mk]
     cases hGX'.has_trivial_blocks hB with
-    | inl h => 
+    | inl h =>
       apply Or.intro_left
       change B = ↑(Block.boundedOrderOfMem G a).bot
       rw [Block.boundedOrderOfMem.bot_eq]
@@ -385,7 +385,7 @@ theorem isPreprimitive_iff_isSimpleOrder_blocks [htGX : IsPretransitive G X] [No
     apply IsPreprimitive.mk_mem a
     intro B haB hB
     cases' h_bot_or_top ⟨B, haB, hB⟩ with hB' hB' <;>
-      simp only [← Subtype.coe_inj, Subtype.coe_mk] at hB' 
+      simp only [← Subtype.coe_inj, Subtype.coe_mk] at hB'
     · left; rw [hB']; exact Set.subsingleton_singleton
     · right; rw [hB']; rfl
 #align is_preprimitive_iff_is_simple_order_blocks isPreprimitive_iff_isSimpleOrder_blocks
@@ -425,7 +425,7 @@ theorem isnontrivial_of_nontrivial_action {N : Subgroup M} (h : fixedPoints N α
   intro x hx
   rw [mem_fixedPoints]
   intro g
-  rw [subsingleton_iff] at hα 
+  rw [subsingleton_iff] at hα
   apply hα
 #align isnontrivial_of_nontrivial_action isnontrivial_of_nontrivial_action
 
@@ -582,7 +582,7 @@ lemma Set.eq_top_iff_ncard {α : Type _} [Fintype α] (B : Set α) :
   rw [← Nat.card_eq_fintype_card]
   rw [← Set.ncard_add_ncard_compl B]
   constructor
-  · intro H 
+  · intro H
     rw [H, add_zero]
   · intro H
     exact Nat.add_left_cancel H.symm
@@ -620,12 +620,12 @@ open scoped Classical
 example (α : Type*) [Fintype α] (s : Set α) [Fintype s]:
   Nat.card s = s.toFinset.card := by
   simp only [Nat.card_eq_fintype_card, Set.toFinset_card]
-  
+
 
 
 end
 
-/- 
+/-
 
 /-- The target of an equivariant map of large image is preprimitive if the source is -/
 theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β] {φ : M → N}
@@ -635,14 +635,14 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
   apply IsPreprimitive.mk
   intro B hB
   cases' subsingleton_or_nontrivial B with hB hB_nt
-  · left; rwa [Set.subsingleton_coe] at hB 
+  · left; rwa [Set.subsingleton_coe] at hB
   dsimp only [IsTrivialBlock]
   rw [or_iff_not_imp_right]
   intro hB_ne_top
   -- Two ways of saying that B is nonempty
   have hB_ne : Set.Nonempty B := by
     rw [← Set.nonempty_coe_sort]
-    apply Nontrivial.to_nonempty 
+    apply Nontrivial.to_nonempty
   -- We reduce to proving `Fintype.card B < 2`
   rw [← Set.subsingleton_coe, ← Fintype.card_le_one_iff_subsingleton, ← Nat.lt_succ_iff]
   -- We reduce to proving that
@@ -659,11 +659,11 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
   rw [Finset.card_eq_sum_ones]
   refine' Finset.sum_le_sum _
   intro t ht
-  rw [Set.toFinset_card, Fintype.card_le_one_iff_subsingleton, Set.inter_comm, 
+  rw [Set.toFinset_card, Fintype.card_le_one_iff_subsingleton, Set.inter_comm,
     ← Set.image_preimage_eq_inter_range, Set.subsingleton_coe]
-  
+
   -- It suffices to prove that the preimage is subsingleton
-  simp only [Set.mem_toFinset, Set.mem_range] at ht 
+  simp only [Set.mem_toFinset, Set.mem_range] at ht
   obtain ⟨g, rfl⟩ := ht
   apply Set.Subsingleton.image
   -- Since the action of M on α is primitive, it suffices to prove that
@@ -671,7 +671,7 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
   apply Or.resolve_right (hM.has_trivial_blocks (IsBlock_preimage f (IsBlock_of_block g hB)))
   intro h
   have h' : ⊤ ⊆ f ⁻¹' (g • B) := subset_of_eq h.symm
-  rw [Set.top_eq_univ, ← Set.image_subset_iff, Set.image_univ] at h' 
+  rw [Set.top_eq_univ, ← Set.image_subset_iff, Set.image_univ] at h'
   -- We will prove that B is large, which will contradict the assumption that it is not ⊤
   apply hB_ne_top
   apply is_top_of_large_block hB
@@ -714,12 +714,12 @@ theorem isPreprimitive_of_large_image
   -- Two ways of saying that B is nonempty
 --   have hB_ne : Set.Nonempty B := by
 --    rw [← Set.nonempty_coe_sort]
---    apply Nontrivial.to_nonempty 
+--    apply Nontrivial.to_nonempty
   -- suffices : B.ncard < 2
   -- · rw [Nat.lt_succ_iff, Set.ncard_le_one_iff] at this
-  --   intro x hx y hy 
+  --   intro x hx y hy
   --   exact this hx hy
-  
+
   -- We reduce to proving that
   -- Fintype.card (Set.range f) ≤ Fintype.card (Set.range (λ g, g • B))
   apply lt_of_mul_lt_mul_right (lt_of_le_of_lt _ hf') (Nat.zero_le _)
@@ -728,27 +728,26 @@ theorem isPreprimitive_of_large_image
   -- We reduce to proving that
   -- ncard (Set.range f ∩ g • B)) ≤ 1 for every g
   -- simp only [Nat.card_eq_fintype_card]
-  simp only [Set.ncard_eq_toFinset_card']
   classical
-  rw [Set.ncard_eq_toFinset_card', 
-    Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
+  simp only [Set.ncard_eq_toFinset_card']
+  rw [Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
       (IsBlockSystem.of_block hB hB_ne).left]
-  rw [Set.ncard_eq_toFinset_card', Finset.card_eq_sum_ones]
+  rw [Finset.card_eq_sum_ones]
   refine' Finset.sum_le_sum _
   intro t ht
   rw [← Set.ncard_eq_toFinset_card', ← Set.subsingleton_iff_ncard_le_one,
     Set.inter_comm, ← Set.image_preimage_eq_inter_range]
   apply Set.Subsingleton.image
   -- It suffices to prove that the preimage is subsingleton
-  simp only [Set.mem_toFinset, Set.mem_range] at ht 
+  simp only [Set.mem_toFinset, Set.mem_range] at ht
   obtain ⟨g, rfl⟩ := ht
   -- Since the action of M on α is primitive, it suffices to prove that
   -- the preimage is a block which is not ⊤
-  apply Or.resolve_right 
+  apply Or.resolve_right
     (hM.has_trivial_blocks (IsBlock_preimage f (IsBlock_of_block g hB)))
   intro h
   apply hB_ne_top
-  -- We will prove that B is large, which will contradict the assumption 
+  -- We will prove that B is large, which will contradict the assumption
   -- that it is not ⊤
   apply is_top_of_large_block hB
   -- It remains to show that fintype.card β < 2 * fintype.card B
@@ -765,7 +764,7 @@ theorem Rudio (hpGX : IsPreprimitive M α) (A : Set α) (hfA : A.Finite) (hA : A
   by
   let B := ⋂ (g : M) (_ : a ∈ g • A), g • A
   suffices b ∉ B by
-    rw [Set.mem_iInter] at this 
+    rw [Set.mem_iInter] at this
     simpa only [Set.mem_iInter, not_forall, exists_prop] using this
   suffices B = {a} by rw [this]; rw [Set.mem_singleton_iff]; exact Ne.symm h
   -- B is a block hence is a trivial block
@@ -774,12 +773,12 @@ theorem Rudio (hpGX : IsPreprimitive M α) (A : Set α) (hfA : A.Finite) (hA : A
     apply Set.Subsingleton.eq_singleton_of_mem hyp
     rw [Set.mem_iInter]; intro g; simp only [Set.mem_iInter, imp_self]
   · -- B = ⊤ : contradiction
-    change B = ⊤ at hyp 
+    change B = ⊤ at hyp
     exfalso; apply hA'
     suffices ∃ g : M, a ∈ g • A by
       obtain ⟨g, hg⟩ := this
       have : B ≤ g • A := Set.biInter_subset_of_mem hg
-      rw [hyp, top_le_iff, ← eq_inv_smul_iff] at this 
+      rw [hyp, top_le_iff, ← eq_inv_smul_iff] at this
       rw [this, Set.top_eq_univ, Set.smul_set_univ]
     -- ∃ (g : M), a ∈ g • A
     obtain ⟨x, hx⟩ := hA
@@ -803,7 +802,7 @@ structure IwasawaStructure where
   T : α → Subgroup M
 /-- The commutativity property of the subgroups -/
   is_comm : ∀ x : α, (T x).IsCommutative
-/-- The conjugacy property of the subgroups -/  
+/-- The conjugacy property of the subgroups -/
   is_conj : ∀ g : M, ∀ x : α, T (g • x) = MulAut.conj g • T x
 /-- The subgroups generate the group -/
   is_generator : iSup T = ⊤
@@ -826,13 +825,12 @@ Ou encore : (?)
 variable {M α}
 
 /-- The Iwasawa criterion : If a quasiprimitive action of a group G on X
-has an Iwasawa structure, then any normal subgroup that acts nontrivially
-contains the group of commutators. -/
+  has an Iwasawa structure, then any normal subgroup that acts nontrivially
+  contains the group of commutators. -/
 theorem commutator_le_iwasawa (is_qprim : IsQuasipreprimitive M α) (IwaS : IwasawaStructure M α)
-    {N : Subgroup M} (nN : N.Normal) (hNX : MulAction.fixedPoints N α ≠ ⊤) : commutator M ≤ N :=
-  by
-  haveI is_transN := is_qprim.pretransitive_of_normal nN hNX
-  haveI ntα : Nontrivial α := isnontrivial_of_nontrivial_action hNX
+    {N : Subgroup M} (nN : N.Normal) (hNX : MulAction.fixedPoints N α ≠ ⊤) : commutator M ≤ N := by
+  have is_transN := is_qprim.pretransitive_of_normal nN hNX
+  have ntα : Nontrivial α := isnontrivial_of_nontrivial_action hNX
   obtain a : α := Nontrivial.to_nonempty.some
   refine' contains_commutators_of N nN (IwaS.T a) _ (IwaS.is_comm a)
   -- by contains_commutators_of, it suffices to prove that N ⊔ IwaS.T x = ⊤
@@ -853,7 +851,7 @@ theorem is_simple_iwasawa (is_nontrivial : Nontrivial M) (is_perfect : commutato
   apply IsSimpleGroup.mk
   intro N nN
   cases or_iff_not_imp_left.mpr (commutator_le_iwasawa is_qprim IwaS nN) with
-  | inl h => 
+  | inl h =>
     refine' Or.inl (N.eq_bot_iff_forall.mpr fun n hn => _)
     apply is_faithful.eq_of_smul_eq_smul
     intro x
@@ -865,4 +863,3 @@ theorem is_simple_iwasawa (is_nontrivial : Nontrivial M) (is_perfect : commutato
 end Iwasawa
 
 #lint
-

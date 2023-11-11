@@ -63,7 +63,7 @@ theorem IsBlock.def {B : Set X} :
   by
   constructor
   · intro hB g g'
-    by_cases (g • B = g' • B) 
+    by_cases (g • B = g' • B)
     · refine' Or.intro_left _ h
     · apply Or.intro_right
       exact hB (Set.mem_range_self g) (Set.mem_range_self g') h
@@ -143,7 +143,7 @@ theorem IsBlock.def_one {B : Set X} : IsBlock G B ↔ ∀ g : G, g • B = B ∨
       apply Or.intro_left
       rw [← inv_inv g', eq_inv_smul_iff, smul_smul]
       exact h
-    | inr h => 
+    | inr h =>
       apply Or.intro_right
       rw [Set.disjoint_iff] at h ⊢
       rintro x ⟨hx, hx'⟩
@@ -156,7 +156,7 @@ theorem IsBlock.def_one {B : Set X} : IsBlock G B ↔ ∀ g : G, g • B = B ∨
       exact ⟨hx, hx'⟩
 #align mul_action.is_block.def_one MulAction.IsBlock.def_one
 
-theorem IsBlock.mk_notempty_one {B : Set X} : 
+theorem IsBlock.mk_notempty_one {B : Set X} :
     IsBlock G B ↔ ∀ g : G, g • B ∩ B ≠ ∅ → g • B = B := by
   rw [IsBlock.def_one]
   apply forall_congr'
@@ -168,7 +168,7 @@ theorem IsBlock.mk_notempty_one {B : Set X} :
 example (α : Type) (p q : α → Prop) (hp : ∀ a, p a ↔ q a) :
    (∀ a, p a) ↔ (∀ a, q a) := by exact forall_congr' hp
 theorem IsBlock.mk_mem {B : Set X} :
-    IsBlock G B ↔ 
+    IsBlock G B ↔
       ∀ (g : G) (a : X) (_ : a ∈ B) (_ : g • a ∈ B), g • B = B := by
   rw [IsBlock.mk_notempty_one]
   simp_rw [← Set.nonempty_iff_ne_empty, Set.nonempty_def]
@@ -199,12 +199,12 @@ theorem IsBlock.mk_subset {B : Set X} :
   by
   constructor
   · intro hB g b hb hgb
-    
+
     rw [Set.le_iff_subset, Set.set_smul_subset_iff,
       IsBlock.def_mem hB hb (Set.mem_smul_set_iff_inv_smul_mem.mp hgb)]
   · rw [IsBlock.mk_notempty_one]
     intro hB g hg
-    rw [← Set.nonempty_iff_ne_empty] at hg 
+    rw [← Set.nonempty_iff_ne_empty] at hg
     obtain ⟨b : X, hb' : b ∈ g • B, hb : b ∈ B⟩ := Set.nonempty_def.mp hg
     apply le_antisymm
     · exact hB hb hb'
@@ -332,9 +332,9 @@ theorem orbit.equal_or_disjoint (a b : X) :
   cases' em (Disjoint (orbit G a) (orbit G b)) with h h
   · apply Or.intro_right; exact h
   apply Or.intro_left
-  rw [Set.not_disjoint_iff] at h 
+  rw [Set.not_disjoint_iff] at h
   obtain ⟨x, hxa, hxb⟩ := h
-  rw [← orbit_eq_iff] at hxa hxb 
+  rw [← orbit_eq_iff] at hxa hxb
   rw [← hxa, ← hxb]
 #align mul_action.orbit.equal_or_disjoint MulAction.orbit.equal_or_disjoint
 
@@ -374,7 +374,7 @@ theorem IsBlock.iInter {ι : Type _} {B : ι → Set X} (hB : ∀ i : ι, IsBloc
     refine' Disjoint.mono _ _ hj
     apply Set.iInter_subset
     apply Set.iInter_subset
-  simp only [not_exists] at h 
+  simp only [not_exists] at h
   apply Or.intro_left
   have : ∀ i : ι, g • B i = B i := fun i => Or.resolve_right (IsBlock.def_one.mp (hB i) g) (h i)
   rw [Set.iInter_congr this]
@@ -386,7 +386,7 @@ theorem IsBlock.of_subgroup_of_conjugate {B : Set X} {H : Subgroup G} (hB : IsBl
   rw [IsBlock.def_one]
   intro h'
   obtain ⟨h, hH, hh⟩ := Subgroup.mem_map.mp (SetLike.coe_mem h')
-  simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hh 
+  simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hh
   suffices : h' • g • B = g • h • B
   simp only [this]
   cases' IsBlock.def_one.mp hB ⟨h, hH⟩ with heq hdis
@@ -452,11 +452,14 @@ theorem IsBlockSystem.of_block [hGX : MulAction.IsPretransitive G X] {B : Set X}
       exact hg
     · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
         forall_apply_eq_imp_iff']
-      intro g' hg'
+      intro B' g' hg' ha
+      rw [← hg']
       apply symm
       apply Or.resolve_right (IsBlock.def.mp hB g g')
       rw [Set.not_disjoint_iff]
       use a
+      rw [hg']
+      exact ⟨hg, ha⟩
   intro b; rintro ⟨g, hg : g • B = b⟩
   rw [← hg]; exact IsBlock_of_block g hB
 #align mul_action.is_block_system.of_block MulAction.IsBlockSystem.of_block
@@ -472,10 +475,10 @@ theorem IsPartition.of_orbits : Setoid.IsPartition (Set.range fun a : X => orbit
   · simp only [Set.mem_range_self, mem_orbit_self, exists_unique_iff_exists, exists_true_left]
   · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
       forall_apply_eq_imp_iff']
-    intro b hb
+    rintro B b ⟨rfl⟩ ha
+    apply symm
     rw [orbit_eq_iff]
-    obtain ⟨g, rfl⟩ := MulAction.mem_orbit_iff.mp hb
-    use g⁻¹; simp only [inv_smul_smul]
+    exact ha
 #align mul_action.is_partition.of_orbits MulAction.IsPartition.of_orbits
 
 section Normal
@@ -539,14 +542,14 @@ theorem IsBlock_of_suborbit {H : Subgroup G} {a : X} (hH : stabilizer G a ≤ H)
   suffices g ∈ H by
     rw [← Subgroup.coe_mk H g this, ← Subgroup.smul_def]
     apply smul_orbit_subset
-  rw [Set.mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def, ← MulAction.mul_smul] at hb' 
+  rw [Set.mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def, ← MulAction.mul_smul] at hb'
   obtain ⟨k : ↥H, hk⟩ := hb'
-  simp only at hk 
+  simp only at hk
   rw [MulAction.mul_smul, ← smul_eq_iff_eq_inv_smul, ← inv_inv (h : G), ← smul_eq_iff_eq_inv_smul, ←
-    MulAction.mul_smul, Subgroup.smul_def, ← MulAction.mul_smul] at hk 
-  rw [← mem_stabilizer_iff] at hk 
+    MulAction.mul_smul, Subgroup.smul_def, ← MulAction.mul_smul] at hk
+  rw [← mem_stabilizer_iff] at hk
   let hk' := hH hk
-  rw [Subgroup.mul_mem_cancel_right, Subgroup.mul_mem_cancel_left] at hk' 
+  rw [Subgroup.mul_mem_cancel_right, Subgroup.mul_mem_cancel_left] at hk'
   exact hk'
   apply Subgroup.inv_mem; exact SetLike.coe_mem h
   exact SetLike.coe_mem k
@@ -560,7 +563,7 @@ theorem stabilizer_of_block {B : Set X} (hB : IsBlock G B) {a : X} (ha : a ∈ B
   cases' IsBlock.def_one.mp hB g with h h'
   exact h
   exfalso; rw [← Set.mem_empty_iff_false a]
-  simp only [disjoint_iff, Set.inf_eq_inter, Set.bot_eq_empty] at h' 
+  simp only [disjoint_iff, Set.inf_eq_inter, Set.bot_eq_empty] at h'
   rw [← h', Set.mem_inter_iff]
   constructor
   rw [← hg]; rw [Set.smul_mem_smul_set_iff]; exact ha
@@ -576,12 +579,12 @@ theorem block_of_stabilizer_of_block [htGX : IsPretransitive G X] {B : Set X} (h
   · -- rw mul_action.mem_orbit_iff, intro h,
     rintro ⟨k, rfl⟩
     let z := mem_stabilizer_iff.mp (SetLike.coe_mem k)
-    rw [← Subgroup.smul_def] at z 
+    rw [← Subgroup.smul_def] at z
     let zk : k • a ∈ k • B := Set.smul_mem_smul_set_iff.mpr ha
     rw [z] at zk ; exact zk
   intro hx
   obtain ⟨k, rfl⟩ := exists_smul_eq G a x
-  suffices : k ∈stabilizer G B 
+  suffices : k ∈stabilizer G B
   use ⟨k, this⟩
   rfl
   · rw [mem_stabilizer_iff]
@@ -593,12 +596,12 @@ A subgroup containing the stabilizer of a is the stabilizer of the orbit of a un
 theorem stabilizer_of_block_of_stabilizer {a : X} {H : Subgroup G} (hH : stabilizer G a ≤ H) :
     stabilizer G (orbit H a) = H := by
   ext g; constructor
-  · intro hg; rw [mem_stabilizer_iff] at hg 
+  · intro hg; rw [mem_stabilizer_iff] at hg
     suffices g • a ∈ orbit H a by
-      rw [mem_orbit_iff] at this 
+      rw [mem_orbit_iff] at this
       obtain ⟨k, hk⟩ := this
       rw [← Subgroup.mul_mem_cancel_left H (SetLike.coe_mem k⁻¹)]
-      rw [smul_eq_iff_eq_inv_smul] at hk 
+      rw [smul_eq_iff_eq_inv_smul] at hk
       apply hH
       rw [mem_stabilizer_iff]; rw [MulAction.mul_smul]
       rw [← Subgroup.smul_def]; exact hk.symm
@@ -659,8 +662,8 @@ theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid
   constructor
   -- injectivity
   rintro ⟨⟨x, hx⟩, ⟨a, ha : a ∈ x⟩⟩ ⟨⟨y, hy⟩, ⟨b, hb : b ∈ y⟩⟩ hab
-  dsimp at hab 
-  rw [hab] at ha 
+  dsimp at hab
+  rw [hab] at ha
   rw [Sigma.subtype_ext_iff]
   simp only [Subtype.mk_eq_mk, Subtype.coe_mk]
   apply And.intro _ hab
@@ -685,7 +688,6 @@ theorem ncard_block_mul_ncard_orbit_eq [Finite X] [IsPretransitive G X] {B : Set
   have := Fintype.ofFinite X
   rw [← Setoid.nat_sum (IsBlockSystem.of_block hB hB_ne).1]
   simp only [finsum_eq_sum_of_fintype]
-  simp only [Finset.sum_finset_coe]
   simp_rw [Set.Nat.card_coe_set_eq]
   rw [Finset.sum_congr rfl ?_]
   rw [Finset.sum_const]
@@ -694,13 +696,13 @@ theorem ncard_block_mul_ncard_orbit_eq [Finite X] [IsPretransitive G X] {B : Set
   rw [Set.ncard_eq_toFinset_card']
   -- this is painful…
   rw [Finset.card_congr]
-  exact fun s hs => ⟨s, Set.mem_toFinset.mp hs⟩ 
+  exact fun s hs => ⟨s, Set.mem_toFinset.mp hs⟩
   · intro s hs
     apply Finset.mem_univ
   · intro s t hs ht hst
     rw [← Subtype.val_inj] at hst
     exact hst
-  · rintro ⟨b, hb⟩ _ 
+  · rintro ⟨b, hb⟩ _
     use b
     simp only [Set.mem_toFinset]
     use hb
@@ -724,8 +726,8 @@ theorem is_top_of_large_block [hfX : Finite X] [hGX : IsPretransitive G X] {B : 
   letI := Fintype.ofFinite X
   cases' Set.eq_empty_or_nonempty B with hB_e hB_ne
   -- case when B is empty (exfalso)
-  · exfalso; rw [hB_e] at hB' 
-    simp only [Set.ncard_empty, mul_zero, gt_iff_lt, not_lt_zero'] at hB' 
+  · exfalso; rw [hB_e] at hB'
+    simp only [Set.ncard_empty, mul_zero, gt_iff_lt, not_lt_zero'] at hB'
   -- case when B is not empty
   rw [Set.top_eq_univ, ← Set.toFinset_inj, Set.toFinset_univ, ← Finset.card_eq_iff_eq_univ, ← Set.ncard_eq_toFinset_card']
   obtain ⟨k, h⟩ := ncard_of_block_divides hB hB_ne
@@ -747,13 +749,13 @@ theorem is_top_of_large_block [hfX : Finite X] [hGX : IsPretransitive G X] {B : 
 #align mul_action.is_top_of_large_block MulAction.is_top_of_large_block
 
 /-- If a block has too many translates, then it is a (sub)singleton  -/
-theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X] 
+theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X]
     {B : Set X} (hB : IsBlock G B)
-    (hB' : Nat.card X < 2 * Set.ncard (Set.range fun g : G => (g • B : Set X))) : 
+    (hB' : Nat.card X < 2 * Set.ncard (Set.range fun g : G => (g • B : Set X))) :
     B.Subsingleton := by
 --  classical
   have := Fintype.ofFinite X
-  suffices : Set.ncard B ≤ 1 
+  suffices : Set.ncard B ≤ 1
   · rw [Set.ncard_le_one_iff_eq] at this
     cases' this with h h
     rw [h]; exact Set.subsingleton_empty
@@ -765,7 +767,7 @@ theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X]
     cases' Nat.lt_or_ge (Set.ncard B) 2 with hb hb
     · rw [← Nat.lt_succ_iff]; exact hb
     · exfalso
-      rw [← hk, lt_iff_not_ge] at hB' 
+      rw [← hk, lt_iff_not_ge] at hB'
       apply hB'
       refine' Nat.mul_le_mul_right _ hb
 #align mul_action.is_top_of_small_block MulAction.IsBlock.is_subsingleton
@@ -783,14 +785,14 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     intro k hk; exfalso
     rw [hfB_e] at hk ; simpa only [Set.smul_set_empty] using hk
 
-  have hB'₀ : ∀ (k : G) (_ : a ∈ k • B), B' ≤ k • B := by 
+  have hB'₀ : ∀ (k : G) (_ : a ∈ k • B), B' ≤ k • B := by
     intro k hk
     exact Set.biInter_subset_of_mem hk
   have hfB' : B'.Finite := by
     obtain ⟨b, hb : b ∈ B⟩ := hfB_ne
     obtain ⟨k, hk : k • b = a⟩ := exists_smul_eq G b a
     apply Set.Finite.subset (Set.Finite.map _ hfB) (hB'₀ k ⟨b, hb, hk⟩)
---  have ha : a ∈ B' := by 
+--  have ha : a ∈ B' := by
 --    apply Set.mem_biInter; intro g; intro h; exact h
   have hag : ∀ g : G, a ∈ g • B' → B' ≤ g • B' :=  by
     intro g hg x hx
@@ -817,10 +819,10 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     exact hag g hg
   rw [IsBlock.mk_notempty_one]
   intro g hg
-  rw [← Set.nonempty_iff_ne_empty] at hg 
+  rw [← Set.nonempty_iff_ne_empty] at hg
   obtain ⟨b : X, hb' : b ∈ g • B', hb : b ∈ B'⟩ := Set.nonempty_def.mp hg
   obtain ⟨k : G, hk : k • a = b⟩ := exists_smul_eq G a b
-  have hak : a ∈ k⁻¹ • B' := by 
+  have hak : a ∈ k⁻¹ • B' := by
     refine ⟨b, hb, ?_⟩
     simp only [← hk, inv_smul_smul]
   have hagk : a ∈ (k⁻¹ * g) • B' :=
@@ -829,8 +831,8 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     exact hb'
   have hkB' : B' = k⁻¹ • B' := hag' k⁻¹ hak
   have hgkB' : B' = (k⁻¹ * g) • B' := hag' (k⁻¹ * g) hagk
-  rw [mul_smul] at hgkB' 
-  rw [← smul_eq_iff_eq_inv_smul] at hkB' hgkB' 
+  rw [mul_smul] at hgkB'
+  rw [← smul_eq_iff_eq_inv_smul] at hkB' hgkB'
   rw [← hgkB', hkB']
 #align mul_action.is_block.of_subset MulAction.IsBlock.of_subset
 
@@ -839,4 +841,3 @@ end Fintype
 end Group
 
 end MulAction
-
