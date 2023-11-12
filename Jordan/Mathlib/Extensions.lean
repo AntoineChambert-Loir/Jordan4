@@ -25,7 +25,6 @@ example (h q : Prop) : h → ¬h → q :=
 
 /-- Given a nat.card inequality, get an embedding from a fin _ -/
 theorem gimme_some {m : ℕ} (hα : ↑m ≤ PartENat.card α) : Nonempty (Fin m ↪ α) := by
-  simp only
   suffices : Nonempty (ULift (Fin m) ↪ α)
   · obtain ⟨x'⟩ := this;
     use Equiv.ulift.symm.toEmbedding.trans x'
@@ -40,12 +39,12 @@ theorem gimme_some_equiv {m : ℕ} [Fintype α] (hα : m = Fintype.card α) : No
 #align gimme_some_equiv gimme_some_equiv
 
 
-theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) : 
+theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) :
     Nonempty (Fin m ≃ α) := by
   cases' fintypeOrInfinite α with h h -- <;> skip
-  · simp only [PartENat.card_eq_coe_fintype_card, PartENat.natCast_inj] at hα 
+  · simp only [PartENat.card_eq_coe_fintype_card, PartENat.natCast_inj] at hα
     exact ⟨(Fintype.equivFinOfCardEq hα).symm⟩
-  · rw [PartENat.card_eq_top_of_infinite] at hα 
+  · rw [PartENat.card_eq_top_of_infinite] at hα
     exfalso
     apply PartENat.natCast_ne_top m
     rw [hα]
@@ -82,7 +81,7 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
   use {
     toFun := fun i => if hi : p i then f ⟨i, hi⟩ else f' ⟨i, hi⟩
     inj' := by
-      apply  Function.Injective.dite p 
+      apply  Function.Injective.dite p
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
         rw [Subtype.mk_eq_mk]
         apply Fin.ext
@@ -107,14 +106,14 @@ theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α)
     ∃ x' : Fin n ↪ α, (Fin.castLEEmb hmn).toEmbedding.trans x' = x :=
   by
   induction' n with n hrec
-  · simp only [Nat.zero_eq, nonpos_iff_eq_zero] at hmn 
+  · simp only [Nat.zero_eq, nonpos_iff_eq_zero] at hmn
     let w : Fin 0 ↪ α := Function.Embedding.ofIsEmpty
     use w; ext ⟨i, hi⟩
-    exfalso; rw [hmn] at hi 
+    exfalso; rw [hmn] at hi
     exact Nat.not_lt_zero i hi
   · cases Nat.eq_or_lt_of_le hmn with
     -- case where m = n.succ
-    | inl h => 
+    | inl h =>
       use (Equiv.toEmbedding (Fin.castIso h.symm).toEquiv).trans x
       ext ⟨i, hi⟩
       simp
@@ -133,7 +132,7 @@ theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α)
 theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m + k)
     (x : Fin m ↪ (sᶜ : Set α)) :
     ∃ x' : Fin n ↪ α,
-      (Fin.castLEEmb (le_trans le_self_add (le_of_eq (Eq.symm h)))).toEmbedding.trans x' = 
+      (Fin.castLEEmb (le_trans le_self_add (le_of_eq (Eq.symm h)))).toEmbedding.trans x' =
           x.trans (subtype (sᶜ)) ∧
       (Fin.natAddEmb m).toEmbedding.trans ((Fin.castIso h.symm).toEquiv.toEmbedding.trans x') =
           z.trans (subtype s) := by
@@ -151,11 +150,11 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
         simp only [Subtype.mk_eq_mk]
         apply (Fin.castIso h').injective
-        rw [not_lt] at hi hj 
+        rw [not_lt] at hi hj
         have hi' : m ≤ (Fin.castIso h') i := by simp only [Fin.coe_orderIso_apply]; exact hi
         have hj' : m ≤ (Fin.castIso h') j := by simp only [Fin.coe_orderIso_apply]; exact hj
         let hij' := z.inj' (Subtype.coe_injective hij)
-        simp only at hij' 
+        simp only at hij'
         rw [← Fin.addNat_subNat hi', ← Fin.addNat_subNat hj', hij']
       · intro i j hi hj hij
         suffices f ⟨i, hi⟩ ∉ s by apply this; rw [hij]; simp only [Subtype.coe_prop]
@@ -166,8 +165,12 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
     rw [dite_eq_iff]
     apply Or.intro_left; use hi; rfl
   · ext ⟨j, hj⟩
-    simp
+    simp only [Fin.natAddEmb_toEmbedding, gt_iff_lt, Set.coe_setOf, Set.mem_setOf_eq, toFun_eq_coe,
+      Fin.castIso_apply, trans_apply, coeFn_mk, Fin.natAdd_mk, Equiv.coe_toEmbedding,
+      RelIso.coe_toEquiv, Fin.cast_mk, add_lt_iff_neg_left, not_lt_zero', Fin.castLT_mk,
+      Fin.subNat_mk, ge_iff_le, add_le_iff_nonpos_right, nonpos_iff_eq_zero, add_tsub_cancel_left,
+      dite_false]
+    rfl
 #align may_extend_with' may_extend_with'
 
 end Extensions
-
