@@ -100,7 +100,6 @@ give two versions of the Iwasawa criterion
 
 -/
 
-
 open MulAction
 
 section Primitive
@@ -845,7 +844,8 @@ theorem commutator_le_iwasawa (is_qprim : IsQuasipreprimitive M α) (IwaS : Iwas
 #align commutator_le_iwasawa commutator_le_iwasawa
 
 /-- The Iwasawa criterion for simplicity -/
-theorem is_simple_iwasawa (is_nontrivial : Nontrivial M) (is_perfect : commutator M = ⊤)
+theorem is_simple_iwasawa
+    (is_nontrivial : Nontrivial M) (is_perfect : commutator M = ⊤)
     (is_qprim : IsQuasipreprimitive M α) (is_faithful : FaithfulSMul M α)
     (IwaS : IwasawaStructure M α) : IsSimpleGroup M := by
   apply IsSimpleGroup.mk

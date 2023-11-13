@@ -19,31 +19,6 @@ import Jordan.V4
 -- import group_theory.solvable
 open scoped Pointwise
 
-/-
-namespace alternatingGroup
-
-variable (α : Type*) [DecidableEq α] [Fintype α]
-
-def iwasawa_three : IwasawaStructure (alternatingGroup α) (Nat.Combination α 3) where
-  T := fun s => Subgroup.subgroupOf (Equiv.Perm.IwasawaT s.val) _
-  is_comm := sorry
-  is_conj := fun g s => by
-    dsimp only [Nat.combination_mulAction.coe_apply']
-    have : g • (s : Finset α) = (g : Equiv.Perm α) • (s : Finset α)
-    rfl
-    rw [this, Equiv.Perm.IwasawaT_is_conj]
-    sorry
-  is_generator := sorry }
-
-def iwasawa_four : IwasawaStructure (alternatingGroup α) (Nat.Combination α 4) where
-  T := fun s => Subgroup.subgroupOf (Equiv.Perm.IwasawaT s.val) _
-  is_comm := sorry
-  is_conj := sorry
-  is_generator := sorry }
-
-end alternatingGroup
--/
-
 open MulAction
 
 theorem Subgroup.smul_le_iff_le_inv_smul {G : Type _} [Group G] (g : G) (H K : Subgroup G) :
@@ -115,41 +90,40 @@ def IwConj (s : Finset α) (g : Equiv.Perm α) :
 set_option linter.uppercaseLean3 false in
 #align equiv.perm.Iw_conj Equiv.Perm.IwConj
 
-/-
-def iwConj' {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
-    Equiv.Perm s ≃* Equiv.Perm t :=
-  {
-    Equiv.permCongr
-      (@Equiv.subtypeEquiv α α _ _ (g : α ≃ α)
-        (by
-          intro a
-          rw [htgs, ← Equiv.Perm.smul_def, ← Finset.smul_mem_smul_finset_iff g])) with
-    map_mul' := fun h k =>
-      Equiv.ext fun x => by simp }
-#align equiv.perm.Iw_conj' Equiv.Perm.iwConj'
+theorem mem_iff_smul_mem_smul_set' {s t : Finset α} {g : Equiv.Perm α}
+    (htgs : t = g • s) (a : α) :
+    a ∈ s ↔ g a ∈ t := by
+  rw [← Finset.smul_mem_smul_finset_iff g, ← htgs, Equiv.Perm.smul_def]
 
-theorem iwConj'_trans {s t u : Finset α} {g k : Equiv.Perm α} (htgs : t = g • s)
+def IwConj' {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
+    Equiv.Perm s ≃* Equiv.Perm t :=
+  { Equiv.permCongr (Equiv.subtypeEquiv g (mem_iff_smul_mem_smul_set' htgs)) with
+    map_mul' := fun h k => Equiv.ext fun x => by simp }
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj' Equiv.Perm.IwConj'
+
+theorem IwConj'_trans {s t u : Finset α} {g k : Equiv.Perm α} (htgs : t = g • s)
     (hukt : u = k • t) :
     let hukgs : u = (k * g) • s := by rw [mul_smul, ← htgs, hukt]
-    (iwConj' htgs).trans (iwConj' hukt) = iwConj' hukgs :=
-  by
-  intro hukgs
+    (IwConj' htgs).trans (IwConj' hukt) = IwConj' hukgs := by
+  intro _
   rfl
-#align equiv.perm.Iw_conj'_trans Equiv.Perm.iwConj'_trans
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj'_trans Equiv.Perm.IwConj'_trans
 
-theorem iwConj'_symm {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
+theorem IwConj'_symm {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
     let hsg't : s = g⁻¹ • t := by rw [htgs, inv_smul_smul]
-    (iwConj' htgs).symm = iwConj' hsg't :=
-  by
-  intro hsg't
+    (IwConj' htgs).symm = IwConj' hsg't := by
+  intro _
   rfl
-#align equiv.perm.Iw_conj'_symm Equiv.Perm.iwConj'_symm
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj'_symm Equiv.Perm.IwConj'_symm
 
-theorem iwConj'_eq_apply {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) (k : Equiv.Perm s) :
+theorem IwConj'_eq_apply {s t : Finset α} {g : Equiv.Perm α}
+    (htgs : t = g • s) (k : Equiv.Perm s) :
     (MulAut.conj g).toMonoidHom.comp (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α) k =
-      (Equiv.Perm.ofSubtype : Equiv.Perm t →* Equiv.Perm α) (iwConj' htgs k) :=
-  by
-  dsimp only [Iw_conj']
+      (Equiv.Perm.ofSubtype : Equiv.Perm t →* Equiv.Perm α) (IwConj' htgs k) := by
+  dsimp only [IwConj']
   ext x
   simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply, MulAut.conj_apply,
     coe_mul, Equiv.toFun_as_coe, MulEquiv.coe_mk]
@@ -165,23 +139,21 @@ theorem iwConj'_eq_apply {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g •
     exact hx
     rw [htgs, ← Finset.inv_smul_mem_iff] at hx
     exact hx
-#align equiv.perm.Iw_conj'_eq_apply Equiv.Perm.iwConj'_eq_apply
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj'_eq_apply Equiv.Perm.IwConj'_eq_apply
 
-theorem iwConj'_eq {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
-    Equiv.Perm.ofSubtype.comp (iwConj' htgs).toMonoidHom =
-      (MulAut.conj g).toMonoidHom.comp Equiv.Perm.ofSubtype :=
-  by
+theorem IwConj'_eq {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
+    Equiv.Perm.ofSubtype.comp (IwConj' htgs).toMonoidHom =
+      (MulAut.conj g).toMonoidHom.comp Equiv.Perm.ofSubtype := by
   ext k x
-  rw [Iw_conj'_eq_apply]
+  rw [IwConj'_eq_apply]
   rfl
-#align equiv.perm.Iw_conj'_eq Equiv.Perm.iwConj'_eq
-
--/
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj'_eq Equiv.Perm.IwConj'_eq
 
 theorem IwConj_eq (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm ↥s) :
     (MulAut.conj g).toMonoidHom.comp (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α) k =
-      (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α) (IwConj s g k) :=
-  by
+      (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α) (IwConj s g k) := by
   dsimp only [IwConj]
   ext x
   simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply, MulAut.conj_apply,
@@ -207,8 +179,7 @@ set_option linter.uppercaseLean3 false in
 
 theorem Iw_is_conj' (s : Finset α) (g : Equiv.Perm α) :
     Equiv.Perm.ofSubtype.comp (IwConj s g).toMonoidHom =
-      (MulAut.conj g).toMonoidHom.comp Equiv.Perm.ofSubtype :=
-  by
+      (MulAut.conj g).toMonoidHom.comp Equiv.Perm.ofSubtype := by
   ext k x
   simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply, MulAut.conj_apply,
     Equiv.Perm.coe_mul]
@@ -218,40 +189,36 @@ theorem Iw_is_conj' (s : Finset α) (g : Equiv.Perm α) :
 set_option linter.uppercaseLean3 false in
 #align equiv.perm.Iw_is_conj' Equiv.Perm.Iw_is_conj'
 
-/-
-theorem iwConj'_sign {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) (k : Equiv.Perm s) :
-    ((iwConj' htgs) k).sign = k.sign :=
-  by
-  dsimp only [Iw_conj', Equiv.permCongr, Equiv.equivCongr]
+theorem IwConj'_sign {s t : Finset α} {g : Equiv.Perm α}
+    (htgs : t = g • s) (k : Equiv.Perm s) :
+    sign ((IwConj' htgs) k) = sign k := by
+  dsimp only [IwConj', Equiv.permCongr, Equiv.equivCongr]
   refine' Equiv.Perm.sign_symm_trans_trans k _
-#align equiv.perm.Iw_conj'_sign Equiv.Perm.iwConj'_sign
+set_option linter.uppercaseLean3 false in
+#align equiv.perm.Iw_conj'_sign Equiv.Perm.IwConj'_sign
 
-theorem Iw_conj_symm'_sign {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s)
-    (k : Equiv.Perm t) : ((iwConj' htgs).symm k).sign = k.sign :=
-  by
-  conv_rhs => rw [← MulEquiv.apply_symm_apply (Iw_conj' htgs) k]
-  rw [Iw_conj'_sign]
+theorem Iw_conj_symm'_sign {s t : Finset α} {g : Equiv.Perm α}
+    (htgs : t = g • s) (k : Equiv.Perm t) :
+    sign ((IwConj' htgs).symm k) = sign k := by
+  conv_rhs => rw [← MulEquiv.apply_symm_apply (IwConj' htgs) k]
+  rw [IwConj'_sign]
+set_option linter.uppercaseLean3 false in
 #align equiv.perm.Iw_conj_symm'_sign Equiv.Perm.Iw_conj_symm'_sign
 
--/
-
 theorem IwConj_sign (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm s) :
-    Equiv.Perm.sign ((IwConj s g) k) = Equiv.Perm.sign k :=
-  by
+    Equiv.Perm.sign ((IwConj s g) k) = Equiv.Perm.sign k := by
   dsimp only [IwConj, Equiv.permCongr, Equiv.equivCongr]
   refine' Equiv.Perm.sign_symm_trans_trans k _
 set_option linter.uppercaseLean3 false in
 #align equiv.perm.Iw_conj_sign Equiv.Perm.IwConj_sign
 
 theorem IwConj_symm_sign (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm (g • s : Finset α)) :
-    Equiv.Perm.sign ((IwConj s g).symm k) = Equiv.Perm.sign k :=
-  by
+    Equiv.Perm.sign ((IwConj s g).symm k) = Equiv.Perm.sign k := by
   let e : s ≃ (g • s : Finset α) := by
     apply Equiv.subtypeEquiv g
     · intro a
       rw [← Finset.smul_mem_smul_finset_iff g, Equiv.Perm.smul_def]
-  suffices ∀ k, (IwConj s g).symm k = (Equiv.permCongr e.symm) k
-    by
+  suffices ∀ k, (IwConj s g).symm k = (Equiv.permCongr e.symm) k by
     rw [this]
     dsimp only [Equiv.permCongr, Equiv.equivCongr]
     simp only [Equiv.coe_fn_mk]
@@ -266,9 +233,9 @@ namespace alternatingGroup
 
 open Equiv.Perm
 
-def Subgroup.equivMk {G G' : Type _} [Group G] [Group G'] (e : G ≃* G') {H : Subgroup G}
-    {H' : Subgroup G'} (h : ∀ g : G, g ∈ H ↔ e g ∈ H') : H ≃* H'
-    where
+def Subgroup.equivMk {G G' : Type*} [Group G] [Group G']
+    (e : G ≃* G') {H : Subgroup G}
+    {H' : Subgroup G'} (h : ∀ g : G, g ∈ H ↔ e g ∈ H') : H ≃* H' where
   toFun g := ⟨e g, (h g).mp g.prop⟩
   invFun g' := ⟨e.symm g', (h _).mpr (by simp only [MulEquiv.apply_symm_apply, SetLike.coe_mem])⟩
   left_inv g := by simp only [Subgroup.coe_mk, MulEquiv.symm_apply_apply, SetLike.eta]
@@ -276,33 +243,29 @@ def Subgroup.equivMk {G G' : Type _} [Group G] [Group G'] (e : G ≃* G') {H : S
   map_mul' x y := by simp only [Subgroup.coe_mul, map_mul, MulMemClass.mk_mul_mk]
 #align alternating_group.subgroup.equiv_mk alternatingGroup.Subgroup.equivMk
 
-/- def iwConj' {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
+def IwConj' {s t : Finset α} {g : Equiv.Perm α} (htgs : t = g • s) :
     alternatingGroup s ≃* alternatingGroup t :=
-  Subgroup.equivMk (Equiv.Perm.iwConj' htgs) fun k => by
-    simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.iwConj'_sign]
-#align alternating_group.Iw_conj' alternatingGroup.iwConj'
--/
+  Subgroup.equivMk (Equiv.Perm.IwConj' htgs) fun k => by
+    simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.IwConj'_sign]
+set_option linter.uppercaseLean3 false in
+#align alternating_group.Iw_conj' alternatingGroup.IwConj'
 
 theorem Iw_is_conj_alt (s : Finset α) (g : alternatingGroup α) :
-    (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α)
-            (alternatingGroup (g • s : Finset α))).subgroupOf
-        (alternatingGroup α) =
+    (Subgroup.map
+      (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α)
+        (alternatingGroup (g • s : Finset α))).subgroupOf (alternatingGroup α) =
       MulAut.conj g •
         (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α)
-              (alternatingGroup s)).subgroupOf
-          (alternatingGroup α) :=
-  by
+          (alternatingGroup s)).subgroupOf (alternatingGroup α) := by
   rw [← mulAut_smul_subgroupOf_eq (MulAut.conj ↑g) (MulAut.conj g)]
   apply congr_arg
-  suffices
-    Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α)
-        (alternatingGroup (g • s : Finset α)) =
-      Subgroup.map (Equiv.Perm.ofSubtype.comp (Equiv.Perm.IwConj s g).toMonoidHom)
-        (alternatingGroup (s : Finset α))
-    by
-    rw [this]
-    change _ = Subgroup.map (MulAut.conj g).toMonoidHom _
-    rw [Subgroup.map_map]
+  suffices Subgroup.map
+    (Equiv.Perm.ofSubtype : Equiv.Perm (g • s : Finset α) →* Equiv.Perm α)
+      (alternatingGroup (g • s : Finset α)) =
+      Subgroup.map
+        (Equiv.Perm.ofSubtype.comp (Equiv.Perm.IwConj s g).toMonoidHom)
+          (alternatingGroup (s : Finset α)) by
+    rw [this, Subgroup.pointwise_smul_def, Subgroup.map_map]
     apply congr_arg₂
     apply Equiv.Perm.Iw_is_conj'
     rfl
@@ -317,7 +280,7 @@ theorem Iw_is_conj_alt (s : Finset α) (g : alternatingGroup α) :
       simp only [IwConj_symm_sign, MulEquiv.apply_symm_apply]
       constructor
       exact Equiv.Perm.mem_alternatingGroup.mp hk
-      sorry
+      apply MulEquiv.apply_symm_apply
     · rintro ⟨x, hx, hx'⟩
       rw [← hx']
       change sign ((IwConj s g) x) = 1
@@ -326,40 +289,44 @@ theorem Iw_is_conj_alt (s : Finset α) (g : alternatingGroup α) :
   ·-- ∀ n…
     intro n;
     rfl
+set_option linter.uppercaseLean3 false in
 #align alternating_group.Iw_is_conj_alt alternatingGroup.Iw_is_conj_alt
 
 theorem isThreeCycle_is_ofSubtype (g : alternatingGroup α)
     (hg : Equiv.Perm.IsThreeCycle (g : Equiv.Perm α)) :
-    ∃ s : Finset α,
-      s.card = 3 ∧
-        g ∈
-          (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α)
-                (alternatingGroup s)).subgroupOf
-            (alternatingGroup α) :=
-  by
+    ∃ s : Finset α, s.card = 3 ∧
+      g ∈ (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α)
+            (alternatingGroup s)).subgroupOf (alternatingGroup α) := by
   use (g : Equiv.Perm α).support
   constructor
   exact Equiv.Perm.IsThreeCycle.card_support hg
   rw [Subgroup.mem_subgroupOf]
   simp only [Subgroup.mem_map]
   let k : Equiv.Perm (g : Equiv.Perm α).support :=
-    Equiv.Perm.subtypePerm (g : Equiv.Perm α) fun a => by simp only [Equiv.Perm.apply_mem_support]
+    Equiv.Perm.subtypePerm (g : Equiv.Perm α)
+      fun a => by simp only [Finset.mem_coe, mem_support, ne_eq, EmbeddingLike.apply_eq_iff_eq]
   use k
-  suffices : Equiv.Perm.ofSubtype k = g
+  suffices : (Equiv.Perm.ofSubtype k : Equiv.Perm α) = g
   constructor
-  -- because `rw equiv.perm.mem_alternating_group` does not work
-  rw [@Equiv.Perm.mem_alternatingGroup (g : Equiv.Perm α).support _ _]
-  rw [← Equiv.Perm.sign_ofSubtype, this]
-  exact Equiv.Perm.IsThreeCycle.sign hg
-  exact this
+  · rw [@Equiv.Perm.mem_alternatingGroup {x // x ∈ ((g : Equiv.Perm α).support)} _ _ k]
+    suffices that : Equiv.Perm.sign (ofSubtype k) = Equiv.Perm.sign k
+    · rw [← that, this, Equiv.Perm.IsThreeCycle.sign hg]
+    rw [Equiv.Perm.sign_ofSubtype k]
+    -- what happens here is ridiculous
+    congr
+    rw [Subtype.fintype, Finset.Subtype.fintype, Fintype.subtype]
+    congr
+    ext x
+    rw [mem_support]
+  · exact this
   · -- k.of_subtype = g
     apply Equiv.Perm.ofSubtype_subtypePerm
     · intro a; simp only [Equiv.Perm.mem_support, imp_self]
 #align alternating_group.is_three_cycle_is_of_subtype alternatingGroup.isThreeCycle_is_ofSubtype
 
-theorem Subgroup.map_closure_eq {G H : Type _} [Group G] [Group H] (f : H →* G) (s : Set H) :
-    Subgroup.map f (Subgroup.closure s) = Subgroup.closure (Set.image f s) :=
-  by
+theorem Subgroup.map_closure_eq {G H : Type _} [Group G] [Group H]
+    (f : H →* G) (s : Set H) :
+    Subgroup.map f (Subgroup.closure s) = Subgroup.closure (Set.image f s) := by
   apply symm
   apply Subgroup.closure_eq_of_le
   · intro g; rintro ⟨k, hk, rfl⟩
@@ -372,58 +339,50 @@ theorem Subgroup.map_closure_eq {G H : Type _} [Group G] [Group H] (f : H →* G
     apply Set.mem_image_of_mem; exact hg
 #align alternating_group.subgroup.map_closure_eq alternatingGroup.Subgroup.map_closure_eq
 
-theorem Subgroup.closure_subgroupOf_eq {G : Type _} [Group G] (N : Subgroup G) (s : Set G)
-    (hs : s ≤ ↑N) : Subgroup.closure (N.Subtype ⁻¹' s) = (Subgroup.closure s).subgroupOf N :=
-  by
+theorem Subgroup.closure_subgroupOf_eq {G : Type _} [Group G]
+    (N : Subgroup G) (s : Set G) (hs : s ≤ ↑N) :
+    Subgroup.closure (N.subtype ⁻¹' s) = (Subgroup.closure s).subgroupOf N := by
   dsimp only [Subgroup.subgroupOf]
   have hN : Function.Injective N.subtype := by
     simp only [Subgroup.coeSubtype, Subtype.coe_injective]
   apply Subgroup.map_injective hN
-  rw [subgroup.map_closure_eq]
+  rw [Subgroup.map_closure_eq]
   suffices : N.subtype '' (N.subtype ⁻¹' s) = s
   rw [this]
   rw [Subgroup.map_comap_eq]
   simp only [Subgroup.subtype_range, right_eq_inf, Subgroup.closure_le]
   exact hs
-  rw [Set.image_preimage_eq_inter_range, Subgroup.coeSubtype, Subtype.range_coe_subtype,
-    Set.inter_eq_left_iff_subset]
-  exact hs
+  rw [Set.image_preimage_eq_inter_range, Subgroup.coeSubtype, Subtype.range_coe_subtype]
+  exact Set.inter_eq_self_of_subset_left hs
 #align alternating_group.subgroup.closure_subgroup_of_eq alternatingGroup.Subgroup.closure_subgroupOf_eq
 
 theorem closure_three_cycles_alternating_eq_top :
-    Subgroup.closure {g : alternatingGroup α | Equiv.Perm.IsThreeCycle (g : Equiv.Perm α)} = ⊤ :=
-  by
-  suffices : Function.Injective (alternatingGroup α).Subtype
-  apply Subgroup.map_injective this
-  rw [subgroup.map_closure_eq]
-  suffices :
-    (alternatingGroup α).Subtype ''
+    Subgroup.closure
+      {g : alternatingGroup α | Equiv.Perm.IsThreeCycle (g : Equiv.Perm α)} = ⊤ := by
+  apply Subgroup.map_injective (alternatingGroup α).subtype_injective
+  rw [Subgroup.map_closure_eq]
+  suffices : (alternatingGroup α).subtype ''
         {g : alternatingGroup α | Equiv.Perm.IsThreeCycle (g : Equiv.Perm α)} =
       {g : Equiv.Perm α | Equiv.Perm.IsThreeCycle g}
-  rw [this]
-  rw [Equiv.Perm.closure_three_cycles_eq_alternating]
-  rw [← Subgroup.comap_top _, Subgroup.map_comap_eq, Subgroup.subtype_range, inf_top_eq]
+  rw [this, Equiv.Perm.closure_three_cycles_eq_alternating,
+    ← Subgroup.comap_top (alternatingGroup α).subtype,
+    Subgroup.map_comap_eq, Subgroup.subtype_range, inf_top_eq]
   · ext g
     simp only [Subgroup.coeSubtype, Set.mem_image, Set.mem_setOf_eq]
     constructor
     rintro ⟨k, hk, rfl⟩; exact hk
     intro hg
-    use g
+    use! g
     rw [Equiv.Perm.mem_alternatingGroup]
     exact Equiv.Perm.IsThreeCycle.sign hg
-    exact ⟨hg, rfl⟩
-  simp only [Subgroup.coeSubtype, Subtype.coe_injective]
 #align alternating_group.closure_three_cycles_alternating_eq_top alternatingGroup.closure_three_cycles_alternating_eq_top
 
+/- -- exact isThreeCycle_is_ofSubtype g hg
 theorem is_three_cycles_exists_ofSubtype (g : alternatingGroup α)
     (hg : Equiv.Perm.IsThreeCycle (g : Equiv.Perm α)) :
-    ∃ s : Finset α,
-      s.card = 3 ∧
-        g ∈
-          (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α)
-                (alternatingGroup s)).subgroupOf
-            (alternatingGroup α) :=
-  by
+    ∃ s : Finset α, s.card = 3 ∧
+      g ∈ (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α)
+            (alternatingGroup s)).subgroupOf (alternatingGroup α) := by
   use (g : Equiv.Perm α).support
   constructor
   exact Equiv.Perm.IsThreeCycle.card_support hg
@@ -443,28 +402,26 @@ theorem is_three_cycles_exists_ofSubtype (g : alternatingGroup α)
     apply Equiv.Perm.ofSubtype_subtypePerm
     · intro a; simp only [Equiv.Perm.mem_support, imp_self]
 #align alternating_group.is_three_cycles_exists_of_subtype alternatingGroup.is_three_cycles_exists_ofSubtype
+-/
 
 theorem Iw_is_generator_alt :
     (iSup fun s : { s : Finset α // s.card = 3 } =>
-        (Subgroup.map Equiv.Perm.ofSubtype (alternatingGroup (s : Finset α))).subgroupOf
-          (alternatingGroup α)) =
-      ⊤ :=
-  by
+      (Subgroup.map Equiv.Perm.ofSubtype
+        (alternatingGroup (s : Finset α))).subgroupOf (alternatingGroup α)) = ⊤ := by
   rw [← closure_three_cycles_alternating_eq_top]
   have lemma1 :
     {g : alternatingGroup α | (g : Equiv.Perm α).IsThreeCycle} =
-      (alternatingGroup α).Subtype ⁻¹' {g : Equiv.Perm α | g.IsThreeCycle} :=
-    by ext g; simp only [Subgroup.coeSubtype, Set.preimage_setOf_eq]
-  have lemma2 : {g : Equiv.Perm α | g.IsThreeCycle} ≤ alternatingGroup α :=
-    by
+      (alternatingGroup α).subtype ⁻¹' {g : Equiv.Perm α | g.IsThreeCycle} := by
+    ext g
+    simp only [Subgroup.coeSubtype, Set.preimage_setOf_eq]
+  have lemma2 : {g : Equiv.Perm α | g.IsThreeCycle} ≤ alternatingGroup α := by
     intro k hk
-    -- simp only [set_like.mem_coe],
     apply Equiv.Perm.IsThreeCycle.mem_alternatingGroup
     exact hk
   apply le_antisymm
   · -- supr ≤ closure
     rw [lemma1]
-    rw [subgroup.closure_subgroup_of_eq (alternatingGroup α) _ lemma2]
+    rw [Subgroup.closure_subgroupOf_eq (alternatingGroup α) _ lemma2]
     rw [Equiv.Perm.closure_three_cycles_eq_alternating]
     rw [iSup_le_iff]
     rintro ⟨s, hs⟩
@@ -475,72 +432,74 @@ theorem Iw_is_generator_alt :
     simp only [SetLike.mem_coe] at hk
     rw [Equiv.Perm.mem_alternatingGroup]
     rw [Equiv.Perm.sign_ofSubtype]
-    exact equiv.perm.mem_alternating_group.mp hk
+    rw [mem_alternatingGroup] at hk
+    convert hk
   · -- closure ≤ supr
     rw [Subgroup.closure_le]
     intro g hg
-    obtain ⟨s, hs3, hsg⟩ := is_three_cycles_exists_of_subtype g hg
+    obtain ⟨s, hs3, hsg⟩ := isThreeCycle_is_ofSubtype g hg
     simp only [SetLike.mem_coe]
     apply Subgroup.mem_iSup_of_mem
     swap; exact ⟨s, hs3⟩
     exact hsg
+set_option linter.uppercaseLean3 false in
 #align alternating_group.Iw_is_generator_alt alternatingGroup.Iw_is_generator_alt
 
-def iw3 : IwasawaStructure (alternatingGroup α) (Nat.finset α 3)
+def Iw3 : IwasawaStructure (alternatingGroup α) (Nat.Combination α 3)
     where
-  t := fun s : Nat.finset α 3 =>
-    (Subgroup.map (Equiv.Perm.ofSubtype : Equiv.Perm (s : Finset α) →* Equiv.Perm α)
-          (alternatingGroup (s : Finset α))).subgroupOf
-      (alternatingGroup α)
+  T := fun s : Nat.Combination α 3 => (Subgroup.map
+    (Equiv.Perm.ofSubtype : Equiv.Perm (s : Finset α) →* Equiv.Perm α)
+      (alternatingGroup (s : Finset α))).subgroupOf (alternatingGroup α)
   is_comm := fun ⟨s, hs⟩ => by
-    apply Subgroup.subgroupOf_isCommutative _
-    haveI : (alternatingGroup (s : Finset α)).IsCommutative :=
-      {
-        is_comm := by
+    have : (alternatingGroup (s : Finset α)).IsCommutative :=
+      { is_comm := by
           apply alternatingGroup.isCommutative_of_order_three
           rw [Fintype.card_coe]; exact hs }
-    apply Subgroup.map_isCommutative (alternatingGroup (s : Finset α))
-  IsConj := fun g ⟨s, hs⟩ => Iw_is_conj_alt s g
+    apply Subgroup.subgroupOf_isCommutative _
+    -- apply Subgroup.map_isCommutative (alternatingGroup (s : Finset α))
+  is_conj := fun g ⟨s, _⟩ => Iw_is_conj_alt s g
   is_generator := Iw_is_generator_alt
-#align alternating_group.Iw3 alternatingGroup.iw3
+set_option linter.uppercaseLean3 false in
+#align alternating_group.Iw3 alternatingGroup.Iw3
 
 /-- If α has at least 5 elements, but not 6, then
 the only nontrivial normal sugroup of (alternating_group α) is the alternating_group itself. -/
 theorem is_normal_subgroup_iff_of_ne_6 {α : Type _} [DecidableEq α] [Fintype α]
     (hα : 5 ≤ Fintype.card α) (hα' : Fintype.card α ≠ 6) {N : Subgroup (alternatingGroup α)}
-    (hnN : N.Normal) : N = ⊥ ∨ N = ⊤ :=
-  by
+    (hnN : N.Normal) : N = ⊥ ∨ N = ⊤ := by
   cases' Subgroup.bot_or_nontrivial N with hN hN
   apply Or.intro_left; exact hN
   apply Or.intro_right
   rw [eq_top_iff]
   rw [← alternatingGroup_is_perfect hα]
-  apply commutator_le_iwasawa _ Iw3 hnN _
+  apply commutator_le_iwasawa _ Iw3 hnN
+  · intro h
+    obtain ⟨g, hgN, hg⟩ := N.nontrivial_iff_exists_ne_one.mp hN
+    obtain ⟨s, hs⟩ := Nat.combination.mulAction_faithful (α := α) (g := g) 3 (by norm_num)
+      (by rw [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+          exact le_trans (by norm_num) hα)
+      (by intro hg'; apply hg
+          exact OneMemClass.coe_eq_one.mp hg')
+    apply hs
+    suffices : s ∈ fixedPoints N (Nat.Combination α 3)
+    · rw [mem_fixedPoints] at this
+      exact this ⟨g, hgN⟩
+    rw [h, Set.top_eq_univ]
+    apply Set.mem_univ
   · apply IsPreprimitive.isQuasipreprimitive
     apply alternatingGroup.Nat.finset_isPreprimitive_of_alt 3
     norm_num
     exact lt_of_lt_of_le (by norm_num) hα
     exact hα'
-  · intro h
-    obtain ⟨g, hgN, hg⟩ := N.nontrivial_iff_exists_ne_one.mp hN
-    obtain ⟨s, hs⟩ := Nat.finset.mulAction_faithful 3 (by norm_num) _ _
-    apply hs
-    suffices : s ∈ fixed_points N (Nat.finset α 3)
-    rw [mem_fixed_points] at this ; exact this ⟨g, hgN⟩
-    rw [h]; rw [Set.top_eq_univ]; apply Set.mem_univ
-    infer_instance
-    exact lt_of_lt_of_le (by norm_num) hα
-    intro hg'; apply hg
-    ext; simp only [Subgroup.coe_one, ← hg']; rfl
 #align alternating_group.is_normal_subgroup_iff_of_ne_6 alternatingGroup.is_normal_subgroup_iff_of_ne_6
 
-def iw4T (s : Finset α) : Subgroup (alternatingGroup α) :=
-  (Subgroup.map
-        (MonoidHom.comp (Equiv.Perm.ofSubtype : Equiv.Perm (s : Finset α) →* Equiv.Perm α)
-          (alternatingGroup (s : Finset α)).Subtype)
-        (commutator (alternatingGroup (s : Finset α)))).subgroupOf
-    (alternatingGroup α)
-#align alternating_group.Iw4T alternatingGroup.iw4T
+def Iw4T (s : Finset α) : Subgroup (alternatingGroup α) :=
+  (Subgroup.map (MonoidHom.comp
+    (Equiv.Perm.ofSubtype : Equiv.Perm (s : Finset α) →* Equiv.Perm α)
+      (alternatingGroup (s : Finset α)).subtype)
+    (commutator (alternatingGroup (s : Finset α)))).subgroupOf (alternatingGroup α)
+set_option linter.uppercaseLean3 false in
+#align alternating_group.Iw4T alternatingGroup.Iw4T
 
 def AlternatingGroup.ofSubtype {α : Type _} [DecidableEq α] [Fintype α] {s : Finset α} :
     alternatingGroup s →* alternatingGroup α :=
