@@ -773,7 +773,7 @@ theorem Stabilizer.isMaximal (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
 
 /-- The action of alternating_group α on the n-element subsets of α is preprimitive
 provided 0 < n < #α and #α ≠ 2*n -/
-theorem Nat.finset_isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
+theorem Nat.Combination.isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
     (hn : n < Fintype.card α) (hα : Fintype.card α ≠ 2 * n) :
     IsPreprimitive (alternatingGroup α) (n.Combination α) := by
   have hα' : 3 ≤ Fintype.card α := three_le h_one_le hn hα
@@ -831,6 +831,6 @@ theorem Nat.finset_isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
     exact hn
   · simp only [Set.ncard_coe_Finset, hs]
     exact hα
-#align alternating_group.nat.finset_is_preprimitive_of_alt alternatingGroup.Nat.finset_isPreprimitive_of_alt
+#align alternating_group.nat.finset_is_preprimitive_of_alt alternatingGroup.Nat.Combination.isPreprimitive_of_alt
 
 end alternatingGroup
