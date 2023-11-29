@@ -1,1 +1,2 @@
 import Jordan.AlternatingIwasawa
+#check alternatingGroup.isSimpleGroup

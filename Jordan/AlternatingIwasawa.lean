@@ -925,7 +925,7 @@ theorem normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
 #align alternating_group.alternating_group.normal_subgroups alternatingGroup.normal_subgroups
 
 /-- If `α` has at least 5 elements, then `alternatingGroup α` is simple. -/
-theorem alternatingGroup.isSimpleGroup {α : Type*} [DecidableEq α] [Fintype α]
+theorem isSimpleGroup {α : Type*} [DecidableEq α] [Fintype α]
     (hα : 5 ≤ Fintype.card α) :
     IsSimpleGroup (alternatingGroup α) := by
   have : Nontrivial (alternatingGroup α) :=
