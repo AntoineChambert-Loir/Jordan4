@@ -393,7 +393,7 @@ theorem List.exists_pw_disjoint_with_card [Fintype α] [DecidableEq α]
 -/
 
 end Ranges
-
+-/
 section ncard
 
 theorem Set.ncard_filter_eq_count {ι κ : Type*} [DecidableEq ι] [DecidableEq κ]
@@ -1927,7 +1927,7 @@ def φ' (a : Equiv.Perm.Basis g) :
       Equiv.ofBijective_apply, Function.comp_apply, Equiv.Perm.coe_mul]
 #align on_cycle_factors.φ' OnCycleFactors.φ'
 
-theorem hφ'_is_rightInverse (τ : Iφ g) :
+/- theorem hφ'_is_rightInverse (τ : Iφ g) :
     (φ g) ((φ' a) τ) = (τ : Equiv.Perm g.cycleFactorsFinset) := by
   apply Equiv.Perm.ext
   rintro ⟨c, hc⟩
@@ -1943,6 +1943,7 @@ theorem hφ'_is_rightInverse (τ : Iφ g) :
   ext y
   exact k_cycle_apply τ.prop ⟨c, hc⟩ y
 #align on_cycle_factors.hφ'_is_right_inverse OnCycleFactors.hφ'_is_rightInverse
+-/
 
 theorem φ'_apply' {τ} (hτ) (x) :
     (ConjAct.ofConjAct (φ' a ⟨τ, hτ⟩ : ConjAct (Equiv.Perm α))) x = k a τ x :=
