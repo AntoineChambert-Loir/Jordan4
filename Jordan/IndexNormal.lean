@@ -26,9 +26,9 @@ variable {α : Type _} [Fintype α] [DecidableEq α]
 
 /-- The alternating group of a subsingleton is ⊥ -/
 theorem alternatingGroup_of_subsingleton [Subsingleton α] :
-    alternatingGroup α = ⊥  :=  
+    alternatingGroup α = ⊥  :=
   Subgroup.eq_bot_of_subsingleton (alternatingGroup α)
-  
+
 #align alternating_group_of_subsingleton alternatingGroup_of_subsingleton
 
 variable (α)
@@ -66,9 +66,9 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
     apply congr_arg₂ _ _ rfl
     revert x y hxy
     by_contra h
-    push_neg at h 
+    push_neg at h
     obtain ⟨a, b, hab, hk⟩ := h
-    rw [Equiv.Perm.sign_swap hab] at hk 
+    rw [Equiv.Perm.sign_swap hab] at hk
     let hk := Or.resolve_right (Int.units_eq_one_or (s _)) hk
     apply hg'
     refine' Equiv.Perm.swap_induction_on g' s.map_one _
@@ -80,8 +80,8 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
 #align alternating_is_characteristic alternatingGroup_is_characteristic
 
 /-- A finite group of prime order is commutative -/
-theorem isCommutative_of_prime_order {G : Type _} [Group G] [Fintype G] 
-    {p : ℕ} [hp : Fact p.Prime] (h : Fintype.card G = p) : 
+theorem isCommutative_of_prime_order {G : Type _} [Group G] [Fintype G]
+    {p : ℕ} [hp : Fact p.Prime] (h : Fintype.card G = p) :
     IsCommutative G (· * ·) := by
   skip
   apply IsCommutative.mk
@@ -95,25 +95,25 @@ example (a b : ℕ) (h : a * 2 = b * 2) : a = b := by apply mul_left_injective�
 theorem alternatingGroup.isCommutative_of_order_three {α : Type _} [Fintype α] [DecidableEq α]
     (hα : Fintype.card α = 3) : IsCommutative (alternatingGroup α) (· * ·) := by
   apply @isCommutative_of_prime_order _ _ _ 3 _
-  have hα' : Nontrivial α := by 
+  have hα' : Nontrivial α := by
     rw [← Fintype.one_lt_card_iff_nontrivial, hα]
     norm_num
   apply mul_right_injective₀ (a := 2) (by norm_num)
   dsimp
   rw [two_mul_card_alternatingGroup, Fintype.card_perm, hα]
   norm_num
-#align alternating_group.is_commutative_of_order_three 
+#align alternating_group.is_commutative_of_order_three
   alternatingGroup.isCommutative_of_order_three
 
 private theorem aux_dvd_lemma (r p : ℕ) (hp : p.Prime) (h : r ∣ Nat.factorial p)
     (hr : ∀ {l : ℕ} (_ : l.Prime) (_ : l ∣ r), p ≤ l) : r ∣ p := by
-  rw [← Nat.coprime.dvd_mul_right _]
-  rw [Nat.mul_factorial_pred (Nat.Prime.pos hp)]
-  exact h
+  rw [← Nat.Coprime.dvd_mul_right _]
+  · rw [Nat.mul_factorial_pred (Nat.Prime.pos hp)]
+    exact h
   rw [Nat.coprime_iff_gcd_eq_one]
   by_contra h
   obtain ⟨l, hl, hl'⟩ := Nat.exists_prime_and_dvd h
-  rw [Nat.dvd_gcd_iff, Nat.Prime.dvd_factorial hl] at hl' 
+  rw [Nat.dvd_gcd_iff, Nat.Prime.dvd_factorial hl] at hl'
   apply (lt_iff_not_ge p.pred p).mp (Nat.pred_lt (Nat.Prime.ne_zero hp))
   rw [Nat.pred_eq_sub_one]; rw [ge_iff_le]
   exact le_trans (hr hl hl'.left) hl'.right
@@ -128,8 +128,8 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor {G : Type _} [Fintype 
   suffices H.normalCore.relindex H = 1
     by
     rw [← Subgroup.normalCore_eq_ker]
-    unfold Subgroup.relindex at this 
-    rw [Subgroup.index_eq_one] at this 
+    unfold Subgroup.relindex at this
+    rw [Subgroup.index_eq_one] at this
     apply le_antisymm; apply Subgroup.normalCore_le
     intro x hx
     rw [← Subgroup.coe_mk H x hx, ← Subgroup.mem_subgroupOf, this]
@@ -147,7 +147,7 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor {G : Type _} [Fintype 
   · /- -- These two lines furnished the standard equality : f.ker.index = fintype.card ↥(f.range)
         let hf := subgroup.index_comap ⊥ f,
         simp only [monoid_hom.comap_bot, subgroup.relindex_bot_left, nat.card_eq_fintype_card] at hf, -/
-    have hf := Subgroup.index_ker f; rw [Nat.card_eq_fintype_card] at hf 
+    have hf := Subgroup.index_ker f; rw [Nat.card_eq_fintype_card] at hf
     rw [hf, ← hHp]
     unfold Subgroup.index
     rw [Nat.card_eq_fintype_card, ← Fintype.card_perm]
@@ -166,7 +166,7 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor {G : Type _} [Fintype 
 #align subgroup.normal_of_index_eq_smallest_prime_factor Subgroup.normal_of_index_eq_smallest_prime_factor
 
 /-- A subgroup of index 2 is normal (does not require finiteness of G) -/
-theorem Subgroup.normal_of_index_eq_two {G : Type _} [Group G] 
+theorem Subgroup.normal_of_index_eq_two {G : Type _} [Group G]
     {H : Subgroup G} (hH : H.index = 2) : H.Normal := by
   have : Fintype (G ⧸ H) := by
     refine' fintypeOfNotInfinite _
@@ -182,8 +182,8 @@ theorem Subgroup.normal_of_index_eq_two {G : Type _} [Group G]
   suffices H.normalCore.relindex H = 1
     by
     rw [← Subgroup.normalCore_eq_ker]
-    unfold Subgroup.relindex at this 
-    rw [Subgroup.index_eq_one] at this 
+    unfold Subgroup.relindex at this
+    rw [Subgroup.index_eq_one] at this
     apply le_antisymm; apply Subgroup.normalCore_le
     intro x hx
     rw [← Subgroup.coe_mk H x hx, ← Subgroup.mem_subgroupOf, this]
@@ -231,33 +231,13 @@ theorem Equiv.Perm.is_prod_swap_list (g : Equiv.Perm α) :
     use Equiv.swap x y::l
     constructor
     · intro s hs
-      rw [List.mem_cons] at hs 
+      rw [List.mem_cons] at hs
       cases' hs with hs hs
       rw [hs]; exact ⟨x, y, hxy, rfl⟩
       exact hl s hs
     rw [List.prod_cons]
     rw [hf]
 #align equiv.perm.is_prod_swap_list Equiv.Perm.is_prod_swap_list
-
-example (G : Type _) [Group G] (a b c : G) : 
-  a * b = c ↔ b = a⁻¹ * c := by 
-  exact Iff.symm eq_inv_mul_iff_mul_eq
-
-#check Finset.card_doubleton
-example (G : Type _) [Fintype G] [One G] (hG : Fintype.card G = 2) (k : G) (hk : k ≠ 1) (g : G) : 
-  g = k ↔ g ≠ 1 := by
-  suffices : g = 1 ∨ g = k
-  cases this with
-  | inl h => 
-    simp only [h, ne_eq, not_true, iff_false]
-    exact Ne.symm hk
-  | inr h => 
-    simp only [h, ne_eq, true_iff]
-    exact hk
-  sorry
-
-#check false_iff
-  
 
 /-- The alternating group is the only subgroup of index 2 of the permutation group -/
 theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index = 2) :
@@ -267,8 +247,8 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
   rw [alternatingGroup_eq_sign_ker, ← QuotientGroup.ker_mk' G]
   ext g
   simp only [Equiv.Perm.sign.mem_ker, (QuotientGroup.mk' G).mem_ker]
-  
-  have h2 : Fact (Nat.Prime 2) := by 
+
+  have h2 : Fact (Nat.Prime 2) := by
     apply Fact.mk
     norm_num
   have hG'' : IsCommutative (Equiv.Perm α ⧸ G) (· * ·) := by
@@ -276,13 +256,13 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
     rw [← Nat.card_eq_fintype_card]
     exact hG
   have : ∃ g : Equiv.Perm α, g.IsSwap ∧ g ∉ G := by
-    by_contra h; push_neg at h 
+    by_contra h; push_neg at h
     suffices : G = ⊤
-    rw [this, Subgroup.index_top] at hG 
+    rw [this, Subgroup.index_top] at hG
     norm_num at hG
     rw [eq_top_iff, ← Equiv.Perm.closure_isSwap, Subgroup.closure_le G]
     intro g hg
-    simp only [Set.mem_setOf_eq] at hg 
+    simp only [Set.mem_setOf_eq] at hg
     simp only [SetLike.mem_coe]
     exact h g hg
   obtain ⟨k, hk, hk'⟩ := this
@@ -292,7 +272,7 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
     obtain ⟨x, y, hxy, hxyk⟩ := hk
     obtain ⟨u, hu⟩ := Equiv.Perm.isConj_swap hab hxy
     let hu' := congr_arg s (SemiconjBy.eq hu)
-    simp only [map_mul] at hu' 
+    simp only [map_mul] at hu'
     apply mul_left_cancel (a := s u)
     rw [habg, hxyk, hu']
     apply hG''.comm
@@ -305,27 +285,27 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
   -- TODO : avoid is_prod_swap_list
   obtain ⟨l, hl, hg⟩ := g.is_prod_swap_list
   let hsg := Equiv.Perm.sign_prod_list_swap hl
-  rw [← hg] at hsg 
+  rw [← hg] at hsg
   have hsg' : s g = s k ^ l.length := by
     rw [hg]
     rw [map_list_prod]
     rw [List.prod_eq_pow_card (List.map s l) (s k) _]
     rw [List.length_map]
     intro x hx
-    simp only [List.mem_map] at hx 
+    simp only [List.mem_map] at hx
     obtain ⟨y, hyl, hxy⟩ := hx
     rw [← hxy]
     apply this'; exact hl y hyl
   obtain ⟨m, hm⟩ := Nat.even_or_odd' l.length
   have neg_one_neq_one : (-1 : Units ℤ) ≠ 1 := by norm_num
   cases' hm with hm hm
-  · rw [hm, pow_mul] at hsg hsg' 
-    rw [hsk2] at hsg' ; rw [Int.units_sq] at hsg 
-    rw [one_pow] at hsg' hsg 
-    simp only [hsg, hsg'] 
-  · rw [hm, pow_add, pow_mul, pow_one] at hsg hsg' 
-    rw [hsk2] at hsg' ; rw [Int.units_sq] at hsg 
-    rw [one_pow, one_mul] at hsg' hsg 
+  · rw [hm, pow_mul] at hsg hsg'
+    rw [hsk2] at hsg' ; rw [Int.units_sq] at hsg
+    rw [one_pow] at hsg' hsg
+    simp only [hsg, hsg']
+  · rw [hm, pow_add, pow_mul, pow_one] at hsg hsg'
+    rw [hsk2] at hsg' ; rw [Int.units_sq] at hsg
+    rw [one_pow, one_mul] at hsg' hsg
     rw [hsg, hsg']
     simp only [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
     constructor
@@ -341,7 +321,7 @@ theorem large_subgroup_of_perm_contains_alternating {G : Subgroup (Equiv.Perm α
     exact Subgroup.index_ne_zero_of_finite h
   cases' eq_or_gt_of_le (Nat.succ_le_iff.mpr h) with h h
   · rw [Subgroup.index_eq_one] at h ; rw [h]; exact le_top
-  rw [← Nat.succ_le_iff] at h ; norm_num at h 
+  rw [← Nat.succ_le_iff] at h ; norm_num at h
   apply le_of_eq
   apply is_alternating_of_index_2
   refine' le_antisymm _ h
@@ -362,4 +342,3 @@ theorem contains_alternating_of_index_le_2' {G : Subgroup (Equiv.Perm α)} (hG :
 #align contains_alternating_of_index_le_2' contains_alternating_of_index_le_2'
 
 #lint
-

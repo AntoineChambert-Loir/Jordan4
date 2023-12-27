@@ -1,1 +1,2 @@
-def hello := "world"
+import Jordan.AlternatingIwasawa
+#check alternatingGroup.isSimpleGroup

@@ -5,16 +5,16 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module alternating_maximal
 -/
-import Mathbin.GroupTheory.GroupAction.SubMulAction
-import Mathbin.GroupTheory.SpecificGroups.Alternating
-import Oneshot.ForMathlib.Alternating
-import Oneshot.IndexNormal
-import Oneshot.Primitive
-import Oneshot.MultipleTransitivity
-import Oneshot.StabilizerPrimitive
-import Oneshot.PermIwasawa
-import Oneshot.PermMaximal
-import Oneshot.V4
+import Mathlib.GroupTheory.GroupAction.SubMulAction
+import Mathlib.GroupTheory.SpecificGroups.Alternating
+import Jordan.Mathlib.Alternating
+import Jordan.IndexNormal
+import Jordan.Primitive
+import Jordan.MultipleTransitivity
+import Jordan.StabilizerPrimitive
+import Jordan.PermIwasawa
+import Jordan.PermMaximal
+import Jordan.V4
 
 -- import tactic.basic tactic.group
 -- import group_theory.solvable
@@ -31,7 +31,7 @@ section Junk
 
 variable {α G H : Type _} [Group G] [Group H] [MulAction G α] {N : Subgroup G}
 
-theorem Subgroup.map_subgroupOf_eq {K : Subgroup N} : (K.map N.Subtype).subgroupOf N = K := by
+theorem Subgroup.map_subgroupOf_eq {K : Subgroup N} : (K.map N.subtype).subgroupOf N = K := by
   rw [← Subgroup.comap_subtype, Subgroup.comap_map_eq, Subgroup.ker_subtype, sup_bot_eq]
 #align subgroup.map_subgroup_of_eq Subgroup.map_subgroupOf_eq
 
@@ -53,25 +53,25 @@ theorem Subgroup.map_iff_mono_of_injective {f : G →* H} {K K' : Subgroup G}
   exact Subgroup.map_mono
   · intro h
     intro x hx
-    suffices f x ∈ Subgroup.map f K'
-      by
-      simp only [Subgroup.mem_map] at this 
+    suffices f x ∈ Subgroup.map f K' by
+      simp only [Subgroup.mem_map] at this
       obtain ⟨y, hy, hx⟩ := this
       rw [← hf hx]; exact hy
     apply h
     rw [Subgroup.mem_map]
-    use ⟨x, hx, rfl⟩
+    exact ⟨x, hx, rfl⟩
 #align subgroup.map_iff_mono_of_injective Subgroup.map_iff_mono_of_injective
 
 theorem Subgroup.map_strict_mono_of_injective {f : G →* H} {K K' : Subgroup G}
-    (hf : Function.Injective f) : K < K' ↔ Subgroup.map f K < Subgroup.map f K' :=
-  by
+    (hf : Function.Injective f) :
+    K < K' ↔ Subgroup.map f K < Subgroup.map f K' := by
   simp only [lt_iff_le_not_le]
   simp_rw [← Subgroup.map_iff_mono_of_injective hf]
 #align subgroup.map_strict_mono_of_injective Subgroup.map_strict_mono_of_injective
 
 theorem Subgroup.map_injective_of_injective {f : G →* H} {K K' : Subgroup G}
-    (hf : Function.Injective f) : Subgroup.map f K = Subgroup.map f K' ↔ K = K' := by
+    (hf : Function.Injective f) :
+    Subgroup.map f K = Subgroup.map f K' ↔ K = K' := by
   simp only [le_antisymm_iff, ← Subgroup.map_iff_mono_of_injective hf]
 #align subgroup.map_injective_of_injective Subgroup.map_injective_of_injective
 
@@ -84,23 +84,22 @@ namespace alternatingGroup
 open scoped Classical
 
 theorem isPretransitive_ofFixingSubgroup (s : Set α) (h0 : s.Nontrivial)
-    (hα : Fintype.card s < Fintype.card (sᶜ : Set α)) :
+    (hα : Set.ncard s < Set.ncard (sᶜ : Set α)) :
     IsPretransitive (fixingSubgroup (alternatingGroup α) s)
-      (SubMulAction.ofFixingSubgroup (alternatingGroup α) s) :=
-  by
-  rw [is_pretransitive_iff_is_one_pretransitive]
-  refine' remaining_transitivity' _ _ _ _ (Fintype.card α - 2) _ _ _
-  simp only [part_enat.of_fintype α, PartENat.coe_le_coe, tsub_le_self]
-  · have h1' : 2 < Fintype.card (sᶜ : Set α) :=
-      by
+      (SubMulAction.ofFixingSubgroup (alternatingGroup α) s) := by
+  rw [isPretransitive_iff_is_one_pretransitive]
+  apply remaining_transitivity'
+  apply IsMultiplyPretransitive.alternatingGroup_of_sub_two
+  · have h1' : 2 < Set.ncard (sᶜ : Set α) := by
       apply lt_of_le_of_lt _ hα
-      rw [Nat.succ_le_iff, Fintype.one_lt_card_iff_nontrivial, Set.nontrivial_coe_sort]
+      rw [Nat.succ_le_iff, Set.one_lt_ncard_iff_nontrivial]
       exact h0
-    rw [add_comm, ← Fintype.card_add_compl s, Nat.add_sub_assoc (le_of_lt h1'), add_le_add_iff_left,
-      Nat.le_sub_iff_right (le_of_lt h1')]
+    rw [add_comm, ← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s,
+      Nat.add_sub_assoc (le_of_lt h1'), add_le_add_iff_left]
+    apply Nat.le_sub_of_add_le
     exact h1'
-  -- Here, we needed to add an instance in multiple_transitivity.lean to apply the following lemma
-  exact MulAction.alternatingGroup_is_fully_minus_two_pretransitive α
+  · rw [PartENat.card_eq_coe_fintype_card]
+    simp only [ge_iff_le, Nat.cast_le, tsub_le_iff_right, le_add_iff_nonneg_right]
 #align alternating_group.is_pretransitive_of_fixing_subgroup alternatingGroup.isPretransitive_ofFixingSubgroup
 
 theorem stabilizer_ne_top' (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nontrivial) :
@@ -108,7 +107,7 @@ theorem stabilizer_ne_top' (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nontrivial
   by
   obtain ⟨a, ha⟩ := hs
   obtain ⟨b, hb, c, hc, hbc⟩ := hsc
-  rw [Set.mem_compl_iff] at hb hc 
+  rw [Set.mem_compl_iff] at hb hc
   have hac : a ≠ c := by intro h; apply hc; rw [← h]; exact ha
   have hab : a ≠ b := by intro h; apply hb; rw [← h]; exact ha
   intro h; apply hc
@@ -135,7 +134,7 @@ theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty)
   by
   cases' hssc with hs' hsc'
   · rw [← stabilizer_compl]
-    rw [← compl_compl s] at hs' 
+    rw [← compl_compl s] at hs'
     exact stabilizer_ne_top' (sᶜ) hsc hs'
   exact stabilizer_ne_top' s hs hsc'
 #align alternating_group.stabilizer_ne_top alternatingGroup.stabilizer_ne_top
@@ -159,25 +158,25 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
   · -- a = b, on prend g = 1,
     use 1
     simp only [hab, Subgroup.one_mem, one_smul, eq_self_iff_true, and_self_iff]
-  rw [← Ne.def] at hab 
-  cases' le_or_gt (Fintype.card t) 2 with ht ht'
+  rw [← Ne.def] at hab
+  cases' le_or_gt (Set.ncard t) 2 with ht ht'
   · -- fintype.card t ≤ 2, alors on prend le produit d'un swap (a b) avec un swap dans tᶜ
-    have h : 1 < Fintype.card (tᶜ : Set α) := by
-      by_contra
-      rw [not_lt] at h 
-      rw [← not_lt] at hα 
+    have h : 1 < Set.ncard (tᶜ : Set α) := by
+      by_contra h
+      rw [not_lt] at h
+      rw [← not_lt] at hα
       apply hα
-      rw [← Fintype.card_add_compl t]
+      rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl t]
       apply Nat.lt_succ_of_le
       apply add_le_add ht h
-    rw [Fintype.one_lt_card_iff] at h 
-    obtain ⟨⟨c, hc⟩, ⟨d, hd⟩, hcd⟩ := h
-    simp only [Ne.def, Subtype.mk_eq_mk] at hcd 
+    rw [Set.one_lt_ncard_iff] at h
+    obtain ⟨c, d, hc, hd, hcd⟩ := h
+    simp only [Ne.def] at hcd
     use Equiv.swap a b * Equiv.swap c d
     constructor
     · simp only [Subgroup.mem_inf]
       constructor
-      · rw [mem_stabilizer_of_finite_iff]
+      · rw [mem_stabilizer_of_finite_iff_smul_le]
         rintro _ ⟨x, hx, rfl⟩
         simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
         have hx_ne : ∀ u ∈ tᶜ, x ≠ u := fun u hu h => Set.mem_compl hu (by rw [← h]; exact hx)
@@ -187,12 +186,12 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         cases' em (x = b) with hxb hxb'
         · rw [hxb, Equiv.swap_apply_right]; exact ha
         rw [Equiv.swap_apply_of_ne_of_ne hxa' hxb']; exact hx
-        exact t.to_finite
+        exact t.toFinite
       · simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.sign_mul]
         rw [Equiv.Perm.sign_swap hab]; rw [Equiv.Perm.sign_swap hcd]
         simp only [Int.units_mul_self]
     simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
-    rw [Set.mem_compl_iff t] at hc hd 
+    rw [Set.mem_compl_iff t] at hc hd
     have hac : a ≠ c; intro h; apply hc; rw [← h]; exact ha
     have had : a ≠ d; intro h; apply hd; rw [← h]; exact ha
     rw [Equiv.swap_apply_of_ne_of_ne hac had]
@@ -204,24 +203,24 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
     constructor
     · simp only [Subgroup.mem_inf]
       constructor
-      · rw [mem_stabilizer_of_finite_iff]
+      · rw [mem_stabilizer_of_finite_iff_smul_le]
         rintro _ ⟨x, hx, rfl⟩
         simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
         cases' em (x = a) with hxa hxa'
         · rw [hxa, Equiv.swap_apply_left]
           rw [Equiv.swap_apply_of_ne_of_ne hab.symm hcb.symm]
           exact hb
-        rw [← Ne.def] at hxa' 
+        rw [← Ne.def] at hxa'
         cases' em (x = b) with hxb hxb'
         · rw [hxb, Equiv.swap_apply_right, Equiv.swap_apply_left]; exact hc
-        rw [← Ne.def] at hxb' 
+        rw [← Ne.def] at hxb'
         rw [Equiv.swap_apply_of_ne_of_ne hxa' hxb']
         cases' em (x = c) with hxc hxc'
         · rw [hxc, Equiv.swap_apply_right]; exact ha
-        rw [← Ne.def] at hxc' 
+        rw [← Ne.def] at hxc'
         rw [Equiv.swap_apply_of_ne_of_ne hxa' hxc']
         exact hx
-        exact t.to_finite
+        exact t.toFinite
       · simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.sign_mul]
         rw [Equiv.Perm.sign_swap hab]; rw [Equiv.Perm.sign_swap (Ne.symm hca)]
         simp only [Int.units_mul_self]
@@ -230,18 +229,16 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
       rw [Equiv.swap_apply_of_ne_of_ne (Ne.symm hab) (Ne.symm hcb)]
     suffices (t \ {a, b}).Nonempty by
       obtain ⟨c, h⟩ := this
-      simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at h 
+      simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at h
       use c
-      apply And.intro h.left
-      exact h.right
+      -- apply And.intro h.left
+      -- exact h.right
     rw [Set.nonempty_diff]
     intro ht
-    rw [gt_iff_lt, ← not_le] at ht' ; apply ht'
-    rw [← Finset.card_doubleton hab]
-    simp only [← Fintype.card_coe, ← Finset.coe_sort_coe]
-    apply Set.card_le_of_subset
-    simp only [Finset.coe_insert, Finset.coe_singleton]
-    exact ht
+    rw [gt_iff_lt, ← not_le] at ht'
+    apply ht'
+    convert Set.ncard_le_of_subset ht
+    rw [(Set.ncard_pair hab).symm]
 #align alternating_group.moves_in alternatingGroup.moves_in
 
 theorem moves_in' (hα : 4 ≤ Fintype.card α) (G : Subgroup (Equiv.Perm α)) (t : Set α)
@@ -250,25 +247,25 @@ theorem moves_in' (hα : 4 ≤ Fintype.card α) (G : Subgroup (Equiv.Perm α)) (
   by
   intro a ha b hb
   obtain ⟨g, hg, H⟩ := moves_in hα t a ha b hb
-  use g; apply hGt; exact hg; exact H
+  use! g
+  exact hGt hg
+  exact H
 #align alternating_group.moves_in' alternatingGroup.moves_in'
 
 theorem has_three_cycle_of_stabilizer' (s : Set α)
-    (hs : 2 < Fintype.card s) :-- (G : subgroup (equiv.perm α)) :
+    (hs : 2 < Set.ncard s) :-- (G : subgroup (equiv.perm α)) :
     --  (hG : stabilizer (equiv.perm α) s ⊓ alternating_group α < G) :
-    ∃ g : Equiv.Perm α, g.IsThreeCycle ∧ g ∈ stabilizer (Equiv.Perm α) s :=
-  by
-  rw [Fintype.two_lt_card_iff] at hs 
-  obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, ⟨c, hc⟩, hab, hac, hbc⟩ := hs
-  rw [Ne.def, Subtype.mk_eq_mk, ← Ne.def] at hab hac hbc 
+    ∃ g : Equiv.Perm α, g.IsThreeCycle ∧ g ∈ stabilizer (Equiv.Perm α) s := by
+  rw [Set.two_lt_ncard_iff] at hs
+  obtain ⟨a, b, c, ha, hb, hc, hab, hac, hbc⟩ := hs
   use Equiv.swap a b * Equiv.swap a c
   constructor
   apply Equiv.Perm.isThreeCycle_swap_mul_swap_same hab hac hbc
   rw [← stabilizer_compl]
-  rw [mem_stabilizer_of_finite_iff]
+  rw [mem_stabilizer_of_finite_iff_smul_le]
   rintro _ ⟨x, hx, rfl⟩
   simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
-  rw [Set.mem_compl_iff] at hx 
+  rw [Set.mem_compl_iff] at hx
   suffices h : ∀ u ∈ s, x ≠ u
   · rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h c hc)]
     rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h b hb)]
@@ -278,21 +275,18 @@ theorem has_three_cycle_of_stabilizer' (s : Set α)
 #align alternating_group.has_three_cycle_of_stabilizer' alternatingGroup.has_three_cycle_of_stabilizer'
 
 theorem has_three_cycle_of_stabilizer [DecidableEq α] (s : Set α) (hα : 4 < Fintype.card α) :
-    ∃ g : Equiv.Perm α, g.IsThreeCycle ∧ g ∈ stabilizer (Equiv.Perm α) s :=
-  by
-  cases' Nat.lt_or_ge 2 (Fintype.card s) with hs hs
-  exact has_three_cycle_of_stabilizer' s hs
-  obtain ⟨g, hg, hg'⟩ := has_three_cycle_of_stabilizer' (sᶜ) _
-  · use g; rw [stabilizer_compl] at hg' ; exact ⟨hg, hg'⟩
-  · rw [lt_iff_not_le] at hα ⊢
-    intro hs'; apply hα
-    rw [← Fintype.card_add_compl s]
-    suffices 2 + 2 ≤ 4 by
-      apply le_trans _ this
-      apply Nat.add_le_add; exact hs
-      apply le_trans _ hs'; apply le_of_eq
-      simp only [Fintype.card_ofFinset, Set.mem_compl_iff]
-    norm_num
+    ∃ g : Equiv.Perm α, g.IsThreeCycle ∧ g ∈ stabilizer (Equiv.Perm α) s := by
+  cases' Nat.lt_or_ge 2 (Set.ncard s) with hs hs
+  · exact has_three_cycle_of_stabilizer' s hs
+  · suffices hs' : _
+    obtain ⟨g, hg, hg'⟩ := has_three_cycle_of_stabilizer' (sᶜ) hs'
+    · use g
+      rw [stabilizer_compl] at hg'
+      exact ⟨hg, hg'⟩
+    · rw [lt_iff_not_le] at hα ⊢
+      intro hs'; apply hα
+      rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
+      convert Nat.add_le_add hs hs'
 #align alternating_group.has_three_cycle_of_stabilizer alternatingGroup.has_three_cycle_of_stabilizer
 
 theorem le_of_isPreprimitive (s : Set α) (hα : 4 < Fintype.card α)
@@ -417,27 +411,25 @@ begin
 end
 
 -/
-theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : sᶜ.Nontrivial)
-    (hα : Fintype.card s < Fintype.card (sᶜ : Set α)) (h4 : 4 ≤ Fintype.card α)
+theorem isPreprimitive_of_stabilizer_lt (s : Set α)
+    (h0 : s.Nontrivial) (h1 : sᶜ.Nontrivial)
+    (hα : Set.ncard s < Set.ncard (sᶜ : Set α)) (h4 : 4 ≤ Fintype.card α)
     (G : Subgroup (Equiv.Perm α))
     (hG : stabilizer (Equiv.Perm α) s ⊓ alternatingGroup α < G ⊓ alternatingGroup α) :
-    IsPreprimitive G α :=
-  by
+    IsPreprimitive G α := by
   -- G acts transitively
-  have : is_pretransitive G α :=
-    by
+  have : IsPretransitive G α := by
     have hG' : stabilizer (Equiv.Perm α) s ⊓ alternatingGroup α ≤ G :=
       le_trans (le_of_lt hG) inf_le_left
     apply Equiv.Perm.IsPretransitive.of_partition G s
     · intro a ha b hb
       obtain ⟨g, hg, H⟩ := alternatingGroup.moves_in h4 s a ha b hb
-      use g
-      apply hG'
-      exact hg
+      use! g
+      exact hG' hg
       exact H
     · intro a ha b hb
       obtain ⟨g, hg, H⟩ := alternatingGroup.moves_in h4 (sᶜ) a ha b hb
-      use g
+      use! g
       apply hG'
       rw [stabilizer_compl] at hg ; exact hg
       exact H
@@ -446,37 +438,34 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
       --  G ⊓ alternating_group α ≤ stabilizer (equiv.perm α) s ⊓ alternating_group α,
       rw [le_inf_iff]
       constructor
-      · intro g; rw [Subgroup.mem_inf]; rintro ⟨hg, hg'⟩
-        rw [mem_stabilizer_iff]
+      · intro g
+        rw [Subgroup.mem_inf, mem_stabilizer_iff]
+        rintro ⟨hg, hg'⟩
         rw [← Subgroup.coe_mk G g hg]
         change (⟨g, hg⟩ : ↥G) • s = s
-        rw [← mem_stabilizer_iff]
-        change _ ∈ stabilizer (↥G) s
-        rw [h]; exact Subgroup.mem_top ⟨g, hg⟩
+        rw [← mem_stabilizer_iff, h]
+        exact Subgroup.mem_top _
       · exact inf_le_right
   apply IsPreprimitive.mk
-  -- The proof needs 4 steps 
+  -- The proof needs 4 steps
   /- Step 1 : No block is equal to sᶜ
        This uses that fintype.card s < fintype.card sᶜ.
        In the equality case, fintype.card s = fintype.card sᶜ, it is possible that B = sᶜ,
        then G is the wreath product,
        this is case (b) of the O'Nan-Scott classification of max'l subgroups of the symmetric group -/
-  have hB_ne_sc : ∀ (B : Set α) (hB : is_block G B), ¬B = sᶜ :=
-    by
+  have hB_ne_sc : ∀ (B : Set α) (hB : IsBlock G B), ¬B = sᶜ := by
     intro B hB hBsc
-    obtain ⟨b, hb⟩ := h1.nonempty; rw [← hBsc] at hb 
+    obtain ⟨b, hb⟩ := h1.nonempty; rw [← hBsc] at hb
     obtain ⟨a, ha⟩ := h0.nonempty
     obtain ⟨k, hk⟩ := exists_smul_eq G b a
-    suffices Fintype.card (B : Set α) ≤ Fintype.card s
-      by
-      apply Nat.lt_irrefl (Fintype.card B)
+    suffices Set.ncard (B : Set α) ≤ Set.ncard s by
+      apply Nat.lt_irrefl (Set.ncard B)
       apply lt_of_le_of_lt this
       simp_rw [hBsc]; exact hα
-    rw [← smul_set_card_eq k B]
-    apply Set.card_le_of_subset
-    change k • B ⊆ s
+    rw [← smul_set_ncard_eq k B]
+    apply Set.ncard_le_of_subset (ht := Set.toFinite s)
     rw [← Set.disjoint_compl_right_iff_subset, ← hBsc]
-    apply or_iff_not_imp_left.mp (is_block.def_one.mp hB k)
+    apply or_iff_not_imp_left.mp (IsBlock.def_one.mp hB k)
     intro h
     apply Set.not_mem_empty a
     rw [← Set.inter_compl_self s]
@@ -484,31 +473,31 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
     exact ha
     rw [← hk, ← hBsc, ← h, Set.smul_mem_smul_set_iff]; exact hb
   -- Step 2 : A block contained in sᶜ is a subsingleton
-  have hB_not_le_sc : ∀ (B : Set α) (hB : is_block G B) (hBsc : B ⊆ sᶜ), B.Subsingleton :=
-    by
+  have hB_not_le_sc : ∀ (B : Set α) (hB : IsBlock G B) (hBsc : B ⊆ sᶜ), B.Subsingleton := by
     intro B hB hBsc
-    suffices : B = coe '' (coe ⁻¹' B : Set (sᶜ : Set α))
-    rw [this]
+    suffices B_eq : B = Subtype.val '' (Subtype.val ⁻¹' B : Set (sᶜ : Set α))
+    rw [B_eq]
     apply Set.Subsingleton.image
-    suffices : is_trivial_block (coe ⁻¹' B : Set (sᶜ : Set α))
+    suffices : IsTrivialBlock (Subtype.val ⁻¹' B : Set (sᶜ : Set α))
     apply Or.resolve_right this
     intro hB'
     apply hB_ne_sc B hB
     apply Set.Subset.antisymm hBsc
     intro x hx
-    rw [← Subtype.coe_mk x hx, ← Set.mem_preimage]
-    rw [hB', Set.top_eq_univ]; apply Set.mem_univ
+    rw [B_eq, hB', Set.top_eq_univ]
+    use! x
+    simp only [Set.mem_univ, and_self]
     · -- is_trivial_block (coe ⁻¹' B : set (sᶜ : set α)),
       suffices : IsPreprimitive (stabilizer G (sᶜ : Set α)) (sᶜ : Set α)
       refine' IsPreprimitive.has_trivial_blocks this _
       -- is_block (coe ⁻¹' B : set (sᶜ : set α))
-      let φ' : stabilizer G (sᶜ : Set α) → G := coe
+      let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α :=
-        { toFun := coe
-          map_smul' := fun m x => by simp only [φ', has_smul.smul_stabilizer_def] }
-      apply MulAction.isBlock_preimage f' hB
-      apply stabilizer.is_preprimitive'
-      rw [← stabilizer_compl] at hG 
+        { toFun := Subtype.val
+          map_smul' := fun m x => by simp only [HasSmul.smul_stabilizer_def] }
+      apply MulAction.IsBlock_preimage f' hB
+      apply stabilizer.isPreprimitive'
+      rw [← stabilizer_compl] at hG
       rw [compl_compl]; exact h0
       rw [stabilizer_compl]
       apply le_trans (le_of_lt hG)
@@ -518,13 +507,12 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
       intro x hx
       use ⟨x, hBsc hx⟩
       simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
-      exact Set.image_preimage_subset coe B
+      exact Set.image_preimage_subset Subtype.val B
   -- Step 3 : A block contained in s is a subsingleton
-  have hB_not_le_s : ∀ (B : Set α) (hB : is_block G B), B ⊆ s → B.Subsingleton :=
-    by
+  have hB_not_le_s : ∀ (B : Set α) (hB : IsBlock G B), B ⊆ s → B.Subsingleton := by
     intro B hB hBs
-    suffices hB_coe : B = coe '' (coe ⁻¹' B : Set ↥s)
-    suffices : is_trivial_block (coe ⁻¹' B : Set s)
+    suffices hB_coe : B = Subtype.val '' (Subtype.val ⁻¹' B : Set s)
+    suffices : IsTrivialBlock (Subtype.val ⁻¹' B : Set s)
     cases' this with hB' hB'
     · -- trivial case
       rw [hB_coe]
@@ -534,23 +522,23 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
       have hBs' : B = s := by
         apply Set.Subset.antisymm hBs
         intro x hx
-        rw [← Subtype.coe_mk x hx]
-        rw [← Set.mem_preimage]
-        rw [hB']
-        rw [Set.top_eq_univ]
+        suffices : x = Subtype.val (⟨x, hx⟩ : s)
+        rw [this, ← Set.mem_preimage, hB', Set.top_eq_univ]
         apply Set.mem_univ
+        rfl
       have : ∃ g' ∈ G, g' • s ≠ s := by
-        by_contra
+        by_contra h
+        push_neg at h
         apply ne_of_lt hG
-        push_neg at h 
         apply le_antisymm
         exact le_of_lt hG
         intro g' hg'
         rw [Subgroup.mem_inf] at hg' ⊢
-        rw [mem_stabilizer_iff]; apply And.intro (h g' hg'.left)
+        rw [mem_stabilizer_iff]
+        apply And.intro (h g' hg'.left)
         exact hg'.right
       obtain ⟨g', hg', hg's⟩ := this
-      cases' is_block.def_one.mp hB ⟨g', hg'⟩ with h h
+      cases' IsBlock.def_one.mp hB ⟨g', hg'⟩ with h h
       · -- case g' • B = B : absurd, since B = s and choice of g'
         exfalso
         apply hg's; rw [← hBs']; exact h
@@ -560,7 +548,7 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
         apply Function.Bijective.injective
         apply MulAction.bijective
         apply hB_not_le_sc ((⟨g', hg'⟩ : G) • B)
-        exact is_block_of_block _ hB
+        exact IsBlock_of_block _ hB
         rw [← hBs']
         apply Disjoint.subset_compl_right
         exact h
@@ -568,29 +556,29 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
       suffices : IsPreprimitive (stabilizer G s) (s : Set α)
       refine' IsPreprimitive.has_trivial_blocks this _
       -- is_block (coe ⁻¹' B : set s)
-      let φ' : stabilizer G s → G := coe
+      let φ' : stabilizer G s → G := Subtype.val
       let f' : s →ₑ[φ'] α :=
-        { toFun := coe
-          map_smul' := fun ⟨m, hm⟩ x => by simp only [φ', has_smul.smul_stabilizer_def] }
-      apply MulAction.isBlock_preimage f' hB
-      apply stabilizer.is_preprimitive' s h1
+        { toFun := Subtype.val
+          map_smul' := fun ⟨m, hm⟩ x => by simp }
+      apply MulAction.IsBlock_preimage f' hB
+      apply stabilizer.isPreprimitive' s h1
       apply le_trans (le_of_lt hG); exact inf_le_left
     · -- B = coe '' (coe ⁻¹' B : set ↥s),
       apply Set.Subset.antisymm
       intro x hx
       use ⟨x, hBs hx⟩
       simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
-      exact Set.image_preimage_subset coe B
+      exact Set.image_preimage_subset Subtype.val B
   intro B hB
-  unfold is_trivial_block
+  unfold IsTrivialBlock
   rw [or_iff_not_imp_left]
   intro hB'
-  obtain ⟨a, ha, ha'⟩ :=
-    set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_sc B hB) h)
-  rw [Set.not_mem_compl_iff] at ha' 
-  obtain ⟨b, hb, hb'⟩ :=
-    set.not_subset_iff_exists_mem_not_mem.mp fun h => hB' ((hB_not_le_s B hB) h)
-  rw [← Set.mem_compl_iff] at hb' 
+  obtain ⟨a, ha, ha'⟩ := Set.not_subset_iff_exists_mem_not_mem.mp
+    fun h => hB' ((hB_not_le_sc B hB) h)
+  rw [Set.not_mem_compl_iff] at ha'
+  obtain ⟨b, hb, hb'⟩ := Set.not_subset_iff_exists_mem_not_mem.mp
+    fun h => hB' ((hB_not_le_s B hB) h)
+  rw [← Set.mem_compl_iff] at hb'
   have hsc_le_B : sᶜ ⊆ B := by
     intro x hx'
     suffices : ∃ k : fixingSubgroup (alternatingGroup α) s, k • b = x
@@ -599,16 +587,16 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
     rw [← hkbx, ← this, Set.smul_mem_smul_set_iff]
     exact hb
     · -- k • B = B,
-      apply or_iff_not_imp_right.mp (is_block.def_one.mp hB ⟨k, _⟩)
+      apply or_iff_not_imp_right.mp (IsBlock.def_one.mp hB ⟨k, _⟩)
       · rw [Set.not_disjoint_iff_nonempty_inter]
         change (k • B ∩ B).Nonempty
         use a
         constructor
-        rw [mem_fixingSubgroup_iff] at hk 
+        rw [mem_fixingSubgroup_iff] at hk
         rw [← hk a ha']
         exact Set.smul_mem_smul_set ha
         exact ha
-      · -- ↑k ∈ G
+        -- ↑k ∈ G
         apply le_trans (le_of_lt hG); exact inf_le_left
         rw [Subgroup.mem_inf]; constructor
         suffices hk' : k ∈ stabilizer (alternatingGroup α) s
@@ -616,15 +604,14 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
         apply MulAction.fixingSubgroup_le_stabilizer; exact hk
         exact k.prop
     · -- ∃ (k : fixing_subgroup (alternating_group α) s), k • b = x,
-      haveI :
-        is_pretransitive (fixingSubgroup (alternatingGroup α) s)
+      haveI : IsPretransitive (fixingSubgroup (alternatingGroup α) s)
           (SubMulAction.ofFixingSubgroup (alternatingGroup α) s) :=
-        is_pretransitive_of_fixing_subgroup s h0 hα
+        isPretransitive_ofFixingSubgroup s h0 hα
       obtain ⟨k, hk⟩ :=
         exists_smul_eq (fixingSubgroup (alternatingGroup α) s)
           (⟨b, hb'⟩ : SubMulAction.ofFixingSubgroup (alternatingGroup α) s) ⟨x, hx'⟩
       use k
-      rw [← Subtype.coe_inj, SubMulAction.val_smul] at hk 
+      rw [← Subtype.coe_inj, SubMulAction.val_smul] at hk
       exact hk
   -- Conclusion of the proof : B = ⊤
   rw [eq_top_iff]
@@ -635,34 +622,29 @@ theorem isPreprimitive_of_stabilizer_lt (s : Set α) (h0 : s.Nontrivial) (h1 : s
     rw [← hgbx, ← this, Set.smul_mem_smul_set_iff]
     exact hsc_le_B hb
   -- g • B = B,
-  apply or_iff_not_imp_right.mp (is_block.def_one.mp hB ⟨g, hg⟩)
+  apply or_iff_not_imp_right.mp (IsBlock.def_one.mp hB ⟨g, hg⟩)
   rw [Set.not_disjoint_iff_nonempty_inter]
   change (g • B ∩ B).Nonempty
-  apply aux_pigeonhole
+  apply Set.ncard_pigeonhole
   -- card B + card (g • B) = card B + card B
   -- ... ≥ card sᶜ + card sᶜ
   -- ... > card s + card s ᶜ = card α
-  rw [← Fintype.card_add_compl s]
+  rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
   apply Nat.lt_of_lt_of_le
-  · apply Nat.add_lt_add_right _ (Fintype.card (sᶜ : Set α))
-    use Fintype.card (sᶜ : Set α)
+  · apply Nat.add_lt_add_right _ (Set.ncard (sᶜ : Set α))
+    use Set.ncard (sᶜ : Set α)
     exact hα
   apply Nat.add_le_add
-  · apply le_trans (Set.card_le_of_subset hsc_le_B)
+  · apply le_trans (Set.ncard_le_of_subset hsc_le_B)
     apply le_of_eq
-    rw [← Set.coe_toFinset B]
-    simp only [← Set.toFinset_card]
-    change _ = ((fun x => g • x) '' ↑B.to_finset).toFinset.card
-    simp_rw [← Finset.coe_image]
-    simp only [Finset.toFinset_coe]
-    rw [Finset.card_image_of_injective _ (MulAction.injective g)]
-  exact Set.card_le_of_subset hsc_le_B
+    rw [MulAction.smul_set_ncard_eq]
+  exact Set.ncard_le_of_subset hsc_le_B
 #align alternating_group.is_preprimitive_of_stabilizer_lt alternatingGroup.isPreprimitive_of_stabilizer_lt
 
 theorem isMaximalStab'
     -- (hα : 4 < fintype.card α)
     (s : Set α)
-    (h0' : s.Nontrivial) (h1' : sᶜ.Nontrivial) (hs : Fintype.card s < Fintype.card (sᶜ : Set α)) :
+    (h0' : s.Nontrivial) (h1' : sᶜ.Nontrivial) (hs : Set.ncard s < Set.ncard (sᶜ : Set α)) :
     Subgroup.IsMaximal (stabilizer (alternatingGroup α) s) :=
   by
   suffices hα : 4 < Fintype.card α
@@ -681,18 +663,18 @@ theorem isMaximalStab'
   exact stabilizer_ne_top' s h0'.nonempty h1'
   -- ∀ (G : subgroup (alternating_group α)), stabilizer (alternating_group α) s < b) → b = ⊤
   · intro G' hG'
-    suffices alternatingGroup α ≤ G'.map (alternatingGroup α).Subtype
+    suffices alternatingGroup α ≤ G'.map (alternatingGroup α).subtype
       by
       rw [eq_top_iff]; intro g hg
       obtain ⟨g', hg', hgg'⟩ := this g.prop
-      simp only [Subgroup.coeSubtype, SetLike.coe_eq_coe] at hgg' 
+      simp only [Subgroup.coeSubtype, SetLike.coe_eq_coe] at hgg'
       rw [← hgg']; exact hg'
     --   apply is_maximal_stab'_temp' s hα,
-    apply le_of_is_preprimitive s hα
+    apply le_of_isPreprimitive s hα
     rw [← Subgroup.subgroupOf_map_subtype, Subgroup.map_subtype_le_map_subtype]
-    rw [MulAction.stabilizer_subgroupOf_eq] at hG' 
+    rw [MulAction.stabilizer_subgroupOf_eq] at hG'
     exact le_of_lt hG'
-    apply is_preprimitive_of_stabilizer_lt s h0' h1' hs (le_of_lt hα)
+    apply isPreprimitive_of_stabilizer_lt s h0' h1' hs (le_of_lt hα)
     rw [lt_iff_le_not_le]
     constructor
     · intro g
@@ -717,11 +699,11 @@ theorem isMaximalStab'
         exists_eq_right]
       exact hg'
   -- hα : 4 < fintype.card α
-  have h0 : 2 ≤ Fintype.card s
-  rw [Nat.succ_le_iff, Fintype.one_lt_card_iff_nontrivial, Set.nontrivial_coe_sort]
-  exact h0'
+  have h0 : 2 ≤ Set.ncard s
+  · rw [Nat.succ_le_iff, Set.one_lt_ncard_iff_nontrivial]
+    exact h0'
+  rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
   change 2 + 2 < _
-  rw [← Fintype.card_add_compl s]
   apply lt_of_le_of_lt
   exact Nat.add_le_add_right h0 2
   apply Nat.add_lt_add_left
@@ -731,7 +713,7 @@ theorem isMaximalStab'
 theorem three_le {c n : ℕ} (h : 1 ≤ n) (h' : n < c) (hh' : c ≠ 2 * n) : 3 ≤ c :=
   by
   cases' Nat.eq_or_lt_of_le h with h h
-  · rw [← h] at h' hh' 
+  · rw [← h] at h' hh'
     cases' Nat.eq_or_lt_of_le h' with h' h'
     · exfalso; apply hh' h'.symm
     exact h'
@@ -740,22 +722,21 @@ theorem three_le {c n : ℕ} (h : 1 ≤ n) (h' : n < c) (hh' : c ≠ 2 * n) : 3 
 #align alternating_group.three_le alternatingGroup.three_le
 
 /-- stabilizer (alternating_group α) s is a maximal subgroup of alternating_group α,
-provided s ≠ ⊥, s ≠ ⊤ and fintype.card α ≠ 2 * fintype.card ↥s) -/
+  provided s ≠ ⊥, s ≠ ⊤ and fintype.card α ≠ 2 * fintype.card ↥s) -/
 theorem Stabilizer.isMaximal (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
-    (hs : Fintype.card α ≠ 2 * Fintype.card ↥s) :
-    Subgroup.IsMaximal (stabilizer (alternatingGroup α) s) :=
-  by
-  have hα : 3 ≤ Fintype.card α :=
-    by
-    rw [← Set.nonempty_coe_sort, ← Fintype.card_pos_iff, ← Nat.succ_le_iff] at h0 h1 
+    (hs : Fintype.card α ≠ 2 * Set.ncard s) :
+    Subgroup.IsMaximal (stabilizer (alternatingGroup α) s) := by
+  have hα : 3 ≤ Fintype.card α := by
+    rw [← Set.ncard_pos, ← Nat.succ_le_iff] at h0 h1
     refine' three_le h0 _ hs
-    rw [← tsub_pos_iff_lt, ← Fintype.card_compl_set]; exact h1
-  have : Nontrivial α := by rw [← Fintype.one_lt_card_iff_nontrivial]; apply lt_of_lt_of_le _ hα;
+    rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
+    exact Nat.lt_add_of_pos_right h1
+  have : Nontrivial α := by
+    rw [← Fintype.one_lt_card_iff_nontrivial]
+    apply lt_of_lt_of_le _ hα
     norm_num
-  have h :
-    ∀ (t : Set α) (h0 : t.Nonempty) (h0' : t.Subsingleton),
-      (stabilizer (alternatingGroup α) t).IsMaximal :=
-    by
+  have h : ∀ (t : Set α) (h0 : t.Nonempty) (h0' : t.Subsingleton),
+    (stabilizer (alternatingGroup α) t).IsMaximal := by
     intro t ht ht'
     suffices : ∃ a : α, t = ({a} : Set α)
     obtain ⟨a, rfl⟩ := this
@@ -763,92 +744,93 @@ theorem Stabilizer.isMaximal (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       ext g; simp only [mem_stabilizer_iff, Set.smul_set_singleton, Set.singleton_eq_singleton_iff]
     rw [this]
     apply hasMaximalStabilizersOfPreprimitive
-    apply alternating_group.is_preprimitive hα
+    apply AlternatingGroup.isPreprimitive hα
     · obtain ⟨a, ha⟩ := ht
       use a; exact Set.Subsingleton.eq_singleton_of_mem ht' ha
-  cases' em s.nontrivial with h0' h0'
-  cases' em sᶜ.Nontrivial with h1' h1'
+  by_cases h0' : Set.Nontrivial s
+  -- cases' em s.Nontrivial with h0' h0'
+  by_cases h1' : Set.Nontrivial sᶜ
+  -- cases' em sᶜ.Nontrivial with h1' h1'
   -- h0' : s.nontrivial, h1' : sᶜ.nontrivial
-  cases' Nat.lt_trichotomy (Fintype.card s) (Fintype.card (sᶜ : Set α)) with hs' hs'
-  · exact is_maximal_stab' s h0' h1' hs'
+  cases' Nat.lt_trichotomy (Set.ncard s) (Set.ncard (sᶜ : Set α)) with hs' hs'
+  · exact isMaximalStab' s h0' h1' hs'
   cases' hs' with hs' hs'
   · exfalso; apply hs
-    rw [← Fintype.card_add_compl s, ← hs', ← two_mul]
-  · rw [← compl_compl s] at h0' 
+    rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s, ← hs', ← two_mul]
+  · rw [← compl_compl s] at h0'
     rw [← stabilizer_compl]
-    apply is_maximal_stab' (sᶜ) h1' h0'
+    apply isMaximalStab' (sᶜ) h1' h0'
     simp_rw [compl_compl s]
     convert hs'
   -- h0' : s.nontrivial, h1' : ¬(s.nontrivial)
-  · simp only [Set.not_nontrivial_iff] at h1' 
-    rw [← stabilizer_compl]; exact h (sᶜ) h1 h1'
+  · simp only [Set.not_nontrivial_iff] at h1'
+    rw [← stabilizer_compl]
+    exact h (sᶜ) h1 h1'
   -- h0' : ¬(s.nontrivial),
-  · simp only [Set.not_nontrivial_iff] at h0' 
+  · simp only [Set.not_nontrivial_iff] at h0'
     exact h s h0 h0'
 #align alternating_group.stabilizer.is_maximal alternatingGroup.Stabilizer.isMaximal
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /-- The action of alternating_group α on the n-element subsets of α is preprimitive
 provided 0 < n < #α and #α ≠ 2*n -/
-theorem Nat.finset_isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n) (hn : n < Fintype.card α)
-    (hα : Fintype.card α ≠ 2 * n) : IsPreprimitive (alternatingGroup α) (n.Finset α) :=
-  by
+theorem Nat.Combination.isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
+    (hn : n < Fintype.card α) (hα : Fintype.card α ≠ 2 * n) :
+    IsPreprimitive (alternatingGroup α) (n.Combination α) := by
   have hα' : 3 ≤ Fintype.card α := three_le h_one_le hn hα
-  have : Nontrivial α := by rw [← Fintype.one_lt_card_iff_nontrivial];
+  have : Nontrivial α := by
+    rw [← Fintype.one_lt_card_iff_nontrivial];
     exact lt_of_le_of_lt h_one_le hn
   cases' Nat.eq_or_lt_of_le h_one_le with h_one h_one_lt
   · -- n = 1 :
-    let f : α →[alternatingGroup α] Nat.finset α 1 :=
+    let f : α →ₑ[@id (alternatingGroup α)] (Nat.Combination α 1) :=
       { toFun := fun x => ⟨{x}, Finset.card_singleton x⟩
         map_smul' := fun g x => rfl }
     rw [← h_one]
     suffices hf : Function.Surjective f
     · apply isPreprimitive_of_surjective_map hf
-      exact alternating_group.is_preprimitive hα'
+      exact AlternatingGroup.isPreprimitive hα'
     rintro ⟨s, hs⟩
-    change s.card = 1 at hs 
-    rw [Finset.card_eq_one] at hs 
+    change s.card = 1 at hs
+    rw [Finset.card_eq_one] at hs
     obtain ⟨a, ha⟩ := hs
     use a
-    simp only [ha, EquivariantMap.coe_mk]; rfl
+    simp only [ha]
   -- h_one_lt : 1 < n
-  have ht : is_pretransitive (alternatingGroup α) (n.finset α) :=
-    by
+  have ht : IsPretransitive (alternatingGroup α) (n.Combination α) := by
     -- apply nat.finset_is_pretransitive_of_multiply_pretransitive,
     have : Fintype.card α - n + n = Fintype.card α := by apply Nat.sub_add_cancel; exact le_of_lt hn
-    rw [isPretransitive_of_bijective_map_iff Function.surjective_id
-        (Nat.finsetCompl_bijective α (alternatingGroup α) n this)]
-    apply Nat.finset_isPretransitive_of_multiply_pretransitive
-    have h' : Fintype.card α - n ≤ Fintype.card α - 2 := by apply Nat.sub_le_sub_left;
+    rw [isPretransitive.of_bijective_map_iff Function.surjective_id
+        (Nat.Combination_compl_bijective α (alternatingGroup α) n this)]
+    apply Nat.Combination_isPretransitive_of_IsMultiplyPretransitive
+    have h' : Fintype.card α - n ≤ Fintype.card α - 2 := by
+      apply Nat.sub_le_sub_left;
       exact h_one_lt
-    apply is_multiply_pretransitive_of_higher (alternatingGroup α) α _ h'
+    apply isMultiplyPretransitive_of_higher (alternatingGroup α) α _ h'
     rw [PartENat.card_eq_coe_fintype_card]; simp only [PartENat.coe_le_coe, tsub_le_self]
-    exact alternating_group_is_fully_minus_two_pretransitive α
-  haveI : Nontrivial (n.finset α) :=
-    Nat.finset_nontrivial α n (lt_trans (Nat.lt_succ_self 0) h_one_lt) hn
-  obtain ⟨sn : n.finset α⟩ := Nontrivial.to_nonempty
+    apply IsMultiplyPretransitive.alternatingGroup_of_sub_two
+  have : Nontrivial (n.Combination α) :=
+    Nat.Combination_nontrivial α n (lt_trans (Nat.lt_succ_self 0) h_one_lt) hn
+  obtain ⟨sn⟩ := Nontrivial.to_nonempty (α := n.Combination α)
   let s := sn.val
   let hs : s.card = n := sn.prop
   -- have hs : (s : finset α).card = n := s.prop,
   rw [← maximal_stabilizer_iff_preprimitive (alternatingGroup α) sn]
-  have : stabilizer (alternatingGroup α) sn = stabilizer (alternatingGroup α) (s : Set α) :=
-    by
+  have : stabilizer (alternatingGroup α) sn =
+    stabilizer (alternatingGroup α) (s : Set α) := by
     ext g
     simp only [mem_stabilizer_iff]
     rw [← Subtype.coe_inj]
     change g • s = s ↔ _
     rw [← Finset.coe_smul_finset, ← Finset.coe_inj]
   rw [this]
-  apply stabilizer.is_maximal (s : Set α)
+  apply Stabilizer.isMaximal (s : Set α)
   · simp only [Finset.coe_nonempty, ← Finset.card_pos, hs]
     apply lt_trans one_pos h_one_lt
   · simp only [← Finset.coe_compl, Finset.coe_nonempty, ← Finset.card_compl_lt_iff_nonempty,
       compl_compl, hs]
     exact hn
-  · simp only [Finset.coe_sort_coe, Fintype.card_coe, hs]
+  · simp only [Set.ncard_coe_Finset, hs]
     exact hα
-  infer_instance
-#align alternating_group.nat.finset_is_preprimitive_of_alt alternatingGroup.Nat.finset_isPreprimitive_of_alt
+#align alternating_group.nat.finset_is_preprimitive_of_alt alternatingGroup.Nat.Combination.isPreprimitive_of_alt
 
 end alternatingGroup
-
