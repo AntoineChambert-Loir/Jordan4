@@ -20,9 +20,7 @@ section Iwasawa
 
 open scoped BigOperators Pointwise
 
-variable {M : Type _} [Group M] {α : Type _} [MulAction M α]
-
-variable (M α)
+variable (M : Type _) [Group M] (α : Type*) [MulAction M α]
 
 /-- The structure underlying the Iwasawa criterion -/
 structure IwasawaStructure where
@@ -34,7 +32,6 @@ structure IwasawaStructure where
   is_conj : ∀ g : M, ∀ x : α, T (g • x) = MulAut.conj g • T x
 /-- The subgroups generate the group -/
   is_generator : iSup T = ⊤
-#align iwasawa_structure IwasawaStructure
 
 /- Variante de la structure d'Iwasawa :
 * M action primitive sur α

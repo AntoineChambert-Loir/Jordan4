@@ -590,13 +590,13 @@ theorem isPreprimitive_of_prime [Fintype α] [hGX : IsPretransitive M α]
   · apply Or.intro_left
     exact hB'
   · apply Or.intro_right
-    suffices : Set.ncard B = 1 ∨ Set.ncard B = Fintype.card α
-    cases' this with h h
-    · exfalso
-      rw [← Set.one_lt_ncard_iff_nontrivial, ← not_le] at hB'
-      exact hB' (le_of_eq h)
-    · rw [Set.eq_top_iff_ncard]
-      exact h
+    suffices Set.ncard B = 1 ∨ Set.ncard B = Fintype.card α by
+      cases' this with h h
+      · exfalso
+        rw [← Set.one_lt_ncard_iff_nontrivial, ← not_le] at hB'
+        exact hB' (le_of_eq h)
+      · rw [Set.eq_top_iff_ncard]
+        exact h
     rw [← Nat.dvd_prime hp]
     simp only [← Nat.card_eq_fintype_card]
     apply ncard_of_block_divides hB
@@ -745,7 +745,7 @@ theorem isPreprimitive_of_large_image
   rw [Nat.card_eq_fintype_card]
   apply lt_of_lt_of_le hf'
   simp only [mul_le_mul_left, Nat.succ_pos', ← smul_set_ncard_eq g B]
-  apply Set.ncard_le_of_subset
+  apply Set.ncard_le_ncard
   rw [← Set.image_univ, Set.image_subset_iff, ← Set.top_eq_univ, h]
   exact Set.toFinite (g • B)
 
