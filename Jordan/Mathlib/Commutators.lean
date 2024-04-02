@@ -23,10 +23,7 @@ theorem mem_commutatorSet_of_isConj_sq
 
 theorem Subgroup.map_top_eq_range {G H : Type _} [Group H] [Group G] (f : H →* G) :
     Subgroup.map f ⊤ = f.range := by
-  suffices : (map f ⊤ : Set G) = (f.range : Set G)
-  refine' SetLike.ext' this
-  simp only [coe_map, coe_top, Set.image_univ, MonoidHom.coe_range]
-#align subgroup.map_top_eq_range Subgroup.map_top_eq_range
+  simp only [map_eq_range_iff, codisjoint_top_left]
 
 theorem Subgroup.map_commutator_eq {G H : Type _} [Group H] [Group G] (f : H →* G) :
     Subgroup.map f (_root_.commutator H) = ⁅f.range, f.range⁆ := by
