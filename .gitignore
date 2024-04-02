@@ -1,6 +1,6 @@
 .DS_Store
 *.olean
-/build
-/lake-packages/*
+.lake/*
 lakefile.olean
 lake-manifest.json
+blueprint/*
