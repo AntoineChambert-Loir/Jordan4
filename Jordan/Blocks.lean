@@ -63,7 +63,7 @@ theorem IsBlock.def {B : Set X} :
   by
   constructor
   · intro hB g g'
-    by_cases (g • B = g' • B)
+    by_cases h : g • B = g' • B
     · refine' Or.intro_left _ h
     · apply Or.intro_right
       exact hB (Set.mem_range_self g) (Set.mem_range_self g') h
@@ -148,8 +148,8 @@ theorem IsBlock.def_one {B : Set X} : IsBlock G B ↔ ∀ g : G, g • B = B ∨
       rw [Set.disjoint_iff] at h ⊢
       rintro x ⟨hx, hx'⟩
       simp only [Set.mem_empty_iff_false]
-      suffices : g'⁻¹ • x ∈ (g'⁻¹ * g) • B ⊓ B
-      apply h this
+      suffices g'⁻¹ • x ∈ (g'⁻¹ * g) • B ⊓ B by
+        apply h this
       simp only [Set.inf_eq_inter, Set.mem_inter_iff]
       simp only [← Set.mem_smul_set_iff_inv_smul_mem]
       rw [← smul_smul]; rw [smul_inv_smul]
@@ -362,7 +362,9 @@ theorem IsBlock.iInter {ι : Type _} {B : ι → Set X} (hB : ∀ i : ι, IsBloc
   rw [IsBlock.def_one]
   cases' em (IsEmpty ι) with hι hι
   · -- ι = ∅, block = ⊤
-    suffices (⋂ i : ι, B i) = Set.univ by rw [this]; exact IsBlock.def_one.mp (top_IsBlock X)
+    suffices (⋂ i : ι, B i) = Set.univ by
+      rw [this]
+      exact IsBlock.def_one.mp (top_IsBlock X)
     simp only [Set.top_eq_univ, Set.iInter_eq_univ]
     intro i; exfalso; apply hι.false; exact i
   intro g
@@ -387,17 +389,14 @@ theorem IsBlock.of_subgroup_of_conjugate {B : Set X} {H : Subgroup G} (hB : IsBl
   intro h'
   obtain ⟨h, hH, hh⟩ := Subgroup.mem_map.mp (SetLike.coe_mem h')
   simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hh
-  suffices : h' • g • B = g • h • B
-  simp only [this]
-  cases' IsBlock.def_one.mp hB ⟨h, hH⟩ with heq hdis
-  · apply Or.intro_left
-    apply congr_arg
-    exact heq
-  · apply Or.intro_right
-    apply Set.disjoint_image_of_injective (MulAction.injective g)
-    exact hdis
-  suffices : (h' : G) • g • B = g • h • B
-  rw [← this]; rfl
+  suffices h' • g • B = g • h • B by
+    simp only [this]
+    cases' IsBlock.def_one.mp hB ⟨h, hH⟩ with heq hdis
+    · left; congr
+    · right
+      exact Set.disjoint_image_of_injective (MulAction.injective g) hdis
+  suffices (h' : G) • g • B = g • h • B by
+    rw [← this]; rfl
   rw [← hh]
   rw [smul_smul (g * h * g⁻¹) g B]
   rw [smul_smul g h B]
@@ -405,16 +404,14 @@ theorem IsBlock.of_subgroup_of_conjugate {B : Set X} {H : Subgroup G} (hB : IsBl
 #align mul_action.is_block.of_subgroup_of_conjugate MulAction.IsBlock.of_subgroup_of_conjugate
 
 /-- A translate of a block is a block -/
-theorem IsBlock_of_block {B : Set X} (g : G) (hB : IsBlock G B) : IsBlock G (g • B) :=
-  by
+theorem IsBlock_of_block {B : Set X} (g : G) (hB : IsBlock G B) : IsBlock G (g • B) := by
   rw [IsBlock.of_top_iff] at hB ⊢
-  suffices : Subgroup.map (MulEquiv.toMonoidHom (MulAut.conj g)) ⊤ = ⊤
-  rw [← this]
-  refine' IsBlock.of_subgroup_of_conjugate hB g
-  suffices ⊤ = Subgroup.comap (MulEquiv.toMonoidHom (MulAut.conj g)) ⊤
-    by
+  suffices Subgroup.map (MulEquiv.toMonoidHom (MulAut.conj g)) ⊤ = ⊤ by
+    rw [← this]
+    exact IsBlock.of_subgroup_of_conjugate hB g
+  suffices ⊤ = Subgroup.comap (MulEquiv.toMonoidHom (MulAut.conj g)) ⊤ by
     rw [this]
-    refine' Subgroup.map_comap_eq_self_of_surjective _ _
+    refine Subgroup.map_comap_eq_self_of_surjective ?_ _
     exact MulEquiv.surjective (MulAut.conj g)
   rw [Subgroup.comap_top]
 #align mul_action.is_block_of_block MulAction.IsBlock_of_block
@@ -495,25 +492,22 @@ theorem orbit.IsBlock_of_normal {N : Subgroup G} (nN : Subgroup.Normal N) (a : X
   simp only [Set.mem_range]
   constructor
   · rintro ⟨⟨k, hk⟩, rfl⟩
-    suffices : g * k * g⁻¹ ∈ N
-    use ⟨g * k * g⁻¹, this⟩
-    change (g * k * g⁻¹) • g • a = g • k • a
-    rw [smul_smul, inv_mul_cancel_right, ← smul_smul]
+    suffices g * k * g⁻¹ ∈ N by
+      use ⟨g * k * g⁻¹, this⟩
+      change (g * k * g⁻¹) • g • a = g • k • a
+      rw [smul_smul, inv_mul_cancel_right, ← smul_smul]
     apply nN.conj_mem; exact hk
   · rintro ⟨⟨k, hk⟩, rfl⟩
-    suffices : g⁻¹ * k * g ∈ N
-    use ⟨g⁻¹ * k * g, this⟩
-    change g • (g⁻¹ * k * g) • a = k • g • a
-    simp only [← mul_assoc, ← smul_smul, smul_inv_smul, inv_inv]
+    suffices g⁻¹ * k * g ∈ N by
+      use ⟨g⁻¹ * k * g, this⟩
+      change g • (g⁻¹ * k * g) • a = k • g • a
+      simp only [← mul_assoc, ← smul_smul, smul_inv_smul, inv_inv]
     convert nN.conj_mem k hk g⁻¹
     rw [inv_inv]
 
-#align mul_action.orbit.is_block_of_normal MulAction.orbit.IsBlock_of_normal
-
 /-- The orbits of a normal subgroup form a block system -/
 theorem IsBlockSystem.of_normal {N : Subgroup G} (nN : Subgroup.Normal N) :
-    IsBlockSystem G (Set.range fun a : X => orbit N a) :=
-  by
+    IsBlockSystem G (Set.range fun a : X => orbit N a) := by
   constructor
   · apply IsPartition.of_orbits
   · intro b; rintro ⟨a, rfl⟩
@@ -584,12 +578,10 @@ theorem block_of_stabilizer_of_block [htGX : IsPretransitive G X] {B : Set X} (h
     rw [z] at zk ; exact zk
   intro hx
   obtain ⟨k, rfl⟩ := exists_smul_eq G a x
-  suffices : k ∈stabilizer G B
-  use ⟨k, this⟩
-  rfl
-  · rw [mem_stabilizer_iff]
-    exact IsBlock.def_mem hB ha hx
-#align mul_action.block_of_stabilizer_of_block MulAction.block_of_stabilizer_of_block
+  suffices k ∈ stabilizer G B by
+    exact ⟨⟨k, this⟩, rfl⟩
+  rw [mem_stabilizer_iff]
+  exact IsBlock.def_mem hB ha hx
 
 /--
 A subgroup containing the stabilizer of a is the stabilizer of the orbit of a under that subgroup -/
@@ -733,8 +725,8 @@ theorem is_top_of_large_block [hfX : Finite X] [hGX : IsPretransitive G X] {B : 
   obtain ⟨k, h⟩ := ncard_of_block_divides hB hB_ne
   simp only [← Nat.card_eq_fintype_card]
   rw [h] at hB' ⊢
-  suffices : k = 1
-  simp only [this, mul_one]
+  suffices k = 1 by
+    simp only [this, mul_one]
   apply le_antisymm
   · rw [← not_lt, ← Nat.succ_le_iff]
     intro hk
@@ -755,8 +747,8 @@ theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X]
     B.Subsingleton := by
 --  classical
   have := Fintype.ofFinite X
-  suffices : Set.ncard B ≤ 1
-  · rw [Set.ncard_le_one_iff_eq] at this
+  suffices Set.ncard B ≤ 1 by
+    rw [Set.ncard_le_one_iff_eq] at this
     cases' this with h h
     rw [h]; exact Set.subsingleton_empty
     obtain ⟨a, ha⟩ := h; rw [ha]; exact Set.subsingleton_singleton
@@ -779,8 +771,8 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     IsBlock G (⋂ (k : G) (_ : a ∈ k • B), k • B) := by
   let B' := ⋂ (k : G) (_ : a ∈ k • B), k • B
   cases' Set.eq_empty_or_nonempty B with hfB_e hfB_ne
-  · suffices : (⋂ (k : G) (_ : a ∈ k • B), k • B) = Set.univ
-    rw [this]; apply top_IsBlock
+  · suffices (⋂ (k : G) (_ : a ∈ k • B), k • B) = Set.univ by
+      rw [this]; apply top_IsBlock
     simp only [Set.iInter_eq_univ]
     intro k hk; exfalso
     rw [hfB_e] at hk ; simpa only [Set.smul_set_empty] using hk

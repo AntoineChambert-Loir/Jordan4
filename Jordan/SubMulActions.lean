@@ -50,17 +50,17 @@ variable {M N α : Type _} [SMul M α]
 /-- The inclusion of a SubMulAction into the ambient set, as an equivariant map -/
 def inclusion (s : SubMulAction M α) : s →ₑ[@id M] α
     where
--- The inclusion map of the inclusion of a SubMulAction 
+-- The inclusion map of the inclusion of a SubMulAction
   toFun := fun x => x.val
 -- The commutation property
   map_smul' _ _ := rfl
 #align sub_mul_action.inclusion SubMulAction.inclusion
 
-theorem inclusion.toFun_eq_coe (s : SubMulAction M α) : 
+theorem inclusion.toFun_eq_coe (s : SubMulAction M α) :
     s.inclusion.toFun = fun x => x.val := rfl
 #align sub_mul_action.inclusion.to_fun_eq_coe SubMulAction.inclusion.toFun_eq_coe
 
-lemma image_inclusion (s : SubMulAction M α) : 
+lemma image_inclusion (s : SubMulAction M α) :
     Set.range s.inclusion = s.carrier  := by
   ext a
   simp only [Set.mem_range, Subtype.exists, mem_carrier, SetLike.mem_coe]
@@ -75,7 +75,7 @@ lemma image_inclusion (s : SubMulAction M α) :
 
 lemma inclusion_injective (s : SubMulAction M α) :
     Function.Injective s.inclusion := by
-  rintro ⟨a, ha⟩ ⟨b, hb⟩ h 
+  rintro ⟨a, ha⟩ ⟨b, hb⟩ h
   simp only [Subtype.mk.injEq]
   exact h
 
@@ -93,7 +93,7 @@ instance : HasCompl (SubMulAction M α) where
     smul_mem' := fun g x ↦ by
       simp only [SetLike.mem_coe, Set.mem_compl_iff, SubMulAction.smul_mem_iff', imp_self] }
 
-theorem Compl_def (s : SubMulAction M α) : 
+theorem Compl_def (s : SubMulAction M α) :
   sᶜ.carrier = (s : Set α)ᶜ :=
   rfl
 #align sub_mul_action.of_compl_def SubMulAction.Compl_def
@@ -125,14 +125,14 @@ theorem neq_of_mem_ofStabilizer (a : α) {x : (SubMulAction.ofStabilizer M a)} :
   x.prop
 #align sub_mul_action.of_stabilizer.neq SubMulAction.neq_of_mem_ofStabilizer
 
-/- 
+/-
 instance ofStabilizerLift (a : α) : HasLiftT (SubMulAction.ofStabilizer M a) α :=
   coeToLift
 #align sub_mul_action.of_stabilizer_lift SubMulAction.ofStabilizerLift
  -/
 
 
-lemma add_card_ofStabilizer_eq (a : α) : 
+lemma add_card_ofStabilizer_eq (a : α) :
     1 + PartENat.card (SubMulAction.ofStabilizer M a) = PartENat.card α :=  by
   unfold PartENat.card
   rw [← Cardinal.mk_sum_compl {a}, map_add]
@@ -171,15 +171,15 @@ theorem mem_ofFixingSubgroup_iff {s : Set α} {x : α} :
   Iff.rfl
 #align sub_mul_action.of_fixing_subgroup.mem_iff SubMulAction.mem_ofFixingSubgroup_iff
 
-theorem not_mem_of_mem_ofFixingSubgroup {s : Set α} 
+theorem not_mem_of_mem_ofFixingSubgroup {s : Set α}
   (x : SubMulAction.ofFixingSubgroup M s) : ↑x ∉ s := x.prop
 #align sub_mul_action.sub_mul_action_of_fixing_subgroup.not_mem SubMulAction.not_mem_of_mem_ofFixingSubgroup
 
-example (s : Set α) : SMul { x // x ∈ fixingSubgroup M s } 
-    { x // x ∈ SubMulAction.ofFixingSubgroup M s } := 
+example (s : Set α) : SMul { x // x ∈ fixingSubgroup M s }
+    { x // x ∈ SubMulAction.ofFixingSubgroup M s } :=
   SetLike.smul (ofFixingSubgroup M s)
 
-example (s : Set α) : MulAction (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) := 
+example (s : Set α) : MulAction (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) :=
   mulAction (ofFixingSubgroup M s)
 
 end Complements
@@ -190,38 +190,36 @@ section fixingSubgroup
 
 variable (M : Type _) [Group M] {α : Type _} [MulAction M α]
 
-example (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : Set α := 
+example (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : Set α :=
   (fun x => x.val) '' s
 
 theorem fixingSubgroup_of_insert (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
     fixingSubgroup M (insert a ((fun x => x.val) '' s : Set α)) =
-      (fixingSubgroup (↥(stabilizer M a)) s).map (Subgroup.subtype (stabilizer M a)) := 
-      --  (fixingSubgroup (↥(stabilizer M a)) s) : Subgroup M) :=
-  by
+      (fixingSubgroup (↥(stabilizer M a)) s).map (Subgroup.subtype (stabilizer M a)) := by
   ext m
   constructor
   · intro hm
     rw [mem_fixingSubgroup_iff] at hm
     rw [Subgroup.mem_map]
-    suffices hm' : m ∈ stabilizer M a
-    · use ⟨m, hm'⟩
+    suffices hm' : m ∈ stabilizer M a by
+      use ⟨m, hm'⟩
       simp only [Subgroup.coeSubtype, and_true]
       rw [mem_fixingSubgroup_iff]
       rintro ⟨y, hy⟩ hy'
       simp only [SetLike.mk_smul_mk, Subtype.mk.injEq]
-      change m • y = y 
+      change m • y = y
       apply hm
       apply Set.mem_insert_of_mem
       use ⟨y, hy⟩
-    · simp only [mem_stabilizer_iff]
-      apply hm
-      apply Set.mem_insert a
+    simp only [mem_stabilizer_iff]
+    apply hm
+    apply Set.mem_insert a
   · rintro ⟨⟨n, hn'⟩, hn, rfl⟩
     simp only [Subgroup.coeSubtype, SetLike.mem_coe, mem_fixingSubgroup_iff] at hn ⊢
     intro x hx
     rw [Set.mem_insert_iff] at hx
     cases' hx with hx hx
-    . -- x = a  
+    . -- x = a
       simpa [hx] using hn'
     . -- x ∈ s
       simp only [Set.mem_image] at hx
@@ -236,7 +234,7 @@ section EquivariantMap
 variable (M : Type _) [Group M] {α : Type _} [MulAction M α]
 
 /- /-- The equivariant map from the sub_mul_action_of stabilizer into the ambient type -/
-def subMulActionOfStabilizerInclusion (a : α) : 
+def subMulActionOfStabilizerInclusion (a : α) :
     SubMulAction.ofStabilizer M a →ₑ[@id (stabilizer M a)] α where
   toFun x := ↑x
   map_smul' g x := rfl
@@ -277,39 +275,36 @@ theorem SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective :
 theorem SubMulAction.of_fixingSubgroupEmpty_mapScalars_surjective :
     Function.Surjective (fixingSubgroup M (∅ : Set α)).subtype := by
   intro g
-  suffices : g ∈ fixingSubgroup M (∅ : Set α)
-  use ⟨g, this⟩
-  rfl
+  suffices g ∈ fixingSubgroup M (∅ : Set α) by
+    exact ⟨⟨g, this⟩, rfl⟩
   rw [mem_fixingSubgroup_iff]
-  intro x hx
-  exfalso
-  exact hx
+  simp only [Set.mem_empty_iff_false, IsEmpty.forall_iff, implies_true]
 #align sub_mul_action.of_fixing_subgroup_empty_map_scalars_surjective SubMulAction.of_fixingSubgroupEmpty_mapScalars_surjective
 
 variable {α}
 
-instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
     SMul (fixingSubgroup (stabilizer M a) s)
-      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := 
+      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) :=
   SetLike.smul (SubMulAction.ofFixingSubgroup (stabilizer M a) s)
 
-instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+instance (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
     MulAction (fixingSubgroup (stabilizer M a) s)
-      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := 
+      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) :=
   SubMulAction.mulAction (SubMulAction.ofFixingSubgroup (stabilizer M a) s)
 
-instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
     SMul (fixingSubgroup M (insert a (Subtype.val '' s)))
-      (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) := 
+      (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) :=
   SetLike.smul (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)))
 
-instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) : 
+instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
     MulAction (fixingSubgroup M (insert a (Subtype.val '' s)))
-      (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) := 
+      (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s))) :=
   SubMulAction.mulAction (SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)))
 
 /- def φ (m :
-    fixingSubgroup M (insert a (Subtype.val '' s))) : fixingSubgroup (stabilizer M a) s := 
+    fixingSubgroup M (insert a (Subtype.val '' s))) : fixingSubgroup (stabilizer M a) s :=
     ⟨⟨(m : M), by
           apply (mem_fixingSubgroup_iff M).mp m.prop
           apply Set.mem_insert⟩,
@@ -321,9 +316,9 @@ instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
 
 /-- The identity map of fixing subgroup of stabilizer
 into the fixing subgroup of the extended set, as an equivariant map -/
-def SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer 
+def SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer
     (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
-    let φ : fixingSubgroup M (insert a (Subtype.val '' s)) → 
+    let φ : fixingSubgroup M (insert a (Subtype.val '' s)) →
       fixingSubgroup (stabilizer M a) s := fun m ↦
       ⟨⟨(m : M), by
           apply (mem_fixingSubgroup_iff M).mp m.prop
@@ -332,9 +327,9 @@ def SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer
         simp only [← SetLike.coe_eq_coe]
         refine' (mem_fixingSubgroup_iff M).mp m.prop _ _
         apply Set.mem_insert_of_mem
-        use ⟨x, (SubMulAction.mem_ofStabilizer_iff  M a).mp x.prop⟩⟩ 
+        use ⟨x, (SubMulAction.mem_ofStabilizer_iff  M a).mp x.prop⟩⟩
     SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)) →ₑ[φ]
-      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := { 
+      (SubMulAction.ofFixingSubgroup (stabilizer M a) s) := {
   toFun := fun x ↦ ⟨⟨(x : α), by
         rintro (h : (x : α) = a)
         apply (SubMulAction.mem_ofFixingSubgroup_iff M).mp x.prop
@@ -345,45 +340,47 @@ def SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer
   map_smul' := fun _ _ ↦ rfl }
 #align sub_mul_action.of_fixing_subgroup_of_stabilizer.map SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer
 
-theorem SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective 
+theorem SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_coe
+    {x : α} (hx : x ∈ ofFixingSubgroup M (insert a (Subtype.val '' s))) :
+    ↑((SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s) ⟨x, hx⟩) = x := by
+  rfl
+
+theorem SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective
     (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
-    Function.Bijective 
+    Function.Bijective
       (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s) := by
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
-    -- PROVE A LEMMA THAT DOES THIS AUTOMATICALLY
     simp only [Subtype.mk_eq_mk]
-    suffices hx : x = ↑((SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s) ⟨x, hx⟩)
-    suffices hy : y = ↑((SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s) ⟨y, hy⟩)
-    rw [hx]; rw [hy]; rw [h]
-    rfl; rfl
+    rw [← SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_coe M hx]
+    rw [← SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_coe M hy]
+    rw [h]
   · rintro ⟨⟨x, hx1⟩, hx2⟩
     refine' ⟨⟨x, _⟩, rfl⟩
     -- ⊢ x ∈ sub_mul_action_of_fixing_subgroup M (insert a (coe '' s))
     rw [SubMulAction.mem_ofFixingSubgroup_iff]
     intro h; cases Set.mem_insert_iff.mp h with
     | inl h' => rw [SubMulAction.mem_ofStabilizer_iff] at hx1 ; exact hx1 h'
-    | inr h' => 
-      rw [SubMulAction.mem_ofFixingSubgroup_iff] at hx2 
+    | inr h' =>
+      rw [SubMulAction.mem_ofFixingSubgroup_iff] at hx2
       apply hx2
       obtain ⟨x1, hx1', rfl⟩ := h'
       simp only [SetLike.eta]
       exact hx1'
 #align sub_mul_action.of_fixing_subgroup_of_stabilizer.map_bijective SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective
 
-theorem SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective 
+theorem SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective
     (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
-    Function.Bijective (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s).toSmulMap :=
-  by
+    Function.Bijective (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s).toSmulMap := by
   constructor
   · rintro ⟨m, hm⟩ ⟨n, hn⟩ hmn
-    rw [← SetLike.coe_eq_coe, ← SetLike.coe_eq_coe] at hmn 
+    rw [← SetLike.coe_eq_coe, ← SetLike.coe_eq_coe] at hmn
     simp only [Subtype.mk_eq_mk]
     exact hmn
   · rintro ⟨⟨m, hm⟩, hm'⟩
-    suffices : m ∈ fixingSubgroup M (insert a (Subtype.val '' s))  
-    use ⟨m, this⟩
-    rfl
+    suffices m ∈ fixingSubgroup M (insert a (Subtype.val '' s)) by
+      use ⟨m, this⟩
+      rfl
     rw [mem_fixingSubgroup_iff]
     intro x hx
     cases' Set.mem_insert_iff.mp hx with hx hx
@@ -392,9 +389,9 @@ theorem SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective
       exact mem_stabilizer_iff.mp hm
     · -- x ∈ coe '' s
       obtain ⟨y, hy, rfl⟩ := (Set.mem_image _ _ _).mp hx
-      rw [mem_fixingSubgroup_iff] at hm' 
+      rw [mem_fixingSubgroup_iff] at hm'
       let hz := hm' y hy
-      rw [← SetLike.coe_eq_coe, SubMulAction.val_smul_of_tower] at hz 
+      rw [← SetLike.coe_eq_coe, SubMulAction.val_smul_of_tower] at hz
       exact hz
 #align sub_mul_action.of_fixing_subgroup_of_stabilizer.scalar_map_bijective SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective
 
@@ -433,7 +430,7 @@ def SubMulAction.conjMap_ofFixingSubgroup {s t : Set α} {g : M} (hst : g • s 
   toFun := fun ⟨x, hx⟩ =>
     ⟨g • x, by
       intro hgxt; apply hx
-      rw [← hst] at hgxt 
+      rw [← hst] at hgxt
       exact Set.smul_mem_smul_set_iff.mp hgxt⟩
   map_smul' := fun ⟨m, hm⟩ ⟨x, hx⟩ => by
     rw [← SetLike.coe_eq_coe]
@@ -447,8 +444,8 @@ theorem SubMulAction.conjMap_ofFixingSubgroup_bijective {s t : Set α} {g : M} (
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
     simp only [Subtype.mk_eq_mk]
-    rw [← SetLike.coe_eq_coe] at hxy 
-    change g • x = g • y at hxy 
+    rw [← SetLike.coe_eq_coe] at hxy
+    change g • x = g • y at hxy
     apply (MulAction.injective g) hxy
   · rintro ⟨x, hx⟩
     have hst' : g⁻¹ • t = s := by
@@ -472,8 +469,8 @@ def SubMulAction.ofStabilizer.conjMap {a b : α} {g : M} (hab : g • a = b) :
   toFun := fun ⟨x, hx⟩ =>
     ⟨g • x, by
       intro hy
-      simp only [Set.mem_singleton_iff] at hy 
-      rw [← hab] at hy 
+      simp only [Set.mem_singleton_iff] at hy
+      rw [← hab] at hy
       apply hx
       simp only [Set.mem_singleton_iff]
       exact MulAction.injective g hy⟩
@@ -490,8 +487,8 @@ theorem SubMulAction.ofStabilizer.conjMap_bijective {a b : α} {g : M} (hab : g 
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
     simp only [Subtype.mk_eq_mk]
-    rw [← SetLike.coe_eq_coe] at hxy 
-    change g • x = g • y at hxy 
+    rw [← SetLike.coe_eq_coe] at hxy
+    change g • x = g • y at hxy
     apply (MulAction.injective g) hxy
   · rintro ⟨x, hx⟩
     use (SubMulAction.ofStabilizer.conjMap M (inv_smul_eq_iff.mpr hab.symm)) ⟨x, hx⟩
@@ -502,56 +499,56 @@ theorem SubMulAction.ofStabilizer.conjMap_bijective {a b : α} {g : M} (hab : g 
 
 
 /- def ψ (s t : Set α) (m : fixingSubgroup M (s ∪ t)) :
-    fixingSubgroup (fixingSubgroup M s) 
+    fixingSubgroup (fixingSubgroup M s)
       (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)) :=
   ⟨⟨m, by
         let hm := m.prop
-        simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm  
+        simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm
         exact hm.left⟩, by
     let hm := m.prop
-    simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm  
+    simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm
     rintro ⟨⟨x, hx⟩, hx'⟩
-    simp only [Set.mem_preimage] at hx' 
+    simp only [Set.mem_preimage] at hx'
     simp only [← SetLike.coe_eq_coe, Subtype.coe_mk, SubMulAction.val_smul_of_tower]
     exact hm.right ⟨x, hx'⟩⟩ -/
 
-instance (s t : Set α) : 
+instance (s t : Set α) :
     SMul (fixingSubgroup (fixingSubgroup M s) (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)))
       (SubMulAction.ofFixingSubgroup (fixingSubgroup M s) (Subtype.val ⁻¹' t :
-        Set (SubMulAction.ofFixingSubgroup M s))) :=  
+        Set (SubMulAction.ofFixingSubgroup M s))) :=
   SetLike.smul (SubMulAction.ofFixingSubgroup { x // x ∈ fixingSubgroup M s } (Subtype.val ⁻¹' t))
-  
-instance (s t : Set α) : 
-    MulAction (fixingSubgroup (fixingSubgroup M s) 
+
+instance (s t : Set α) :
+    MulAction (fixingSubgroup (fixingSubgroup M s)
         (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)))
-      (SubMulAction.ofFixingSubgroup (fixingSubgroup M s) 
-        (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s))) :=  
-  SubMulAction.mulAction 
-    (SubMulAction.ofFixingSubgroup (fixingSubgroup M s) 
+      (SubMulAction.ofFixingSubgroup (fixingSubgroup M s)
+        (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s))) :=
+  SubMulAction.mulAction
+    (SubMulAction.ofFixingSubgroup (fixingSubgroup M s)
       (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)))
-  
-/-- The identity between the iterated sub_mul_action 
-  of the fixing_subgroups and the sub_mul_action of the fixing_subgroup 
+
+/-- The identity between the iterated sub_mul_action
+  of the fixing_subgroups and the sub_mul_action of the fixing_subgroup
   of the union, as an equivariant map -/
 def SubMulAction.map_ofFixingSubgroupUnion (s t : Set α) :
     let ψ : fixingSubgroup M (s ∪ t) →
-      fixingSubgroup (fixingSubgroup M s) 
+      fixingSubgroup (fixingSubgroup M s)
         (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)) :=
       fun m ↦ ⟨⟨m, by
         let hm := m.prop
-        simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm  
+        simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm
         exact hm.left⟩, by
       let hm := m.prop
-      simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm  
+      simp only [fixingSubgroup_union, Subgroup.mem_inf] at hm
       rintro ⟨⟨x, hx⟩, hx'⟩
-      simp only [Set.mem_preimage] at hx' 
+      simp only [Set.mem_preimage] at hx'
       simp only [← SetLike.coe_eq_coe, Subtype.coe_mk, SubMulAction.val_smul_of_tower]
       exact hm.right ⟨x, hx'⟩⟩
     SubMulAction.ofFixingSubgroup M (s ∪ t) →ₑ[ψ]
       SubMulAction.ofFixingSubgroup (fixingSubgroup M s)
         (Subtype.val ⁻¹' t : Set (SubMulAction.ofFixingSubgroup M s)) where
   toFun x :=
-    ⟨⟨x, fun hx => x.prop (Set.mem_union_left t hx)⟩, 
+    ⟨⟨x, fun hx => x.prop (Set.mem_union_left t hx)⟩,
         fun hx => x.prop (by
           apply Set.mem_union_right s
           simpa only [Set.mem_preimage, Subtype.coe_mk] using hx)⟩
@@ -571,18 +568,17 @@ theorem SubMulAction.OfFixingSubgroupUnion.map_bijective (s t : Set α) :
   by
   constructor
   · intro a b h
-    simp only [← SetLike.coe_eq_coe] 
-    simp only [← SetLike.coe_eq_coe] at h 
+    simp only [← SetLike.coe_eq_coe] at h ⊢
     exact h
   · rintro ⟨⟨a, ha⟩, ha'⟩
-    suffices : a ∈ ofFixingSubgroup M (s ∪ t)
-    use ⟨a, this⟩; rfl
-    · intro hy
-      cases' (Set.mem_union a s t).mp hy with h h
-      · exact ha h
-      · apply ha'
-        simp only [Set.mem_preimage]
-        exact h
+    suffices a ∈ ofFixingSubgroup M (s ∪ t) by
+      exact ⟨⟨a, this⟩,  rfl⟩
+    intro hy
+    cases' (Set.mem_union a s t).mp hy with h h
+    · exact ha h
+    · apply ha'
+      simp only [Set.mem_preimage]
+      exact h
 #align sub_mul_action.of_fixing_subgroup_union.map_bijective SubMulAction.OfFixingSubgroupUnion.map_bijective
 
 /-- The equivariant map on sub_mul_action.of_fixing_subgroup given a set inclusion -/
@@ -598,13 +594,13 @@ def SubMulAction.ofFixingSubgroup.mapOfInclusion {s t : Set α} (hst : t ⊆ s) 
   map_smul' := fun _ _ => rfl
 #align sub_mul_action.of_fixing_subgroup.map_of_inclusion SubMulAction.ofFixingSubgroup.mapOfInclusion
 
-lemma SubMulAction.ofFixingSubgroup.mapOfInclusion_injective 
+lemma SubMulAction.ofFixingSubgroup.mapOfInclusion_injective
     {s t : Set α} (hst : t ⊆ s) :
     Function.Injective (SubMulAction.ofFixingSubgroup.mapOfInclusion M hst) := by
   rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
   rw [← SetLike.coe_eq_coe] at hxy ⊢
   exact hxy
-  
+
 /-- The equivariant map between sub_mul_action.of_stabilizer
   and .of_fixing_subgroup of the singleton -/
 def SubMulAction.OfFixingSubgroupOfSingleton.map (a : α) :
@@ -643,19 +639,19 @@ theorem SubMulAction.OfFixingSubgroupOfEq.map_def {s t : Set α} (hst : s = t) :
   fun _ _ => rfl
 #align sub_mul_action.of_fixing_subgroup_of_eq.map_def SubMulAction.OfFixingSubgroupOfEq.map_def
 
-theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_def 
+theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_def
     {s t : Set α} (hst : s = t) (g : M) (hg : g ∈ fixingSubgroup M s) :
     g = (SubMulAction.OfFixingSubgroupOfEq.map M hst).toSmulMap (⟨g, hg⟩ : fixingSubgroup M s) :=
   rfl
 #align sub_mul_action.of_fixing_subgroup_of_eq.to_smul_map_def SubMulAction.OfFixingSubgroupOfEq.toSmulMap_def
 
-theorem SubMulAction.OfFixingSubgroupOfEq.map_bijective 
+theorem SubMulAction.OfFixingSubgroupOfEq.map_bijective
     {s t : Set α} (hst : s = t) :
     Function.Bijective (SubMulAction.OfFixingSubgroupOfEq.map M hst) := by
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
     rw [← SetLike.coe_eq_coe] at hxy ⊢
-    simp only [SubMulAction.OfFixingSubgroupOfEq.map_def M hst] at hxy 
+    simp only [SubMulAction.OfFixingSubgroupOfEq.map_def M hst] at hxy
     simp only
     rw [hxy]
   · rintro ⟨x, hxt⟩
@@ -683,4 +679,3 @@ theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_bijective {s t : Set α} (hs
 end EquivariantMap
 
 #lint
-
