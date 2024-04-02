@@ -12,7 +12,7 @@ variable {G : Type _} [Group G]
 
 open Subgroup
 
-theorem mem_commutatorSet_of_isConj_sq 
+theorem mem_commutatorSet_of_isConj_sq
     {G : Type _} [Group G] {g : G} (hg : IsConj g (g ^ 2)) :
     g ∈ commutatorSet G := by
   obtain ⟨h, hg⟩ := hg
@@ -46,18 +46,17 @@ Since I only use it with groups,
 I should probably use function.surjective.comm_semigroup
 --/
 theorem surj_to_comm {G H : Type _} [Mul G] [Mul H] (φ : MulHom G H)
-    (is_surj : Function.Surjective φ) (is_comm : IsCommutative G (· * ·)) :
-    IsCommutative H (· * ·) := by
-  apply IsCommutative.mk
-  intro a b
-  obtain ⟨a', ha'⟩ := is_surj a
-  obtain ⟨b', hb'⟩ := is_surj b
-  simp only [← ha', ← hb', ← map_mul]
-  rw [is_comm.comm]
+    (is_surj : Function.Surjective φ) (is_comm : Std.Commutative (· * · : G → G → G)) :
+    Std.Commutative (· * · : H → H → H) where
+  comm := fun a b ↦ by
+    obtain ⟨a', ha'⟩ := is_surj a
+    obtain ⟨b', hb'⟩ := is_surj b
+    simp only [← ha', ← hb', ← map_mul]
+    rw [is_comm.comm]
 #align surj_to_comm surj_to_comm
 
 theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) :
-    IsCommutative (G ⧸ N) (· * ·) ↔ commutator G ≤ N := by
+    Std.Commutative (· * · : G ⧸ N → _ → _) ↔ commutator G ≤ N := by
   skip
   constructor
   · intro hcomm
@@ -72,8 +71,9 @@ theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) 
     rw [← commutatorElement_def]
     rw [commutatorElement_eq_one_iff_mul_comm]
     apply hcomm.comm
-  · intro hGN; refine' IsCommutative.mk _
-    intro x'; obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N x'
+  · intro hGN;
+    apply Std.Commutative.mk
+    rintro x'; obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N x'
     intro y'; obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective N y'
     rw [← commutatorElement_eq_one_iff_mul_comm, ← map_commutatorElement]
     simp only [QuotientGroup.mk'_apply]
@@ -95,16 +95,16 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   let φ : H →* G ⧸ N := MonoidHom.comp (QuotientGroup.mk' N) (Subgroup.subtype H)
   -- Il suffit de prouver que φ est surjective
   refine' surj_to_comm φ.toMulHom _ hH.is_comm
-  suffices hφ : Function.Surjective φ; exact hφ
+  simp only [MulHom.coe_mk, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe]
   -- On prouve que l'image de φ est égale à ⊤
   rw [← MonoidHom.range_top_iff_surjective]
   -- let R := monoid_hom.range φ,
   /-  j : H → G, p : G → G/N,  φ = p o j, on veut prouver que φ est surjective.
       R = im(φ), S = p⁻¹(R) ⊆ G -/
-  -- Il va suffire de prouver que S = ⊤, car p est surjective 
+  -- Il va suffire de prouver que S = ⊤, car p est surjective
   -- let S := φ.range.comap (quotient_group.mk' N),
-  suffices S_top : φ.range.comap (QuotientGroup.mk' N) = ⊤
-  · rw [eq_top_iff]
+  suffices S_top : φ.range.comap (QuotientGroup.mk' N) = ⊤ by
+    rw [eq_top_iff]
     intro x _
     let y := Quotient.out' x
     have hy : y ∈ φ.range.comap (QuotientGroup.mk' N) := by rw [S_top]; exact Subgroup.mem_top y
@@ -115,15 +115,12 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   -- have lN : N ≤ φ.range.comap (quotient_group.mk' N),
   · intro g hg
     rw [Subgroup.mem_comap]
-    suffices : QuotientGroup.mk' N g = 1
-    simp only [this, (MonoidHom.range φ).one_mem]
+    convert (MonoidHom.range φ).one_mem
     simp only [hg, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   -- S contient H = j(H)
   -- have lH : H ≤ φ.range.comap (quotient_group.mk' N),
   · intro h hh
-    simp only [Subgroup.mem_comap, MonoidHom.mem_range, MonoidHom.coe_comp, QuotientGroup.coe_mk',
-      Subgroup.coeSubtype, Function.comp_apply]
-    use ⟨h, hh⟩
+    simp only [mem_comap, QuotientGroup.mk'_apply, MonoidHom.mem_range, MonoidHom.coe_comp,
+      QuotientGroup.coe_mk', coeSubtype, Function.comp_apply, Subtype.exists, exists_prop, φ]
+    use h
 #align contains_commutators_of contains_commutators_of
-
-
