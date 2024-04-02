@@ -38,16 +38,16 @@ variable {α : Type _}
 
 open scoped BigOperators
 
+example (s t : Set α) : s ∩ t = t ∩ s := by exact Set.inter_comm s t
 /-- A partion of a type induces partitions on subsets -/
-theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)} (hP : Setoid.IsPartition P)
-    (s : Set α) :
-    Setoid.IsPartition {u : Set s | ∃ t : Set α, t ∈ P ∧ Subtype.val ⁻¹' t = u ∧ t ∩ s ≠ ∅} :=
-  by
+theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)}
+    (hP : Setoid.IsPartition P) (s : Set α) :
+    Setoid.IsPartition {u : Set s | ∃ t : Set α, t ∈ P ∧ Subtype.val ⁻¹' t = u ∧ t ∩ s ≠ ∅} := by
   constructor
   · intro h
     obtain ⟨t, _, ht, hts⟩ := Set.mem_setOf_eq.mp h
     apply hts
-    rw [← Subtype.image_preimage_coe, ht, Set.image_empty]
+    rw [Set.inter_comm, ← Subtype.image_preimage_coe, ht, Set.image_empty]
   · intro a
     obtain ⟨t, ht⟩ := hP.right ↑a
     simp only [exists_unique_iff_exists, exists_prop, and_imp] at ht
@@ -58,11 +58,11 @@ theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)} (hP : Setoid.IsPa
       intro h
       rw [← Set.mem_empty_iff_false (a : α), ← h]
       exact Set.mem_inter ht.left.right (Subtype.mem a)
-    · simp only [Ne.def, Set.mem_setOf_eq, exists_unique_iff_exists, exists_prop, and_imp,
-        forall_exists_index]
+    · simp only [Ne.def, Set.mem_setOf_eq, exists_unique_iff_exists,
+        exists_prop, and_imp, forall_exists_index]
       intro y x hxP hxy _ hay
       rw [← hxy, Subtype.preimage_coe_eq_preimage_coe_iff]
-      refine' congr_arg₂ _ _ rfl
+      congr
       apply ht.right x hxP; rw [← Set.mem_preimage, hxy]; exact hay
 #align setoid.is_partition_on Setoid.isPartition_on
 
@@ -85,12 +85,8 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
   have hs'2 : ∀ z : Finset α, z ∈ c → a ∈ z → z = s.toFinset := by
     intro z hz ha
     rw [← Finset.coe_inj, Set.coe_toFinset]
-    refine' hs' z _ (Finset.mem_coe.mpr ha)
-    -- To get the correct type automatically and perform the rewrite
-    suffices : ∀ {u v : Finset α}, v ∈ c → u = v → u ∈ c
-    · refine' this hz _
-      convert Finset.toFinset_coe z
-    · intro u v hu huv; rw [huv]; exact hu
+    refine hs' z ?_ (Finset.mem_coe.mpr ha)
+    simp only [Finset.toFinset_coe, hz]
   use s.toFinset
   ext t
   simp only [Finset.mem_filter, Finset.mem_singleton]
@@ -98,8 +94,8 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
   · rintro ⟨ht, ha⟩
     exact hs'2 t ht ha
   · intro ht
-    rw [← ht] at hs ; apply And.intro hs.left
-    rw [ht]; simp only [Set.mem_toFinset]; exact hs.right
+    simp only [ht, Set.mem_toFinset]
+    exact hs
 #align partition.card_of_partition' Partition.card_of_partition'
 
 /-- The cardinal of ambient fintype equals
@@ -107,30 +103,25 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
 theorem Partition.card_of_partition [Fintype α] {c : Set (Set α)} (hc : Setoid.IsPartition c) :
     ∑ s : Set α in c.toFinset, s.toFinset.card = Fintype.card α := by
   let c' : Finset (Finset α) := {s : Finset α | (s : Set α) ∈ c}.toFinset
-
   have hcc' : c = {s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c'} := by
-    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
+    simp only [c', Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
       Finset.mem_filter, true_and, exists_eq_left', Set.coe_toFinset, Set.setOf_mem_eq]
   rw [hcc'] at hc
   rw [← Partition.card_of_partition' hc]
-  suffices hi : ∀ a ∈ c.toFinset, a.toFinset ∈ c'
-  suffices hj : ∀ a ∈ c', (a : Set α) ∈ c.toFinset
-  rw [Finset.sum_bij' _ hi _ _ hj]
-  · intro a _; simp only [Set.coe_toFinset]
-  · intro a _; convert Finset.toFinset_coe a
-  · intro a _; rfl
-  · -- hj
+  have hi : ∀ a ∈ c.toFinset, a.toFinset ∈ c' := by
     intro a ha
-    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
-      Finset.mem_filter, true_and] at ha
-    simp only [Set.mem_toFinset]
-    exact ha
-  · -- hi
-    intro a ha
-    simp only [Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
+    simp only [c', Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
       Finset.mem_filter, Set.coe_toFinset, true_and]
     simp only [Set.mem_toFinset] at ha
     exact ha
+  have hj : ∀ a ∈ c', (a : Set α) ∈ c.toFinset := by
+    intro a ha
+    simp only [c', Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
+      Finset.mem_filter, true_and] at ha
+    simp only [Set.mem_toFinset]
+    exact ha
+  rw [Finset.sum_bij' _ _ hi hj _ _]
+  all_goals { intros; simp only [Set.coe_toFinset, Finset.toFinset_coe] }
 #align partition.card_of_partition Partition.card_of_partition
 
 /-- Given a partition of the ambient finite type,
