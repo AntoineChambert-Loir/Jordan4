@@ -48,12 +48,11 @@ theorem IsMaximal.ne_top {K : Subgroup G} (h : K.IsMaximal) : K ≠ ⊤ :=
 #align subgroup.is_maximal.ne_top Subgroup.IsMaximal.ne_top
 
 theorem isMaximal_iff {K : Subgroup G} :
-    K.IsMaximal ↔ K ≠ ⊤ ∧ ∀ (H : Subgroup G) (g), K ≤ H → g ∉ K → g ∈ H → H = ⊤ :=
-  by
+    K.IsMaximal ↔ K ≠ ⊤ ∧ ∀ (H : Subgroup G) (g), K ≤ H → g ∉ K → g ∈ H → H = ⊤ := by
   constructor
   · intro hK
     constructor
-    · exact hK.ne_top 
+    · exact hK.ne_top
     · intro H g hKH hgK hgH
       apply (isMaximal_def.1 hK).2
       rw [← Ne.le_iff_lt]
@@ -63,7 +62,7 @@ theorem isMaximal_iff {K : Subgroup G} :
         rw [z] at hgK
         exact hgK hgH
   · rintro ⟨hG, hmax⟩
-    constructor; constructor; 
+    constructor; constructor;
     · assumption
     · intro H hKH
       obtain ⟨g, hgH, hgK⟩ := Set.exists_of_ssubset hKH
@@ -78,4 +77,3 @@ theorem IsMaximal.eq_of_le {K H : Subgroup G} (hK : K.IsMaximal) (hH : H ≠ ⊤
 end Subgroup
 
 #lint
-

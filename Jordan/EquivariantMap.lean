@@ -8,32 +8,143 @@ Authors: Antoine Chambert-Loir
 
 import Jordan.Mathlib.Set
 
--- import Jordan.ForMathlib.MulActionSemiHom
-
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Data.Set.Pointwise.Basic
-import Mathlib.GroupTheory.GroupAction.Defs
+import Mathlib.GroupTheory.GroupAction.Hom
 
-/-! Equivariant maps
+/-! Complements on equivariant maps
 
-In this file, we add some complements to `MulActionSemiHom`:
-
-* some pointwise lemmas
-
-*
-
-We also introduce the notation `α →[M] β` to mean `α →ₑ[id M] β`.
-
-* `is_equivariant φ f` is a predicate that says that `f : α → β`
-is equivariant with respect to `φ`.
-
-## TODO
-
-If this is to replace `mul_action_hom`,
-then one has to rewrite the rest of `GroupAction.lean`
+In this file, we add some complements to the theory
+of equivariant maps by adding some pointwise lemmas.
 
 -/
 
+
+/-- The map of monoids underlying a `MulActionHom` -/
+@[nolint unusedArguments]
+def MulActionHom.toMap {M N α β : Type*}
+  [SMul M α] [SMul N β] {φ : M → N} (_ : α →ₑ[φ] β) : M → N := φ
+
+open scoped Pointwise
+
+variable {α β M N : Type*} {φ : M → N} [SMul M α] [SMul N β]
+
+variable {f : α →ₑ[φ] β}
+
+namespace Set
+
+open MulActionHom
+
+/-- Image of translated set under an action -/
+@[simp]
+theorem image_smul_setₑ (m : M) (s : Set α) : f '' (m • s) = φ m • f '' s := by
+  change f.toFun '' ((fun a => m • a) '' s) = (fun b => φ m • b) '' (f.toFun '' s)
+  simp only [Set.image_image]
+  apply Set.image_congr
+  intro a _; rw [f.map_smul']
+#align equivariant_map.image_smul_setₑ Set.image_smul_setₑ
+
+variable {β₁ : Type _} [SMul M β₁] {f₁ : α →[M] β₁}
+
+theorem image_smul_set (m : M) (s : Set α) : f₁ '' (m • s) = m • f₁ '' s := by simp
+#align equivariant_map.image_smul_set Set.image_smul_set
+
+/-- Translation of preimage is contained in preimage of translation -/
+theorem preimage_smul_setₑ_le {m : M} (t : Set β) : m • f ⁻¹' t ⊆ f ⁻¹' (φ m • t) := by
+  rintro x ⟨y, hy, rfl⟩
+  -- was exact ⟨f y, hy, by rw [map_smul]⟩
+  -- why doesn't map_smul work anymore??
+  refine ⟨f y, hy, (by rw [map_smulₛₗ])⟩
+#align equivariant_map.preimage_smul_setₑ_le Set.preimage_smul_setₑ_le
+
+theorem preimage_smul_set_le {m : M} (t : Set β₁) : m • f₁ ⁻¹' t ⊆ f₁ ⁻¹' (m • t) :=
+  preimage_smul_setₑ_le t
+#align equivariant_map.preimage_smul_set_le Set.preimage_smul_set_le
+
+/-- When the action is bijective, preimage of translation equals translation of preimage -/
+theorem preimage_smul_setₑ' {m : M} (hmα : Function.Bijective fun a : α => m • a)
+    (hmβ : Function.Bijective fun b : β => φ m • b) (t : Set β) : f ⁻¹' (φ m • t) = m • f ⁻¹' t := by
+  apply Set.Subset.antisymm
+  · rintro x ⟨y, yt, hy⟩
+    dsimp at hy
+    obtain ⟨x', hx' : m • x' = x⟩ := hmα.surjective x
+    refine ⟨x',  ?_, hx'⟩
+    simp only [← hx', map_smulₛₗ] at hy
+    simp only [mem_preimage]
+    rw [← hmβ.injective hy]; exact yt
+  exact preimage_smul_setₑ_le t
+#align equivariant_map.preimage_smul_setₑ' Set.preimage_smul_setₑ'
+
+theorem preimage_smul_set' {m : M} (hmα : Function.Bijective fun a : α => m • a)
+    (hmβ : Function.Bijective fun b : β₁ => m • b) (t : Set β₁) : f₁ ⁻¹' (m • t) = m • f₁ ⁻¹' t :=
+  preimage_smul_setₑ' hmα hmβ t
+#align equivariant_map.preimage_smul_set' Set.preimage_smul_set'
+
+section Group
+
+variable {M N : Type _} [Group M] [Group N] {φ : M → N}
+
+variable {α β : Type _} [MulAction M α] [MulAction N β]
+
+variable {f : α →ₑ[φ] β}
+
+open scoped Pointwise
+
+/-- For an equivariant map between group actions,
+preimage of translation equals translation of preimage -/
+theorem preimage_smul_setₑ {m : M} (t : Set β) : f ⁻¹' (φ m • t) = m • f ⁻¹' t :=
+  preimage_smul_setₑ' (MulAction.bijective m) (MulAction.bijective (φ m)) t
+#align equivariant_map.preimage_smul_setₑ Set.preimage_smul_setₑ
+
+variable {β₁ : Type _} [MulAction M β₁] {f₁ : α →[M] β₁}
+
+theorem preimage_smul_set {m : M} (t : Set β₁) : f₁ ⁻¹' (m • t) = m • f₁ ⁻¹' t :=
+  preimage_smul_set' (MulAction.bijective m) (MulAction.bijective m) t
+#align equivariant_map.preimage_smul_set Set.preimage_smul_set
+
+end Group
+
+end Set
+
+section Pretransitivity
+
+open MulAction
+
+variable {M : Type _} [Group M] {α : Type _} [MulAction M α]
+
+variable {N β : Type _} [Group N] [MulAction N β]
+
+theorem isPretransitive.of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Surjective f)
+    (h : IsPretransitive M α) : IsPretransitive N β :=
+  by
+  apply MulAction.IsPretransitive.mk
+  intro x y; let h_eq := h.exists_smul_eq
+  obtain ⟨x', rfl⟩ := hf x
+  obtain ⟨y', rfl⟩ := hf y
+  obtain ⟨g, rfl⟩ := h_eq x' y'
+  use φ g; simp only [map_smulₛₗ]
+#align is_pretransitive_of_surjective_map isPretransitive.of_surjective_map
+
+theorem isPretransitive.of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] β}
+    (hφ : Function.Surjective φ) (hf : Function.Bijective f) :
+    IsPretransitive M α ↔ IsPretransitive N β :=
+  by
+  constructor
+  apply isPretransitive.of_surjective_map hf.surjective
+  · intro hN
+    -- let hN_heq := hN.exists_smul_eq,
+    apply IsPretransitive.mk
+    intro x y
+    obtain ⟨k, hk⟩ := exists_smul_eq N (f x) (f y)
+    obtain ⟨g, rfl⟩ := hφ k
+    use g
+    apply hf.injective
+    simp only [hk, map_smulₛₗ]
+#align is_pretransitive_of_bijective_map_iff isPretransitive.of_bijective_map_iff
+
+end Pretransitivity
+
+#exit
 
 /-- Equivariant maps -/
 structure EquivariantMap {M N : Type _}
@@ -269,120 +380,3 @@ theorem inverse_inverse
 -- #align equivariant_map.inverse_inverse EquivariantMap.inverse_inverse
 
 end Inverse
-
-open scoped Pointwise
-
-variable {α β M N : Type _} {φ : M → N} [SMul M α] [SMul N β]
-
-variable {f : α →ₑ[φ] β}
-
-/-- Image of translated set under an action -/
-@[simp]
-theorem image_smul_setₑ (m : M) (s : Set α) : f '' (m • s) = φ m • f '' s :=
-  by
-  change f.toFun '' ((fun a => m • a) '' s) = (fun b => φ m • b) '' (f.toFun '' s)
-  simp only [Set.image_image]
-  apply Set.image_congr
-  intro a _; rw [f.map_smul']
-#align equivariant_map.image_smul_setₑ EquivariantMap.image_smul_setₑ
-
-variable {β₁ : Type _} [SMul M β₁] {f₁ : α →[M] β₁}
-
-theorem image_smul_set (m : M) (s : Set α) : f₁ '' (m • s) = m • f₁ '' s := by simp
-#align equivariant_map.image_smul_set EquivariantMap.image_smul_set
-
-/-- Translation of preimage is contained in preimage of translation -/
-theorem preimage_smul_setₑ_le {m : M} (t : Set β) : m • f ⁻¹' t ⊆ f ⁻¹' (φ m • t) :=
-  by
-  rintro x ⟨y, hy, rfl⟩
-  refine' ⟨f y, hy, by rw [map_smul]⟩
-#align equivariant_map.preimage_smul_setₑ_le EquivariantMap.preimage_smul_setₑ_le
-
-theorem preimage_smul_set_le {m : M} (t : Set β₁) : m • f₁ ⁻¹' t ⊆ f₁ ⁻¹' (m • t) :=
-  preimage_smul_setₑ_le t
-#align equivariant_map.preimage_smul_set_le EquivariantMap.preimage_smul_set_le
-
-/-- When the action is bijective, preimage of translation equals translation of preimage -/
-theorem preimage_smul_setₑ' {m : M} (hmα : Function.Bijective fun a : α => m • a)
-    (hmβ : Function.Bijective fun b : β => φ m • b) (t : Set β) : f ⁻¹' (φ m • t) = m • f ⁻¹' t :=
-  by
-  apply Set.Subset.antisymm
-  · rintro x ⟨y, yt, hy⟩
-    obtain ⟨x', hx' : m • x' = x⟩ := hmα.surjective x
-    use x'; apply And.intro _ hx'
-    simp; simp only [← hx', map_smul] at hy
-    rw [← hmβ.injective hy]; exact yt
-  exact preimage_smul_setₑ_le t
-#align equivariant_map.preimage_smul_setₑ' EquivariantMap.preimage_smul_setₑ'
-
-theorem preimage_smul_set' {m : M} (hmα : Function.Bijective fun a : α => m • a)
-    (hmβ : Function.Bijective fun b : β₁ => m • b) (t : Set β₁) : f₁ ⁻¹' (m • t) = m • f₁ ⁻¹' t :=
-  preimage_smul_setₑ' hmα hmβ t
-#align equivariant_map.preimage_smul_set' EquivariantMap.preimage_smul_set'
-
-
-section Group
-
-variable {M N : Type _} [Group M] [Group N] {φ : M → N}
-
-variable {α β : Type _} [MulAction M α] [MulAction N β]
-
-variable {f : α →ₑ[φ] β}
-
-open scoped Pointwise
-
-/-- For an equivariant map between group actions,
-preimage of translation equals translation of preimage -/
-theorem preimage_smul_setₑ {m : M} (t : Set β) : f ⁻¹' (φ m • t) = m • f ⁻¹' t :=
-  preimage_smul_setₑ' (MulAction.bijective m) (MulAction.bijective (φ m)) t
-#align equivariant_map.preimage_smul_setₑ EquivariantMap.preimage_smul_setₑ
-
-variable {β₁ : Type _} [MulAction M β₁] {f₁ : α →[M] β₁}
-
-theorem preimage_smul_set {m : M} (t : Set β₁) : f₁ ⁻¹' (m • t) = m • f₁ ⁻¹' t :=
-  preimage_smul_set' (MulAction.bijective m) (MulAction.bijective m) t
-#align equivariant_map.preimage_smul_set EquivariantMap.preimage_smul_set
-
-end Group
-
-end SMul
-
-end EquivariantMap
-
-section Pretransitivity
-
-open MulAction
-
-variable {M : Type _} [Group M] {α : Type _} [MulAction M α]
-
-variable {N β : Type _} [Group N] [MulAction N β]
-
-theorem isPretransitive.of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Surjective f)
-    (h : IsPretransitive M α) : IsPretransitive N β :=
-  by
-  apply MulAction.IsPretransitive.mk
-  intro x y; let h_eq := h.exists_smul_eq
-  obtain ⟨x', rfl⟩ := hf x
-  obtain ⟨y', rfl⟩ := hf y
-  obtain ⟨g, rfl⟩ := h_eq x' y'
-  use φ g; simp only [EquivariantMap.map_smul]
-#align is_pretransitive_of_surjective_map isPretransitive.of_surjective_map
-
-theorem isPretransitive.of_bijective_map_iff {φ : M → N} {f : α →ₑ[φ] β}
-    (hφ : Function.Surjective φ) (hf : Function.Bijective f) :
-    IsPretransitive M α ↔ IsPretransitive N β :=
-  by
-  constructor
-  apply isPretransitive.of_surjective_map hf.surjective
-  · intro hN
-    -- let hN_heq := hN.exists_smul_eq,
-    apply IsPretransitive.mk
-    intro x y
-    obtain ⟨k, hk⟩ := exists_smul_eq N (f x) (f y)
-    obtain ⟨g, rfl⟩ := hφ k
-    use g
-    apply hf.injective
-    simp only [hk, EquivariantMap.map_smul]
-#align is_pretransitive_of_bijective_map_iff isPretransitive.of_bijective_map_iff
-
-end Pretransitivity

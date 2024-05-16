@@ -12,7 +12,7 @@ import Jordan.Mathlib.Partitions
 import Jordan.SubMulActions
 import Jordan.Mathlib.Commutators
 
-import Jordan.EquivariantMap
+-- import Jordan.EquivariantMap
 import Jordan.MaximalSubgroups
 import Jordan.Blocks
 

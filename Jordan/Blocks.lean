@@ -5,14 +5,16 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module blocks
 -/
-import Jordan.Mathlib.Stabilizer
+-- import Jordan.Mathlib.Stabilizer
+-- import Jordan.SubMulActions
 import Jordan.EquivariantMap
-import Jordan.SubMulActions
 
--- import Jordan.Mathlib.Algebra.Hom.GroupAction
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Algebra.BigOperators.Finprod
 import Mathlib.Data.Set.Card
+import Mathlib.GroupTheory.GroupAction.Basic
+import Mathlib.GroupTheory.GroupAction.SubMulAction
+import Mathlib.GroupTheory.Subgroup.Actions
 
 /-! # Blocks
 
@@ -261,9 +263,9 @@ theorem IsBlock_preimage {H Y : Type _} [Group H] [MulAction H Y] {φ : H → G}
   intro g
   cases' IsBlock.def_one.mp hB (φ g) with heq hdis
   · apply Or.intro_left
-    rw [← EquivariantMap.preimage_smul_setₑ, heq]
+    rw [← Set.preimage_smul_setₑ, heq]
   · apply Or.intro_right
-    rw [← EquivariantMap.preimage_smul_setₑ]
+    rw [← Set.preimage_smul_setₑ]
     apply Disjoint.preimage; exact hdis
 #align mul_action.is_block_preimage MulAction.IsBlock_preimage
 
@@ -274,7 +276,7 @@ theorem IsBlock_image {H Y : Type _} [Group H] [MulAction H Y] {φ : G → H} (j
   intro h h'
   obtain ⟨g, rfl⟩ := hφ h
   obtain ⟨g', rfl⟩ := hφ h'
-  simp only [← EquivariantMap.image_smul_setₑ]
+  simp only [← Set.image_smul_setₑ]
   cases' IsBlock.def.mp hB g g' with h h
   · apply Or.intro_left; rw [h]
   · apply Or.intro_right

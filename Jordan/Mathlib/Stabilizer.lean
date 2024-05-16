@@ -63,7 +63,7 @@ instance _root_.SMul.ofStabilizer (s : Set α) : SMul (stabilizer G s) s where
 theorem _root_.SMul.smul_stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :
     ((g • x : ↥s) : α) = (g : G) • (x : α) := rfl
 
-/-- The mul_action of stabilizer a set on that set -/
+/-- The MulAction of the stabilizer a set on that set -/
 instance ofStabilizer (s : Set α) : MulAction (stabilizer G s) s where
   one_smul x := by
     simp only [← Subtype.coe_inj, SMul.smul_stabilizer_def, OneMemClass.coe_one, one_smul]
@@ -101,8 +101,7 @@ theorem le_stabilizer_iff_smul_le (s : Set α) (H : Subgroup G) :
 
 /-- To prove membership to stabilizer of a *finite set*, it is enough to prove one inclusion. -/
 theorem mem_stabilizer_of_finite_iff_smul_le (s : Set α) (hs : s.Finite) (g : G) :
-    g ∈ stabilizer G s ↔ g • s ⊆ s :=
-  by
+    g ∈ stabilizer G s ↔ g • s ⊆ s := by
   haveI : Fintype s := Set.Finite.fintype hs
   haveI : Fintype (g • s : Set α) := Fintype.ofFinite _
   rw [mem_stabilizer_iff]
@@ -125,8 +124,7 @@ theorem mem_stabilizer_of_finite_iff_le_smul (s : Set α) (hs : s.Finite) (g : G
   exact Set.subset_set_smul_iff.symm
 #align mul_action.mem_stabilizer_of_finite_iff_le_smul MulAction.mem_stabilizer_of_finite_iff_le_smul
 
-theorem fixingSubgroup_le_stabilizer (s : Set α) : fixingSubgroup G s ≤ stabilizer G s :=
-  by
+theorem fixingSubgroup_le_stabilizer (s : Set α) : fixingSubgroup G s ≤ stabilizer G s := by
   intro k hk
   rw [mem_fixingSubgroup_iff] at hk
   rw [mem_stabilizer_iff]

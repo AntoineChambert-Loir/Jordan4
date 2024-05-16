@@ -5,16 +5,13 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module sub_mul_actions
 -/
-
--- import Jordan.EquivariantMap
-
+-- ==> Mathlib.GroupTheory.GroupAction.SubMulAction.Invariant
+import Jordan.EquivariantMap
 
 import Mathlib.Data.Finset.Pointwise
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.Tactic.Group
-
-import Jordan.EquivariantMap
 
 /-!
 # Complements on sub_mul_actions
@@ -38,7 +35,6 @@ and permit to manipulate them in a relatively smooth way.
 open scoped Pointwise
 
 open MulAction
-
 section SubMulActions
 
 namespace SubMulAction
@@ -48,8 +44,7 @@ section Inclusion
 variable {M N α : Type _} [SMul M α]
 
 /-- The inclusion of a SubMulAction into the ambient set, as an equivariant map -/
-def inclusion (s : SubMulAction M α) : s →ₑ[@id M] α
-    where
+def inclusion (s : SubMulAction M α) : s →[M] α where
 -- The inclusion map of the inclusion of a SubMulAction
   toFun := fun x => x.val
 -- The commutation property
@@ -235,7 +230,7 @@ variable (M : Type _) [Group M] {α : Type _} [MulAction M α]
 
 /- /-- The equivariant map from the sub_mul_action_of stabilizer into the ambient type -/
 def subMulActionOfStabilizerInclusion (a : α) :
-    SubMulAction.ofStabilizer M a →ₑ[@id (stabilizer M a)] α where
+    SubMulAction.ofStabilizer M a →[stabilizer M a] α where
   toFun x := ↑x
   map_smul' g x := rfl
 #align sub_mul_action_of_stabilizer_inclusion subMulActionOfStabilizerInclusion
@@ -371,7 +366,7 @@ theorem SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective
 
 theorem SubMulAction.scalarMap_ofFixingSubgroupOfStabilizer_bijective
     (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
-    Function.Bijective (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s).toSmulMap := by
+    Function.Bijective (SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer M a s).toMap := by
   constructor
   · rintro ⟨m, hm⟩ ⟨n, hn⟩ hmn
     rw [← SetLike.coe_eq_coe, ← SetLike.coe_eq_coe] at hmn
@@ -639,11 +634,11 @@ theorem SubMulAction.OfFixingSubgroupOfEq.map_def {s t : Set α} (hst : s = t) :
   fun _ _ => rfl
 #align sub_mul_action.of_fixing_subgroup_of_eq.map_def SubMulAction.OfFixingSubgroupOfEq.map_def
 
-theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_def
+theorem SubMulAction.OfFixingSubgroupOfEq.toMap_def
     {s t : Set α} (hst : s = t) (g : M) (hg : g ∈ fixingSubgroup M s) :
-    g = (SubMulAction.OfFixingSubgroupOfEq.map M hst).toSmulMap (⟨g, hg⟩ : fixingSubgroup M s) :=
+    g = (SubMulAction.OfFixingSubgroupOfEq.map M hst).toMap (⟨g, hg⟩ : fixingSubgroup M s) :=
   rfl
-#align sub_mul_action.of_fixing_subgroup_of_eq.to_smul_map_def SubMulAction.OfFixingSubgroupOfEq.toSmulMap_def
+#align sub_mul_action.of_fixing_subgroup_of_eq.to_smul_map_def SubMulAction.OfFixingSubgroupOfEq.toMap_def
 
 theorem SubMulAction.OfFixingSubgroupOfEq.map_bijective
     {s t : Set α} (hst : s = t) :
@@ -661,9 +656,8 @@ theorem SubMulAction.OfFixingSubgroupOfEq.map_bijective
     exact hxt
 #align sub_mul_action.of_fixing_subgroup_of_eq.map_bijective SubMulAction.OfFixingSubgroupOfEq.map_bijective
 
-theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_bijective {s t : Set α} (hst : s = t) :
-    Function.Bijective (SubMulAction.OfFixingSubgroupOfEq.map M hst).toSmulMap :=
-  by
+theorem SubMulAction.OfFixingSubgroupOfEq.toMap_bijective {s t : Set α} (hst : s = t) :
+    Function.Bijective (SubMulAction.OfFixingSubgroupOfEq.map M hst).toMap := by
   constructor
   · rintro ⟨g, hg⟩ ⟨k, hk⟩ hgk
     rw [← SetLike.coe_eq_coe] at hgk ⊢
@@ -674,7 +668,7 @@ theorem SubMulAction.OfFixingSubgroupOfEq.toSmulMap_bijective {s t : Set α} (hs
     rfl
     rw [hst]
     exact hk
-#align sub_mul_action.of_fixing_subgroup_of_eq.to_smul_map_bijective SubMulAction.OfFixingSubgroupOfEq.toSmulMap_bijective
+#align sub_mul_action.of_fixing_subgroup_of_eq.to_smul_map_bijective SubMulAction.OfFixingSubgroupOfEq.toMap_bijective
 
 end EquivariantMap
 

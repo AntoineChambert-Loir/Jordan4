@@ -25,8 +25,8 @@ example (h q : Prop) : h → ¬h → q :=
 
 /-- Given a nat.card inequality, get an embedding from a fin _ -/
 theorem gimme_some {m : ℕ} (hα : ↑m ≤ PartENat.card α) : Nonempty (Fin m ↪ α) := by
-  suffices : Nonempty (ULift (Fin m) ↪ α)
-  · obtain ⟨x'⟩ := this;
+  suffices Nonempty (ULift (Fin m) ↪ α) by
+    obtain ⟨x'⟩ := this;
     use Equiv.ulift.symm.toEmbedding.trans x'
     apply Function.Embedding.injective
   rw [← Cardinal.le_def, Cardinal.mk_fintype, Fintype.card_ulift, Fintype.card_fin]
@@ -76,7 +76,7 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
     toFun := fun ⟨_, _⟩ => a
     inj' := by
       rintro ⟨i, hi⟩ ⟨j, hj⟩ _
-      simp only [Subtype.mk_eq_mk, Fin.eq_iff_veq]
+      simp only [Subtype.mk_eq_mk, Fin.ext_iff]
       rw [Nat.eq_of_lt_succ_of_not_lt i.prop hi, Nat.eq_of_lt_succ_of_not_lt j.prop hj] }
   use {
     toFun := fun i => if hi : p i then f ⟨i, hi⟩ else f' ⟨i, hi⟩
@@ -98,7 +98,10 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
     simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, coeFn_mk]
     rw [dite_eq_iff]
     apply Or.intro_left; use hi; rfl
-  · simp
+  · simp only [gt_iff_lt, Set.coe_setOf, Set.mem_setOf_eq, toFun_eq_coe,
+    coeFn_mk, lt_self_iff_false, ↓reduceDite, p, f, f']
+
+
 #align may_extend_with may_extend_with
 
 /-- Extend an embedding from Fin given a PartENat.card inequality -/
@@ -146,7 +149,7 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
     inj' := by
       refine' Function.Injective.dite p _ _ _
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
-        simpa only [Subtype.mk_eq_mk, Fin.eq_iff_veq] using x.inj' (Subtype.coe_injective hij)
+        simpa only [Subtype.mk_eq_mk, Fin.ext_iff] using x.inj' (Subtype.coe_injective hij)
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
         simp only [Subtype.mk_eq_mk]
         apply (Fin.castIso h').injective
@@ -157,8 +160,12 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
         simp only at hij'
         rw [← Fin.addNat_subNat hi', ← Fin.addNat_subNat hj', hij']
       · intro i j hi hj hij
-        suffices f ⟨i, hi⟩ ∉ s by apply this; rw [hij]; simp only [Subtype.coe_prop]
-        simp only [← Set.mem_compl_iff, Subtype.coe_prop] }
+        suffices f ⟨i, hi⟩ ∉ s by
+          apply this
+          rw [hij]
+          simp only [Set.coe_setOf, Set.mem_setOf_eq, Fin.castIso_apply,
+            toFun_eq_coe, Subtype.coe_prop, g]
+        simp only [f, ← Set.mem_compl_iff, Subtype.coe_prop] }
   constructor
   · ext ⟨i, hi⟩
     simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, coeFn_mk]
@@ -167,9 +174,8 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
   · ext ⟨j, hj⟩
     simp only [Fin.natAddEmb_toEmbedding, gt_iff_lt, Set.coe_setOf, Set.mem_setOf_eq, toFun_eq_coe,
       Fin.castIso_apply, trans_apply, coeFn_mk, Fin.natAdd_mk, Equiv.coe_toEmbedding,
-      RelIso.coe_toEquiv, Fin.cast_mk, add_lt_iff_neg_left, not_lt_zero', Fin.castLT_mk,
-      Fin.subNat_mk, ge_iff_le, add_le_iff_nonpos_right, nonpos_iff_eq_zero, add_tsub_cancel_left,
-      dite_false]
+      RelIso.coe_fn_toEquiv, Fin.cast_mk, add_lt_iff_neg_left, not_lt_zero', ↓reduceDite,
+      Fin.subNat_mk, add_tsub_cancel_left, p, f, g]
     rfl
 #align may_extend_with' may_extend_with'
 
