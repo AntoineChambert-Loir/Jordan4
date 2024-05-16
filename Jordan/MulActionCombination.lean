@@ -117,18 +117,18 @@ theorem Nat.combination.mulAction_faithful (hn : 1 ≤ n) (hα : n.succ ≤ Part
     ext a
     simpa only using h a
   obtain ⟨a, ha⟩ := zob
-  suffices : ∃ (s : Set α), s.encard = n ∧ a ∈ s ∧ g • a ∉ s
-  obtain ⟨s, hs, has, has'⟩ := this
-  have : Set.Finite s := Set.finite_of_encard_eq_coe hs
-  rw [Set.Finite.encard_eq_coe_toFinset_card this, cast_inj] at hs
-  use ⟨Set.Finite.toFinset this, hs⟩
-  · -- g • s ≠ s,
-    simp only [ne_eq]
-    rw [Nat.Combination.eq_iff, ← Finset.coe_inj, combination_mulAction.coe_apply', Finset.coe_smul_finset, Set.Finite.coe_toFinset]
-    intro h
-    apply has'
-    rw [← h]
-    exact Set.smul_mem_smul_set has
+  suffices ∃ (s : Set α), s.encard = n ∧ a ∈ s ∧ g • a ∉ s by
+    obtain ⟨s, hs, has, has'⟩ := this
+    have : Set.Finite s := Set.finite_of_encard_eq_coe hs
+    rw [Set.Finite.encard_eq_coe_toFinset_card this, cast_inj] at hs
+    use ⟨Set.Finite.toFinset this, hs⟩
+    · -- g • s ≠ s,
+      simp only [ne_eq]
+      rw [Nat.Combination.eq_iff, ← Finset.coe_inj, combination_mulAction.coe_apply', Finset.coe_smul_finset, Set.Finite.coe_toFinset]
+      intro h
+      apply has'
+      rw [← h]
+      exact Set.smul_mem_smul_set has
 
   -- ∃ (s : Set α), s.encard = n ∧ a ∈ s ∧ g • a ∉ s,
   have : ({a} : Set α) ⊆ {g • a}ᶜ := by
@@ -139,9 +139,9 @@ theorem Nat.combination.mulAction_faithful (hn : 1 ≤ n) (hα : n.succ ≤ Part
       ← Set.encard_singleton (g • a), Set.encard_add_encard_compl, Set.encard_univ]
     rw [← PartENat.withTopEquiv_natCast, PartENat.withTopEquiv_le]
     exact hα
-  obtain ⟨s, has, has', hs⟩ := Set.exists_superset_subset_encard_eq this
-    (by rw [Set.encard_singleton, ← Nat.cast_one, Nat.cast_le]
-        exact hn) hα'
+  obtain ⟨s, has, has', hs⟩ := Set.exists_superset_subset_encard_eq this (by
+    rw [Set.encard_singleton, ← Nat.cast_one, Nat.cast_le]
+    exact hn) hα'
   use s
   constructor
   · exact hs
@@ -209,29 +209,29 @@ variable [Fintype α]
 
 theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
     Nontrivial (n.Combination α) := by
-  suffices : Nonempty (n.Combination α)
-  obtain ⟨s, hs⟩ := this
-  change s.card = n at hs
-  let h'1 := id h1
-  rw [← hs, Finset.card_pos] at h'1 ; obtain ⟨a, ha⟩ := h'1
-  let h'2 := id h2
-  rw [← hs, Finset.card_lt_iff_ne_univ, Ne.def, ← Finset.coe_eq_univ, ← Ne.def,
+  suffices Nonempty (n.Combination α) by
+    obtain ⟨s, hs⟩ := this
+    change s.card = n at hs
+    let h'1 := id h1
+    rw [← hs, Finset.card_pos] at h'1 ; obtain ⟨a, ha⟩ := h'1
+    let h'2 := id h2
+    rw [← hs, Finset.card_lt_iff_ne_univ, Ne.def, ← Finset.coe_eq_univ, ← Ne.def,
     Set.ne_univ_iff_exists_not_mem] at h'2
-  obtain ⟨b, hb⟩ := h'2
-  let t : Finset α := insert b (Finset.erase s a)
-  rw [nontrivial_iff]
-  use ⟨s, hs⟩
-  use ⟨t, by
-    rw [Nat.Combination.mem_iff]
-    rw [Finset.card_insert_of_not_mem]
-    rw [Finset.card_erase_of_mem ha]
-    rw [hs]; rw [Nat.sub_add_cancel]; exact h1
-    intro h; apply hb; apply Finset.erase_subset; exact h⟩
-  intro h
-  rw [Subtype.mk_eq_mk] at h
-  apply hb
-  rw [h]
-  exact Finset.mem_insert_self b _
+    obtain ⟨b, hb⟩ := h'2
+    let t : Finset α := insert b (Finset.erase s a)
+    rw [nontrivial_iff]
+    use ⟨s, hs⟩
+    use ⟨t, by
+      rw [Nat.Combination.mem_iff]
+      rw [Finset.card_insert_of_not_mem]
+      rw [Finset.card_erase_of_mem ha]
+      rw [hs]; rw [Nat.sub_add_cancel]; exact h1
+      intro h; apply hb; apply Finset.erase_subset; exact h⟩
+    intro h
+    rw [Subtype.mk_eq_mk] at h
+    apply hb
+    rw [h]
+    exact Finset.mem_insert_self b _
 
   obtain ⟨s, _, hs'⟩ := Finset.exists_smaller_set (Finset.univ : Finset α) n
     (le_of_lt h2)
