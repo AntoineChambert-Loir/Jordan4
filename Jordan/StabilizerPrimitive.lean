@@ -84,8 +84,8 @@ theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv
   let f : s →ₑ[φ] s :=
     { toFun := id
       map_smul' := fun ⟨m, hm⟩ x => by
-        simp only [id_eq, ← Subtype.coe_inj, HasSmul.smul_stabilizer_def, Perm.smul_def]
-        rfl }
+        simp only [id_eq, ← Subtype.coe_inj, SMul.smul_stabilizer_def,
+          Perm.smul_def, Submonoid.mk_smul] }
   have : Function.Surjective f := Function.surjective_id
   apply isPreprimitive_of_surjective_map this
   apply stabilizer_isPreprimitive
@@ -98,56 +98,47 @@ namespace alternatingGroup
 theorem stabilizer.isPreprimitive (s : Set α) (hs : (sᶜ : Set α).Nontrivial) :
     IsPreprimitive (stabilizer (alternatingGroup α) s) s := by
   let φ : stabilizer (alternatingGroup α) s → Equiv.Perm s := MulAction.toPerm
-  suffices hφ : Function.Surjective φ
-  let f : s →ₑ[φ] s :=
-    { toFun := id
+  suffices hφ : Function.Surjective φ by
+    let f : s →ₑ[φ] s := {
+      toFun := id
       map_smul' := fun ⟨g, hg⟩ ⟨x, hx⟩ => by
-        simp only [id.def, Equiv.Perm.smul_def, toPerm_apply] }
-  have hf : Function.Bijective f := Function.bijective_id
-  rw [isPreprimitive_of_bijective_map_iff hφ hf]
-  exact Equiv.Perm.isPreprimitive s
-  suffices : ∃ k : Equiv.Perm (sᶜ : Set α), Equiv.Perm.sign k = -1
-  obtain ⟨k, hk_sign⟩ := this
-  have hks : Equiv.Perm.ofSubtype k • s = s := by
-    rw [← mem_stabilizer_iff]
-    exact Equiv.Perm.ofSubtype_mem_stabilizer' s k
+        simp only [id.def, Equiv.Perm.smul_def]
+        rw [toPerm_apply] }
+    have hf : Function.Bijective f := Function.bijective_id
+    rw [isPreprimitive_of_bijective_map_iff hφ hf]
+    exact Equiv.Perm.isPreprimitive s
   -- function.surjective φ
-  have hφ : Function.Surjective φ := by
-    have hminus_one_ne_one : (-1 : Units ℤ) ≠ 1 := Int.neg_units_ne_self 1
+  suffices ∃ k : Equiv.Perm (sᶜ : Set α), Equiv.Perm.sign k = -1 by
+    obtain ⟨k, hk_sign⟩ := this
+    have hks : Equiv.Perm.ofSubtype k • s = s := by
+      rw [← mem_stabilizer_iff]
+      exact Equiv.Perm.ofSubtype_mem_stabilizer' s k
+    have hminus_one_ne_one : (-1 : Units ℤ) ≠ 1 := Ne.symm (units_ne_neg_self 1)
     intro g
-    let g' := if Equiv.Perm.sign g = 1
-      then Equiv.Perm.ofSubtype g
-      else Equiv.Perm.ofSubtype g * Equiv.Perm.ofSubtype k
+    let g' := if Equiv.Perm.sign g = 1 then Equiv.Perm.ofSubtype g else Equiv.Perm.ofSubtype g * Equiv.Perm.ofSubtype k
     use! g'
     rw [Equiv.Perm.mem_alternatingGroup]
     cases' Int.units_eq_one_or (Equiv.Perm.sign g) with hsg hsg <;>
-      · -- dsimp [g']
-        simp only [hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false,
-          Equiv.Perm.sign_ofSubtype, Equiv.Perm.sign_mul, mul_neg, mul_one,
-          neg_neg, hsg, hk_sign]
-    rw [mem_stabilizer_iff]
-    change g' • s = s
+    · simp only [g', hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false, Equiv.Perm.sign_ofSubtype, Equiv.Perm.sign_mul, mul_neg, mul_one, neg_neg, hsg, hk_sign]
+    rw [mem_stabilizer_iff, Submonoid.mk_smul]
     cases' Int.units_eq_one_or (Equiv.Perm.sign g) with hsg hsg
-    · simp only [hsg, eq_self_iff_true, if_true]
+    · simp only [g', hsg, eq_self_iff_true, if_true]
       exact Equiv.Perm.ofSubtype_mem_stabilizer s g
-    · simp only [hsg, hminus_one_ne_one, if_false, mul_smul, hks]
+    · simp only [g', hsg, hminus_one_ne_one, if_false, mul_smul, hks]
       exact Equiv.Perm.ofSubtype_mem_stabilizer s g
-    dsimp [φ]
+    dsimp only [id_eq, ite_true, ite_false, eq_mpr_eq_cast, cast_eq, φ]
     cases' Int.units_eq_one_or (Equiv.Perm.sign g) with hsg hsg
-    · -- dsimp [g']
-      simp only [hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
+    · simp only [g', hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
       ext x
-      change Equiv.Perm.ofSubtype g ↑x = ↑(g x)
-      exact Equiv.Perm.ofSubtype_apply_coe g x
-    · -- dsimp [g'];
-      simp only [hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
+      simp only [toPerm_apply, SMul.smul_stabilizer_def, Submonoid.mk_smul, Equiv.Perm.smul_def,
+        Equiv.Perm.ofSubtype_apply_coe]
+    · simp only [g', hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
       ext x
-      change (Equiv.Perm.ofSubtype g * Equiv.Perm.ofSubtype k) ↑x = ↑(g x)
-      rw [Equiv.Perm.mul_apply]
+      simp only [toPerm_apply, SMul.smul_stabilizer_def, Submonoid.mk_smul]
+      simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
       rw [Equiv.Perm.ofSubtype_apply_of_not_mem k _]
       exact Equiv.Perm.ofSubtype_apply_coe g x
       rw [Set.not_mem_compl_iff]; exact x.prop
-  exact hφ
   -- ∃ k : equiv.perm (sᶜ : set α), equiv.perm.sign k = -1,
   obtain ⟨a, ha, b, hb, hab⟩ := hs
   use Equiv.swap ⟨a, ha⟩ ⟨b, hb⟩
