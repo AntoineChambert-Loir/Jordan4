@@ -5,8 +5,9 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module blocks
 -/
--- import Jordan.Mathlib.Stabilizer
--- import Jordan.SubMulActions
+
+import Jordan.Mathlib.Stabilizer
+import Jordan.SubMulActions
 import Jordan.EquivariantMap
 
 import Mathlib.Data.Setoid.Partition
@@ -15,6 +16,7 @@ import Mathlib.Data.Set.Card
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.GroupTheory.Subgroup.Actions
+
 
 /-! # Blocks
 
@@ -284,8 +286,9 @@ theorem IsBlock_image {H Y : Type _} [Group H] [MulAction H Y] {φ : G → H} (j
 #align mul_action.is_block_image MulAction.IsBlock_image
 
 theorem SubMulAction.IsBlock {C : SubMulAction G X} {B : Set X} (hB : IsBlock G B) :
-    IsBlock G (Subtype.val ⁻¹' B : Set C) := by
-  exact @IsBlock_preimage G _ X _ G C _ _ (MonoidHom.id G) C.inclusion B hB
+    IsBlock G (Subtype.val ⁻¹' B : Set C) :=
+  @IsBlock_preimage G _ X _ G C _ _ (MonoidHom.id G) C.inclusion B hB
+
 #align mul_action.sub_mul_action.is_block MulAction.SubMulAction.IsBlock
 
 theorem SubMulAction.smul_coe_eq_coe_smul {C : SubMulAction G X} {B : Set C} {g : G} :
