@@ -49,8 +49,8 @@ theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
     apply Finset.card_le_univ
   by_cases h4 : 4 ∈ g.cycleType
   · exfalso
-    suffices : g.cycleType = {4}
-    rw [this, ← Units.eq_iff] at hg0 ; norm_num at hg0
+    suffices g.cycleType = {4} by
+      rw [this, ← Units.eq_iff] at hg0 ; norm_num at hg0
     rw [← Multiset.cons_erase h4]
     apply symm
     rw [Multiset.singleton_eq_cons_iff]
@@ -73,40 +73,52 @@ theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
         exact hg4
         norm_num
       cases' Nat.eq_or_lt_of_le hk2 with hk2 hk1
-      -- g.cycleType.card = 2
-      rw [hk2] at this ;
-      simp only [this]
-      simp only [Finset.mem_univ, Multiset.replicate_succ, Multiset.replicate_one,
-        Multiset.empty_eq_zero, Multiset.cons_ne_zero, Multiset.insert_eq_cons, eq_self_iff_true,
-        false_or_iff, and_self_iff]
-      -- we know : g.cycleType.card ≤ 1
-      rw [Nat.lt_succ_iff] at hk1
-      cases' Nat.eq_or_lt_of_le hk1 with hk1 hk0
-      -- g.cycleType.card = 1 : exfalso
-      exfalso;
-      rw [hk1, ← Units.eq_iff] at hg0 ; norm_num at hg0
-      -- g.cycleType.card = 0
-      simp only [Nat.lt_one_iff] at hk0
-      rw [hk0] at this ; simp only [this]
+      · -- g.cycleType.card = 2
+        rw [hk2] at this ;
+        simp only [this]
+        simp only [Finset.mem_univ, Multiset.replicate_succ, Multiset.replicate_one,
+          Multiset.empty_eq_zero, Multiset.cons_ne_zero, Multiset.insert_eq_cons, eq_self_iff_true,
+          false_or_iff, and_self_iff]
+        simp only [Multiset.replicate_zero, Multiset.cons_zero]
+      · -- we know : g.cycleType.card ≤ 1
+        rw [Nat.lt_succ_iff] at hk1
+        cases' Nat.eq_or_lt_of_le hk1 with hk1 hk0
+        -- g.cycleType.card = 1 : exfalso
+        exfalso
+        rw [hk1, ← Units.eq_iff] at hg0 ; norm_num at hg0
+        -- g.cycleType.card = 0
+        simp only [Nat.lt_one_iff] at hk0
+        rw [hk0] at this ; simp only [this]
+        left
+        simp only [Multiset.replicate_zero, Multiset.empty_eq_zero]
     rw [Multiset.eq_replicate_card]
     intro i hi
-    have := dvd_trans (Multiset.dvd_lcm hi) hg
+    have : i ∣ 2 ^ n := by
+      apply Nat.dvd_trans _ hg
+      exact Multiset.dvd_lcm hi
     rw [Nat.dvd_prime_pow] at this
-    obtain ⟨k, ⟨_, rfl⟩⟩ := this
-    suffices : k = 1; rw [this]; norm_num
+    obtain ⟨k, hk, hlcm⟩ := this
+    suffices k = 1 by
+      rw [hlcm, this]; norm_num
     apply le_antisymm
     rw [← not_lt]; intro hk1
-    suffices : k = 2
-    apply h4; rw [this] at hi ; exact hi
+    suffices k = 2 by
+      apply h4
+      rw [this] at hlcm ; norm_num at hlcm
+      rw [← hlcm]
+      exact hi
     refine' le_antisymm _ hk1
     · -- k ≤ 2
-      rw [← Nat.pow_le_iff_le_right (Nat.le_refl 2)]
-      norm_num; rw [← hα4]
+      rw [← Nat.pow_le_pow_iff_right (Nat.le_refl 2)]
+      norm_num; rw [← hα4, ← hlcm]
       apply le_trans (Equiv.Perm.le_card_support_of_mem_cycleType hi)
       apply Finset.card_le_univ
-    rw [Nat.one_le_iff_ne_zero]; intro hk0
-    rw [hk0] at hi ; norm_num at hi
-    apply Nat.lt_irrefl 1; exact Equiv.Perm.one_lt_of_mem_cycleType hi
+    rw [Nat.one_le_iff_ne_zero]
+    intro hk0
+    rw [hk0] at hlcm ; norm_num at hlcm
+    rw [hlcm] at hi
+    apply Nat.lt_irrefl 1
+    exact Equiv.Perm.one_lt_of_mem_cycleType hi
     exact Nat.prime_two
 set_option linter.uppercaseLean3 false in
 #align alternating_group.mem_V4_of_order_two_pow alternatingGroup.mem_V4_of_order_two_pow
@@ -115,38 +127,37 @@ open scoped Classical
 
 theorem A4_card (hα4 : Fintype.card α = 4) :
     Fintype.card (alternatingGroup α) = 12 := by
-  have : Nontrivial α; rw [← Fintype.one_lt_card_iff_nontrivial, hα4]; norm_num
+  have : Nontrivial α := by
+    rw [← Fintype.one_lt_card_iff_nontrivial, hα4]
+    norm_num
   apply mul_right_injective₀ (_: 2 ≠ 0)
   dsimp
   rw [two_mul_card_alternatingGroup, Fintype.card_perm, hα4]
-  norm_num
-  norm_num
+  all_goals
+    norm_num
+  rfl
 set_option linter.uppercaseLean3 false in
 #align alternating_group.A4_card alternatingGroup.A4_card
 
 theorem A4_sylow_card (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     Fintype.card S = 4 := by
   rw [Sylow.card_eq_multiplicity, ← Nat.factors_count_eq, A4_card α hα4]
-  suffices : Nat.factors 12 ~ [2, 2, 3]
-  · rw [List.Perm.count_eq this]
-    norm_num
-  norm_num
+  rfl
 set_option linter.uppercaseLean3 false in
 #align alternating_group.A4_sylow_card alternatingGroup.A4_sylow_card
 
 theorem A4_sylow_carrier (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     S.carrier =
       {g : alternatingGroup α |
-        (g : Equiv.Perm α).cycleType = 0 ∨ (g : Equiv.Perm α).cycleType = {2, 2}} :=
-  by
+        (g : Equiv.Perm α).cycleType = 0 ∨ (g : Equiv.Perm α).cycleType = {2, 2}} := by
   apply Set.eq_of_subset_of_card_le
   · -- inclusion S ⊆ (cycleType = 0 ∨ cycleType = { 2, 2 })
     intro k hk
     simp only [Set.mem_setOf_eq]
     obtain ⟨n, hn⟩ := (IsPGroup.iff_orderOf.mp S.isPGroup') ⟨k, hk⟩
     apply mem_V4_of_order_two_pow α hα4 (↑k) k.prop n
-    rw [← orderOf_subgroup ⟨k, hk⟩, Subgroup.coe_mk] at hn
-    rw [orderOf_subgroup, hn]
+    rw [← orderOf_submonoid ⟨k, hk⟩, Subgroup.coe_mk] at hn
+    rw [orderOf_submonoid, hn]
   -- card K4 ≤ card S
   change _ ≤ Fintype.card S
   rw [A4_sylow_card α hα4 S]
@@ -154,6 +165,7 @@ theorem A4_sylow_carrier (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingG
   rw [Fintype.card_subtype]; rw [Fintype.card_subtype]
   simp only [OnCycleFactors.AlternatingGroup.card_of_cycleType, hα4]
   norm_num
+  rfl
 set_option linter.uppercaseLean3 false in
 #align alternating_group.A4_sylow_carrier alternatingGroup.A4_sylow_carrier
 
@@ -170,7 +182,8 @@ theorem V4_is_unique_sylow (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatin
     rw [← Subgroup.mem_carrier, A4_sylow_carrier α hα4 S, Set.mem_setOf_eq, or_imp]
     constructor
     · intro hk
-      suffices hk : k = 1; rw [hk]; exact Subgroup.one_mem _
+      suffices hk : k = 1 by
+        rw [hk]; exact Subgroup.one_mem _
       rw [← Subtype.coe_inj, Subgroup.coe_one, ← Equiv.Perm.cycleType_eq_zero, hk]
     · intro hk
       simp only [V4]
@@ -227,13 +240,13 @@ set_option linter.uppercaseLean3 false in
 #align alternating_group.V4_card alternatingGroup.V4_card
 
 theorem isCommutative_of_exponent_two {G : Type _} [Group G] (hG2 : ∀ g : G, g ^ 2 = 1) :
-    IsCommutative G (· * ·) := by
-  suffices : ∀ g : G, g⁻¹ = g
-  apply IsCommutative.mk
-  intro a b
-  rw [← mul_inv_eq_iff_eq_mul, ← mul_inv_eq_one, this, this, ← hG2 (a * b), pow_two,
-    mul_assoc (a * b) a b]
-  · intro g; rw [← mul_eq_one_iff_inv_eq, ← hG2 g, pow_two]
+    Std.Commutative (α := G) (· * ·) := by
+  suffices ∀ g : G, g⁻¹ = g by
+    constructor
+    intro a b
+    rw [← mul_inv_eq_iff_eq_mul, ← mul_inv_eq_one, this, this, ← hG2 (a * b), pow_two,
+      mul_assoc (a * b) a b]
+  intro g; rw [← mul_eq_one_iff_inv_eq, ← hG2 g, pow_two]
 #align alternating_group.is_commutative_of_exponent_two alternatingGroup.isCommutative_of_exponent_two
 
 theorem V4_carrier_eq (hα4 : Fintype.card α = 4) :
@@ -268,7 +281,7 @@ set_option linter.uppercaseLean3 false in
 #align alternating_group.V4_is_commutative alternatingGroup.V4_isCommutative
 
 theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G] (H : Subgroup G)
-    [nH : H.Normal] : IsCommutative (G ⧸ H) (· * ·) ↔ commutator G ≤ H := by
+    [nH : H.Normal] : Std.Commutative (α := G ⧸ H) (· * ·) ↔ commutator G ≤ H := by
   constructor
   · intro h
     simp only [commutator_eq_closure, Subgroup.closure_le]
@@ -277,7 +290,7 @@ theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G]
     rw [← QuotientGroup.mk'_apply, map_commutatorElement (QuotientGroup.mk' H) g1 g2]
     simp only [QuotientGroup.mk'_apply, commutatorElement_eq_one_iff_mul_comm, h.comm]
   · intro h
-    apply IsCommutative.mk
+    constructor
     intro a b
     obtain ⟨g1, rfl⟩ := QuotientGroup.mk'_surjective H a
     obtain ⟨g2, rfl⟩ := QuotientGroup.mk'_surjective H b
@@ -291,18 +304,6 @@ theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G]
     refine' Subgroup.mem_top g2
 #align alternating_group.subgroup.quotient_is_commutative_iff_commutator_le alternatingGroup.Subgroup.quotient_isCommutative_iff_commutator_le
 
-example (hα4 : 4 ≤ Fintype.card α) (a b : α) (hab : a ≠ b) : ∃ c : α, c ≠ a ∧ c ≠ b :=
-  by
-  suffices : ({a, b} : Finset α)ᶜ.Nonempty
-  obtain ⟨c, hc⟩ := this
-  use c
-  simp only [Finset.compl_insert, Finset.mem_erase, Finset.mem_compl, Finset.mem_singleton] at hc ;
-  exact hc
-  rw [← Finset.card_compl_lt_iff_nonempty, compl_compl]
-  refine' lt_of_lt_of_le _ hα4
-  rw [Finset.card_doubleton hab]
-  norm_num
-
 theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
     Subgroup.center (alternatingGroup α) = ⊥ := by
   rw [eq_bot_iff]
@@ -315,7 +316,7 @@ theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
   have hab : b ≠ a := by simp only [b]; rw [← Equiv.Perm.mem_support]; exact ha
   have : ({a, b} : Finset α)ᶜ.Nonempty :=
     by
-    rw [← Finset.card_compl_lt_iff_nonempty, compl_compl, Finset.card_doubleton hab.symm]
+    rw [← Finset.card_compl_lt_iff_nonempty, compl_compl, Finset.card_pair hab.symm]
     refine' lt_of_lt_of_le (by norm_num) hα4
   obtain ⟨c, hc⟩ := this
   simp only [Finset.compl_insert, Finset.mem_erase, Ne.def, Finset.mem_compl,
@@ -327,10 +328,10 @@ theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
     simp
   rw [MulAction.is_two_pretransitive_iff] at h2trans
   obtain ⟨k, hk, hk'⟩ := h2trans a b a c hab.symm (Ne.symm hc.left)
-  suffices : k • (⟨g, hg⟩ : alternatingGroup α) • a ≠ c
-  apply this; rw [← hk']; rfl
-  suffices : k • (⟨g, hg⟩ : alternatingGroup α) • a = (⟨g, hg⟩ : alternatingGroup α) • k • a
-  rw [this, hk]; exact Ne.symm hc.right
+  suffices k • (⟨g, hg⟩ : alternatingGroup α) • a ≠ c by
+    apply this; rw [← hk']; rfl
+  suffices k • (⟨g, hg⟩ : alternatingGroup α) • a = (⟨g, hg⟩ : alternatingGroup α) • k • a by
+    rw [this, hk]; exact Ne.symm hc.right
   rw [Subgroup.mem_center_iff] at hg'
   specialize hg' k
   simp only [smul_smul, hg']
@@ -347,8 +348,8 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
       rw [← Subgroup.card_eq_card_quotient_mul_card_subgroup, V4_card α hα4, A4_card α hα4]
       norm_num
   have comm_ne_bot : commutator (alternatingGroup α) ≠ ⊥ := by
-    have : Nontrivial (Subgroup (alternatingGroup α))
-    · rw [Subgroup.nontrivial_iff]
+    have : Nontrivial (Subgroup (alternatingGroup α)) := by
+      rw [Subgroup.nontrivial_iff]
       rw [← Fintype.one_lt_card_iff_nontrivial]
       rw [A4_card α hα4]
       norm_num
@@ -358,36 +359,35 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
     exact bot_ne_top
     rw [hα4]
   obtain ⟨k, hk, hk'⟩ := Or.resolve_left (Subgroup.bot_or_exists_ne_one _) comm_ne_bot
-  suffices hk22 : (k : Equiv.Perm α).cycleType = {2, 2}
-  refine' le_antisymm _ comm_le
-  intro g hg
-  rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hg
-  cases' hg with hg hg
-  · rw [Equiv.Perm.cycleType_eq_zero, OneMemClass.coe_eq_one] at hg
-    rw [hg]
-    exact Subgroup.one_mem _
-  · rw [← hg, ← Equiv.Perm.isConj_iff_cycleType_eq, isConj_iff] at hk22
-    obtain ⟨c, hc⟩ := hk22
-    rw [← MulAut.conjNormal_apply, Subtype.coe_inj] at hc
-    simp only [commutator, ← hc]
-    let fc : MulAut (alternatingGroup α) := MulAut.conjNormal c
-    suffices :
-      (⊤ : Subgroup (alternatingGroup α)) =
-        Subgroup.map fc.toMonoidHom (⊤ : Subgroup (alternatingGroup α))
-    rw [this, ← Subgroup.map_commutator]
-    refine' Subgroup.mem_map_of_mem _ hk
-    · apply symm
+  suffices hk22 : (k : Equiv.Perm α).cycleType = {2, 2} by
+    refine' le_antisymm _ comm_le
+    intro g hg
+    rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hg
+    cases' hg with hg hg
+    · rw [Equiv.Perm.cycleType_eq_zero, OneMemClass.coe_eq_one] at hg
+      rw [hg]
+      exact Subgroup.one_mem _
+    · rw [← hg, ← Equiv.Perm.isConj_iff_cycleType_eq, isConj_iff] at hk22
+      obtain ⟨c, hc⟩ := hk22
+      rw [← MulAut.conjNormal_apply, Subtype.coe_inj] at hc
+      simp only [commutator, ← hc]
+      let fc : MulAut (alternatingGroup α) := MulAut.conjNormal c
+      suffices (⊤ : Subgroup (alternatingGroup α)) =
+        Subgroup.map fc.toMonoidHom (⊤ : Subgroup (alternatingGroup α)) by
+        rw [this, ← Subgroup.map_commutator]
+        refine' Subgroup.mem_map_of_mem _ hk
+      apply symm
       rw [← MonoidHom.range_eq_map]
       rw [MonoidHom.range_top_iff_surjective]
       exact MulEquiv.surjective _
-  · have hk2 := comm_le hk
-    rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hk2
-    cases' hk2 with hk2 hk2
-    · exfalso
-      apply hk'
-      rw [Equiv.Perm.cycleType_eq_zero] at hk2
-      simp only [← Subtype.coe_inj, hk2, Subgroup.coe_one]
-    exact hk2
+  have hk2 := comm_le hk
+  rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hk2
+  cases' hk2 with hk2 hk2
+  · exfalso
+    apply hk'
+    rw [Equiv.Perm.cycleType_eq_zero] at hk2
+    simp only [← Subtype.coe_inj, hk2, Subgroup.coe_one]
+  · exact hk2
 set_option linter.uppercaseLean3 false in
 #align alternating_group.V4_eq_commutator alternatingGroup.V4_eq_commutator
 

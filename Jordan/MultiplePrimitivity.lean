@@ -60,8 +60,7 @@ theorem isMultiplyPreprimitive_zero : IsMultiplyPreprimitive M α 0 := by
 
 /-- An action is preprimitive iff it is 1-preprimitive -/
 theorem isPreprimitive_iff_is_one_preprimitive :
-    IsPreprimitive M α ↔ IsMultiplyPreprimitive M α 1 :=
-  by
+    IsPreprimitive M α ↔ IsMultiplyPreprimitive M α 1 := by
   constructor
   · intro h
     constructor
@@ -70,12 +69,12 @@ theorem isPreprimitive_iff_is_one_preprimitive :
     · intro s hs
       --  rw [Nat.cast_one] at hs
       simp only [Nat.cast_one] at hs
-      suffices : s = ∅
-      rw [this]
-      rw [isPreprimitive_of_bijective_map_iff
+      suffices s = ∅ by
+        rw [this]
+        rw [isPreprimitive_of_bijective_map_iff
           (SubMulAction.of_fixingSubgroupEmpty_mapScalars_surjective M α)
           (SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective M α)]
-      exact h
+        exact h
       rw [← Set.encard_eq_zero, ← Nat.cast_zero, ← WithTop.add_one_eq_coe_succ_iff]
       exact hs
 
@@ -156,7 +155,7 @@ theorem stabilizer.isMultiplyPreprimitive
           apply Set.mem_insert_of_mem
           use ⟨x, ?_⟩
           refine' And.intro _ rfl
-          · simp only [Set.mem_preimage]
+          · simp only [t, Set.mem_preimage]
             exact hxs
           exact hxa
         · intro hxat
@@ -316,7 +315,7 @@ theorem isMultiplyPreprimitive_of_bijective_map
       rw [← hs', Set.mem_image_iff_bex] at hy
       obtain ⟨x, hx, hx'⟩ := hy
       simp only [Subtype.coe_mk]
-      rw [← hx', ← f.map_smul']
+      rw [← hx', ← map_smulₛₗ]
       apply congr_arg
       rw [mem_fixingSubgroup_iff] at hm
       exact hm x hx⟩
@@ -330,7 +329,9 @@ theorem isMultiplyPreprimitive_of_bijective_map
     rintro ⟨y, hy⟩
     obtain ⟨x, hx⟩ := hf.right y
     use ⟨x, ?_⟩
-    · simp only [Subtype.mk.injEq, hx]
+    · simp only [f']
+      apply Subtype.coe_injective
+      exact hx
     · intro h
       apply hy
       rw [← hs']

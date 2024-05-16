@@ -60,7 +60,8 @@ theorem stabilizer_isPreprimitive (s : Set α) : IsPreprimitive (stabilizer (Equ
   let φ : stabilizer (Equiv.Perm α) s → Equiv.Perm s := MulAction.toPerm
   let f : s →ₑ[φ] s :=
     { toFun := id
-      map_smul' := fun g x => by simp only [id.def, Equiv.Perm.smul_def, toPerm_apply] }
+      map_smul' := fun g x => by
+        simp only [id_eq, Perm.smul_def, toPerm_apply, φ] }
   have hf : Function.Bijective f := Function.bijective_id
   rw [isPreprimitive_of_bijective_map_iff _ hf]
   exact Equiv.Perm.isPreprimitive s
@@ -77,8 +78,7 @@ theorem stabilizer_isPreprimitive (s : Set α) : IsPreprimitive (stabilizer (Equ
 #align equiv.perm.stabilizer_is_preprimitive Equiv.Perm.stabilizer_isPreprimitive
 
 theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv.Perm α))
-    (hG : stabilizer (Equiv.Perm α) s ≤ G) : IsPreprimitive (stabilizer G s) s :=
-  by
+    (hG : stabilizer (Equiv.Perm α) s ≤ G) : IsPreprimitive (stabilizer G s) s := by
   let φ : stabilizer (Equiv.Perm α) s → stabilizer G s := fun g =>
     ⟨⟨g, hG g.prop⟩, mem_stabilizer_iff.mp g.prop⟩
   let f : s →ₑ[φ] s :=
