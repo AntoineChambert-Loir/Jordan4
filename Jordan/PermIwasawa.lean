@@ -15,6 +15,7 @@ import Jordan.Mathlib.Alternating
 import Jordan.MulActionCombination
 import Jordan.Jordan
 import Jordan.PermMaximal
+import Jordan.Iwasawa
 
 /-!
 # Normal subgroups of the symmetric group
@@ -87,18 +88,17 @@ lemma Equiv.Perm.ofSubtype_range_eq (s : Set α) [DecidablePred fun a ↦ a ∈ 
         by_contra ha'
         rw [← h _ ha', ← Perm.smul_def, Set.smul_mem_smul_set_iff] at ha
         exact ha' ha
-    suffices hk' : _
-    use Equiv.Perm.subtypePerm k hk'
-    rw [Equiv.Perm.ofSubtype_subtypePerm]
-    simp only [ne_eq, Finset.mem_coe]
-    intro x hx
-    specialize h x
-    rw [not_imp_comm] at h
-    exact h hx
-    · intro x
-      rw [← Equiv.Perm.smul_def]
-      nth_rewrite 2 [hks]
-      rw [Set.smul_mem_smul_set_iff]
+    suffices hk' : _ by
+      use Equiv.Perm.subtypePerm k hk'
+      rw [Equiv.Perm.ofSubtype_subtypePerm]
+      simp only [ne_eq, Finset.mem_coe]
+      intro x
+      rw [not_imp_comm]
+      exact h x
+    intro x
+    rw [← Equiv.Perm.smul_def]
+    nth_rewrite 2 [hks]
+    rw [Set.smul_mem_smul_set_iff]
 
 lemma _root_.MulAction.smul_compl_set_eq {G α : Type*} [Group G] [MulAction G α]
     (s : Set α) (g : G) :
@@ -132,7 +132,8 @@ theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) :
   have hkg : ∀ a, a ∈ s ↔ g a ∈ g • s := by
     intro a
     rw [← Equiv.Perm.smul_def, Finset.smul_mem_smul_finset_iff]
-  let kg : s ≃ (g • s) := Equiv.subtypeEquiv g hkg
+
+  let kg : s ≃ (g • s : Finset α) := Equiv.subtypeEquiv g hkg
   let kg' := Equiv.permCongrMul kg
 
   /-
@@ -150,31 +151,29 @@ theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) :
         = g ∘ (Iwt s) ∘ g⁻¹
   -/
 
-  suffices : (Iwt (g • s)).comp kg'.toMonoidHom
-    = ((MulAut.conj g).toMonoidHom.comp (Iwt s))
-  rw [this1]
-  rw [← this]
-  rw [← SetLike.coe_set_eq]
-  simp only [Finset.coe_sort_coe, MonoidHom.coe_range, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom,
-    EquivLike.surjective_comp, EquivLike.range_comp]
+  suffices (Iwt (g • s)).comp kg'.toMonoidHom
+    = ((MulAut.conj g).toMonoidHom.comp (Iwt s)) by
+    rw [this1, ← this, ← SetLike.coe_set_eq]
+    simp only [Finset.coe_sort_coe, MonoidHom.coe_range, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom,
+      EquivLike.surjective_comp, EquivLike.range_comp]
 
   ext h x
   unfold Iwt
   simp only [Finset.coe_sort_coe, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply,
     MulAut.conj_apply, coe_mul]
   by_cases hx : g⁻¹ x ∈ s
-  · suffices hx' : x ∈ g • s
-    rw [ofSubtype_apply_of_mem h hx]
-    rw [ofSubtype_apply_of_mem ((Equiv.permCongrMul kg) h) hx']
-    unfold Equiv.permCongrMul
-    simp only [toFun_as_coe, invFun_as_coe, permCongr_symm, subtypeEquiv_symm, MulEquiv.coe_mk,
-      coe_fn_mk, permCongr_apply, subtypeEquiv_apply, EmbeddingLike.apply_eq_iff_eq]
-    rfl
+  · suffices hx' : x ∈ g • s by
+      rw [ofSubtype_apply_of_mem h hx]
+      rw [ofSubtype_apply_of_mem ((Equiv.permCongrMul kg) h) hx']
+      unfold Equiv.permCongrMul
+      simp only [toFun_as_coe, invFun_as_coe, permCongr_symm, subtypeEquiv_symm, MulEquiv.coe_mk,
+        coe_fn_mk, permCongr_apply, subtypeEquiv_apply, EmbeddingLike.apply_eq_iff_eq]
+      rfl
     exact Finset.inv_smul_mem_iff.mp hx
-  · suffices hx' : x ∉ g • s
-    rw [ofSubtype_apply_of_not_mem h hx]
-    rw [ofSubtype_apply_of_not_mem ((Equiv.permCongrMul kg) h) hx']
-    simp only [apply_inv_self]
+  · suffices hx' : x ∉ g • s by
+      rw [ofSubtype_apply_of_not_mem h hx]
+      rw [ofSubtype_apply_of_not_mem ((Equiv.permCongrMul kg) h) hx']
+      simp only [apply_inv_self]
     rw [← Finset.inv_smul_mem_iff]
     exact hx
 set_option linter.uppercaseLean3 false in
@@ -185,7 +184,7 @@ def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
   T := fun s ↦ IwasawaT (s.val)
   is_comm := fun s ↦ by
     apply MonoidHom.range_isCommutative
-    rw [← Equiv.Perm.isCommutative_iff]
+    rw [Equiv.Perm.isCommutative_iff]
     apply le_of_eq
     simp only [Finset.mem_coe, Fintype.card_coe]
     exact s.prop
@@ -197,7 +196,7 @@ def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
     intro g hg
     simp only [Set.mem_setOf_eq] at hg
     obtain ⟨a, b, hab, rfl⟩ := hg
-    let s : Nat.Combination α 2 := ⟨{a, b}, Finset.card_doubleton hab⟩
+    let s : Nat.Combination α 2 := ⟨{a, b}, Finset.card_pair hab⟩
     apply Subgroup.mem_iSup_of_mem s
     unfold IwasawaT
     unfold Iwt
@@ -211,18 +210,11 @@ def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
 set_option linter.uppercaseLean3 false in
 #align equiv.perm.Iw2 Equiv.Perm.iwasawa_two
 
-/-
-lemma finset.mem_doubleton_iff (a b x : α) : x ∈ ({a, b} : finset α) ↔ (x = a ∨ x = b) :=
-begin
-  rw [finset.mem_insert, finset.mem_singleton],
-end
- -/
 /-- If α has at least 5 elements, then
 the only nontrivial normal sugroup of (perm α) is the alternating_group. -/
 theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
     (hα : 5 ≤ Fintype.card α) {N : Subgroup (Equiv.Perm α)} (hnN : N.Normal) (ntN : Nontrivial N) :
-    alternatingGroup α ≤ N :=
-  by
+    alternatingGroup α ≤ N := by
   rw [← alternatingGroup.commutator_group_eq hα]
   refine' commutator_le_iwasawa _ iwasawa_two hnN _
   · -- quasipreprimitive action
@@ -242,8 +234,8 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
         apply le_trans (by norm_num) hα)
     (by exact hg_ne)
   apply hs
-  suffices : s ∈ fixedPoints N (Nat.Combination α 2)
-  · rw [mem_fixedPoints] at this
+  suffices s ∈ fixedPoints N (Nat.Combination α 2) by
+    rw [mem_fixedPoints] at this
     exact this ⟨g, hgN⟩
   rw [h, Set.top_eq_univ]
   apply Set.mem_univ

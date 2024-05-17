@@ -196,8 +196,8 @@ theorem IsPreprimitive.mk_mem [htGX : IsPretransitive G X] (a : X)
 /-- If the action is not trivial, then the trivial blocks condition implies preprimitivity
 (pretransitivity is automatic) (based condition) -/
 theorem IsPreprimitive.mk_mem' (a : X) (ha : a ∉ fixedPoints G X)
-    (H : ∀ (B : Set X) (_ : a ∈ B) (_ : IsBlock G B), IsTrivialBlock B) : IsPreprimitive G X :=
-  by
+    (H : ∀ (B : Set X) (_ : a ∈ B) (_ : IsBlock G B), IsTrivialBlock B) :
+    IsPreprimitive G X := by
   have : IsPretransitive G X := by
     apply IsPretransitive.mk_base a
     cases' H (orbit G a) (mem_orbit_self a) (IsBlock_of_orbit a) with H H
@@ -313,8 +313,8 @@ variable (G : Type _) [Group G] {X : Type _} [MulAction G X]
 
 open scoped BigOperators Pointwise
 
-instance Block.boundedOrderOfMem (a : X) : BoundedOrder { B : Set X // a ∈ B ∧ IsBlock G B }
-    where
+instance Block.boundedOrderOfMem (a : X) :
+    BoundedOrder { B : Set X // a ∈ B ∧ IsBlock G B } where
   top := ⟨⊤, by rw [Set.top_eq_univ]; apply Set.mem_univ, top_IsBlock X⟩
   le_top := by
     rintro ⟨B, ha, hB⟩
@@ -326,7 +326,8 @@ instance Block.boundedOrderOfMem (a : X) : BoundedOrder { B : Set X // a ∈ B �
     exact ha
 #align block.bounded_order_of_mem Block.boundedOrderOfMem
 
-theorem Block.boundedOrderOfMem.top_eq (a : X) : ((Block.boundedOrderOfMem G a).top : Set X) = ⊤ :=
+theorem Block.boundedOrderOfMem.top_eq (a : X) :
+    ((Block.boundedOrderOfMem G a).top : Set X) = ⊤ :=
   rfl
 #align block.bounded_order_of_mem.top_eq Block.boundedOrderOfMem.top_eq
 
@@ -336,8 +337,7 @@ theorem Block.boundedOrderOfMem.bot_eq (a : X) :
 #align block.bounded_order_of_mem.bot_eq Block.boundedOrderOfMem.bot_eq
 
 theorem Block.mem_is_nontrivial_order_of_nontrivial [Nontrivial X] (a : X) :
-    Nontrivial { B : Set X // a ∈ B ∧ IsBlock G B } :=
-  by
+    Nontrivial { B : Set X // a ∈ B ∧ IsBlock G B } := by
   rw [nontrivial_iff]
   use (Block.boundedOrderOfMem G a).bot
   use (Block.boundedOrderOfMem G a).top
@@ -353,9 +353,9 @@ theorem Block.mem_is_nontrivial_order_of_nontrivial [Nontrivial X] (a : X) :
 
 /-- A pretransitive action on a nontrivial type is preprimitive iff
 the set of blocks containing a given element is a simple order -/
-theorem isPreprimitive_iff_isSimpleOrder_blocks [htGX : IsPretransitive G X] [Nontrivial X]
-    (a : X) : IsPreprimitive G X ↔ IsSimpleOrder { B : Set X // a ∈ B ∧ IsBlock G B } :=
-  by
+theorem isPreprimitive_iff_isSimpleOrder_blocks
+    [htGX : IsPretransitive G X] [Nontrivial X] (a : X) :
+    IsPreprimitive G X ↔ IsSimpleOrder { B : Set X // a ∈ B ∧ IsBlock G B } := by
   haveI : Nontrivial { B : Set X // a ∈ B ∧ IsBlock G B } :=
     Block.mem_is_nontrivial_order_of_nontrivial G a
   constructor
@@ -685,7 +685,8 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
 theorem isPreprimitive_of_large_image
     [Fintype β] [htβ : IsPretransitive N β] {φ : M → N}
     {f : α →ₑ[φ] β} (hM : IsPreprimitive M α)
-    (hf' : Fintype.card β < 2 * Set.ncard (Set.range f)) : IsPreprimitive N β :=  by
+    (hf' : Fintype.card β < 2 * Set.ncard (Set.range f)) :
+    IsPreprimitive N β :=  by
   -- classical
   apply IsPreprimitive.mk
   intro B hB
@@ -751,8 +752,7 @@ theorem isPreprimitive_of_large_image
 
 /-- Theorem of Rudio (Wielandt, 1964, Th. 8.1) -/
 theorem Rudio (hpGX : IsPreprimitive M α) (A : Set α) (hfA : A.Finite) (hA : A.Nonempty)
-    (hA' : A ≠ ⊤) (a b : α) (h : a ≠ b) : ∃ g : M, a ∈ g • A ∧ b ∉ g • A :=
-  by
+    (hA' : A ≠ ⊤) (a b : α) (h : a ≠ b) : ∃ g : M, a ∈ g • A ∧ b ∉ g • A := by
   let B := ⋂ (g : M) (_ : a ∈ g • A), g • A
   suffices b ∉ B by
     rw [Set.mem_iInter] at this

@@ -18,6 +18,7 @@ import Jordan.Primitive
 import Jordan.MultipleTransitivity
 import Jordan.Jordan
 import Jordan.MulActionCombination
+import Jordan.StabilizerPrimitive
 
 /-# Maximal subgroups of the symmetric groups
 
@@ -197,22 +198,6 @@ theorem stabilizer_empty_eq_top (G : Type _) [Group G] (α : Type _) [MulAction 
   simp only [Set.smul_set_empty]
 #align equiv.perm.stabilizer_empty_eq_top Equiv.Perm.stabilizer_empty_eq_top
 
-theorem ofSubtype_mem_stabilizer {α : Type*} {s : Set α} (g : Perm s) :
-    ofSubtype g ∈ stabilizer (Perm α) s := by
-  apply Set.Subset.antisymm
-  · intro x
-    rw [Set.mem_smul_set]
-    rintro ⟨y, hy, rfl⟩
-    simp only [Equiv.Perm.smul_def]
-    rw [Equiv.Perm.ofSubtype_apply_of_mem g hy]
-    refine' Subtype.mem _
-  · intro x hx
-    obtain ⟨y, hy⟩ := Equiv.surjective g ⟨x, hx⟩
-    rw [Set.mem_smul_set]
-    use y
-    apply And.intro y.prop
-    simp only [hy, Equiv.Perm.smul_def, Equiv.Perm.ofSubtype_apply_coe, Subtype.coe_mk]
-
 theorem stabilizer_univ_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G α] :
     stabilizer G (_root_.Set.univ : Set α) = ⊤ := by
   rw [eq_top_iff]
@@ -296,6 +281,30 @@ theorem Subtype.image_preimage_of_val {α : Type*} {s B : Set α} (h : B ⊆ s) 
   use ⟨x, h hx⟩
   simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
 
+-- Move to Blocks.lean
+theorem _root_.MulAction.isTrivialBlock_or_2_mul_ncard_le_card  {G : Type*} [Group G] [MulAction G α] [IsPretransitive G α]
+    {B : Set α} (hB : IsBlock G B) :
+    IsTrivialBlock B ∨ (2 * Set.ncard B ≤ Nat.card α) := by
+  by_cases hBne : Set.Nonempty B
+  · obtain ⟨m, hm⟩ := ncard_of_block_divides hB hBne
+    match m with
+    | 0 =>
+      left; left
+      simp only [mul_zero, Finite.card_eq_zero_iff] at hm
+      exact Set.subsingleton_of_subsingleton
+    | 1 =>
+      left; right
+      simp only [mul_one] at hm
+      rw [Set.eq_top_iff_ncard, ← hm, Nat.card_eq_fintype_card]
+    | m + 2 =>
+      right
+      rw [hm, mul_comm, add_comm, mul_add]
+      apply Nat.le_add_right
+  · simp only [Set.not_nonempty_iff_eq_empty] at hBne
+    rw [hBne]
+    left; left
+    exact Set.subsingleton_empty
+
 theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     (hα : s.ncard < sᶜ.ncard) :
     Subgroup.IsMaximal (stabilizer (Equiv.Perm α) s) := by
@@ -313,7 +322,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
   apply jordan_swap _ g hg_swap hg
   -- First, we prove that G acts transitively
   have : IsPretransitive G α := by
-    apply Equiv.Perm.IsPretransitive.of_partition G s
+    apply IsPretransitive.of_partition G s
     · apply moves_in; exact hG
     · apply moves_in; rw [stabilizer_compl]; exact hG
     · intro h
@@ -339,26 +348,29 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
        of maximal subgroups of the symmetric group -/
   have hB_ne_sc : ∀ (B : Set α) (_ : IsBlock G B), ¬B = sᶜ := by
     intro B hB hBsc
-    obtain ⟨b, hb⟩ := h1; rw [← hBsc] at hb
-    obtain ⟨a, ha⟩ := h0
-    obtain ⟨k, hk⟩ := exists_smul_eq G b a
-    suffices B.ncard ≤ s.ncard by
-      apply Nat.lt_irrefl B.ncard
-      apply lt_of_le_of_lt this
-      rw [hBsc]
+    cases MulAction.isTrivialBlock_or_2_mul_ncard_le_card hB with
+    | inl hB_triv =>
+      cases hB_triv with
+      | inl hB_subsingleton =>
+        have : Set.ncard B ≤ 1 := by
+          rw [Set.ncard_le_one_iff_eq]
+          apply Set.Subsingleton.eq_empty_or_singleton
+          exact hB_subsingleton
+        apply not_lt.mpr this
+        rw [hBsc]
+        apply lt_of_le_of_lt _ hα
+        rw [Nat.succ_le_iff, Set.ncard_pos]
+        exact h0
+      | inr hB_top =>
+        apply Set.not_nonempty_empty
+        simp only [hBsc, Set.top_eq_univ, Set.compl_univ_iff] at hB_top
+        rw [← hB_top]
+        exact h0
+    | inr hcard =>
+      apply not_lt.mpr hcard
+      rw [← Set.ncard_add_ncard_compl B, two_mul, add_lt_add_iff_left,
+        hBsc, compl_compl]
       exact hα
-    rw [← smul_set_ncard_eq k B]
-    apply Set.ncard_le_ncard _ (Set.toFinite s)
-    change k • B ⊆ s
-    rw [← Set.disjoint_compl_right_iff_subset, ← hBsc]
-    apply or_iff_not_imp_left.mp (IsBlock.def_one.mp hB k)
-    intro h
-    apply Set.not_mem_empty a
-    rw [← Set.inter_compl_self s]
-    constructor
-    exact ha
-    rw [← hk, ← hBsc, ← h, Set.smul_mem_smul_set_iff]
-    exact hb
 
   -- Step 2 : A block contained in sᶜ is a subsingleton
   have hB_not_le_sc : ∀ (B : Set α) (_ : IsBlock G B) (_ : B ⊆ sᶜ), B.Subsingleton := by
@@ -401,11 +413,11 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     use! Equiv.Perm.ofSubtype g
     · apply le_of_lt hG
       rw [← stabilizer_compl]
-      convert ofSubtype_mem_stabilizer g
+      convert ofSubtype_mem_stabilizer _ g
     · rw [mem_stabilizer_iff]
       change Equiv.Perm.ofSubtype g • sᶜ = sᶜ
       rw [← mem_stabilizer_iff]
-      convert ofSubtype_mem_stabilizer g
+      convert ofSubtype_mem_stabilizer _ g
     · ext ⟨x, hx⟩
       change Equiv.Perm.ofSubtype g • x = _
       simp only [Equiv.Perm.smul_def]
