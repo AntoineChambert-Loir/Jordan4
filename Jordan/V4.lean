@@ -105,7 +105,7 @@ theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
       rw [this] at hlcm ; norm_num at hlcm
       rw [← hlcm]
       exact hi
-    refine' le_antisymm _ hk1
+    refine le_antisymm ?_ hk1
     · -- k ≤ 2
       rw [← Nat.pow_le_pow_iff_right (Nat.le_refl 2)]
       norm_num; rw [← hα4, ← hlcm]
@@ -194,7 +194,7 @@ theorem A4_card_two_sylow_eq_one (hα4 : Fintype.card α = 4) :
 theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characteristic := by
   obtain ⟨S : Sylow 2 (alternatingGroup α)⟩ := Sylow.nonempty (G := alternatingGroup α)
   rw [V4_is_unique_sylow α hα4 S]
-  refine' Sylow.characteristic_of_normal S _
+  refine Sylow.characteristic_of_normal S ?_
   rw [← Subgroup.normalizer_eq_top]
   rw [← Subgroup.index_eq_one]
   rw [← card_sylow_eq_index_normalizer]
@@ -251,7 +251,7 @@ theorem V4_is_of_exponent_two (hα4 : Fintype.card α = 4) :
 
 theorem V4_isCommutative (hα4 : Fintype.card α = 4) :
     (V4 α).IsCommutative := by
-  refine' { is_comm := isCommutative_of_exponent_two (V4_is_of_exponent_two α hα4) }
+  refine { is_comm := isCommutative_of_exponent_two (V4_is_of_exponent_two α hα4) }
 
 theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G] (H : Subgroup G)
     [nH : H.Normal] : Std.Commutative (α := G ⧸ H) (· * ·) ↔ commutator G ≤ H := by
@@ -273,8 +273,8 @@ theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G]
     rw [QuotientGroup.eq_one_iff]
     apply h
     apply Subgroup.commutator_mem_commutator
-    refine' Subgroup.mem_top g1
-    refine' Subgroup.mem_top g2
+    refine Subgroup.mem_top g1
+    refine Subgroup.mem_top g2
 
 theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
     Subgroup.center (alternatingGroup α) = ⊥ := by
@@ -289,13 +289,13 @@ theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
   have : ({a, b} : Finset α)ᶜ.Nonempty :=
     by
     rw [← Finset.card_compl_lt_iff_nonempty, compl_compl, Finset.card_pair hab.symm]
-    refine' lt_of_lt_of_le (by norm_num) hα4
+    refine lt_of_lt_of_le (by norm_num) hα4
   obtain ⟨c, hc⟩ := this
   simp only [Finset.compl_insert, Finset.mem_erase, Ne, Finset.mem_compl,
     Finset.mem_singleton] at hc
   have h2trans : MulAction.IsMultiplyPretransitive (alternatingGroup α) α 2 := by
-    refine' MulAction.isMultiplyPretransitive_of_higher (alternatingGroup α) α
-      (MulAction.IsMultiplyPretransitive.alternatingGroup_of_sub_two α) _ _
+    refine MulAction.isMultiplyPretransitive_of_higher (alternatingGroup α) α
+      (MulAction.IsMultiplyPretransitive.alternatingGroup_of_sub_two α) ?_ ?_
     exact Nat.le_sub_of_add_le hα4
     simp
   rw [MulAction.is_two_pretransitive_iff] at h2trans
@@ -333,7 +333,7 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
     rw [hα4]
   obtain ⟨k, hk, hk'⟩ := Or.resolve_left (Subgroup.bot_or_exists_ne_one _) comm_ne_bot
   suffices hk22 : (k : Equiv.Perm α).cycleType = {2, 2} by
-    refine' le_antisymm _ comm_le
+    refine le_antisymm ?_ comm_le
     intro g hg
     rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hg
     cases' hg with hg hg
@@ -348,7 +348,7 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
       suffices (⊤ : Subgroup (alternatingGroup α)) =
         Subgroup.map fc.toMonoidHom (⊤ : Subgroup (alternatingGroup α)) by
         rw [this, ← Subgroup.map_commutator]
-        refine' Subgroup.mem_map_of_mem _ hk
+        refine Subgroup.mem_map_of_mem _ hk
       apply symm
       rw [← MonoidHom.range_eq_map]
       rw [MonoidHom.range_top_iff_surjective]

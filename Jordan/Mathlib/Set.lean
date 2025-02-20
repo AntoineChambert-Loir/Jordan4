@@ -163,7 +163,7 @@ theorem smul_compl_set (a : α) (s : Set β) : a • sᶜ = (a • s)ᶜ :=
 theorem smul_set_iInter (a : α) (s : ι → Set β) : (a • ⋂ i, s i) = ⋂ i, a • s i :=
   by
   obtain _ | _ := isEmpty_or_nonempty ι
-  · refine' Eq.trans _ (Set.iInter_of_empty _).symm
+  · refine Eq.trans ?_ (Set.iInter_of_empty _).symm
     rw [Set.iInter_of_empty]
     exact Set.smul_set_univ
   · exact (MulAction.injective _).image_iInter_eq _

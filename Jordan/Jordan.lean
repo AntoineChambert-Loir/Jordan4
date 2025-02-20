@@ -194,7 +194,7 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
     exact le_of_lt hsn'
   have : Nontrivial α := by
     rw [← PartENat.one_lt_card_iff_nontrivial]
-    refine' lt_trans _ hsn'
+    refine lt_trans ?_ hsn'
     rw [← Nat.cast_two, ← Nat.cast_one, PartENat.coe_lt_coe]
     norm_num
   have hGa : (stabilizer G a).IsMaximal :=  by
@@ -402,7 +402,7 @@ theorem is_two_pretransitive_weak_jordan [DecidableEq α]
           (by intro h; apply this; rw [h]; trivial)
     suffices ∃ m : ℕ, m < n ∧ t.ncard = Nat.succ m by
       obtain ⟨m, hmn, htm⟩ := this
-      refine' hrec m hmn hG htm (by
+      refine hrec m hmn hG htm (by
         apply lt_trans _ hsn'
         rw [add_lt_add_iff_left, Nat.succ_lt_succ_iff]
         exact hmn) ht_trans
@@ -664,7 +664,7 @@ theorem isMultiplyPreprimitive_jordan
         change (fun x => g • x) '' {a} = {b}
         rw [Set.image_singleton, hg]
       rw [htb]
-      refine' isPreprimitive_of_surjective_map
+      refine isPreprimitive_of_surjective_map
         (SubMulAction.conjMap_ofFixingSubgroup_bijective G hst).surjective hGs
 
   -- Induction step
@@ -690,7 +690,7 @@ theorem isMultiplyPreprimitive_jordan
     rw [stabilizer.isMultiplyPreprimitive G α _ hG.toIsPretransitive]
     suffices n + 2 = 1 + Nat.succ n by
       rw [this]
-      refine' hrec ht_prim _ _ hGs'
+      refine hrec ht_prim ?_ ?_ hGs'
       · -- t.card = Nat.succ n
         rw [← Set.ncard_image_of_injective t Subtype.val_injective]
         apply Nat.add_right_cancel
@@ -751,9 +751,8 @@ theorem eq_s2_of_nontrivial (hα : Fintype.card α ≤ 2) (hG : Nontrivial G) :
     apply Fintype.card_subtype_le
   · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     rw [Fintype.card_equiv (Equiv.cast rfl)]
-    refine' le_trans _ _
-    exact (2 : ℕ).factorial
-    exact Nat.factorial_le hα
+    trans (2 : ℕ).factorial
+    · exact Nat.factorial_le hα
     rw [Nat.factorial_two]
     rw [← Fintype.one_lt_card_iff_nontrivial] at hG
     exact hG
@@ -838,7 +837,7 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     apply le_antisymm (Fintype.card_subtype_le _)
     rw [Fintype.card_equiv (Equiv.cast rfl)]
-    refine' le_trans (Nat.factorial_le hα3) _
+    refine le_trans (Nat.factorial_le hα3) ?_
     rw [Nat.factorial_two]
     have : Nonempty G := One.instNonempty
     apply Nat.le_of_dvd Fintype.card_pos
@@ -857,7 +856,7 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
     rw [hn, add_comm 1]
     simp only [ge_iff_le, Nat.succ_sub_succ_eq_sub, nonpos_iff_eq_zero, add_eq_zero, and_false, tsub_zero]
   rw [hn']
-  refine' isMultiplyPreprimitive_jordan hG hsc _ _
+  refine isMultiplyPreprimitive_jordan hG hsc ?_ ?_
   · rw [← hn']
     apply Nat.sub_lt _ (by norm_num)
     apply lt_of_lt_of_le (by norm_num) hα3
@@ -903,8 +902,7 @@ theorem jordan_three_cycle [DecidableEq α]
   have hn' : Fintype.card α - 2 = 1 + n.succ :=  by
     simp [hn, add_comm 1]
   rw [hn']
-  refine' isMultiplyPreprimitive_jordan hG _ _ _
-  exact (g.supportᶜ : Set α)
+  refine isMultiplyPreprimitive_jordan (s := (g.supportᶜ : Set α)) hG ?_ ?_ ?_
   · apply Nat.add_left_cancel
     rw [Set.ncard_add_ncard_compl, Set.ncard_coe_Finset,
       Equiv.Perm.IsThreeCycle.card_support h3g,

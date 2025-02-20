@@ -58,7 +58,7 @@ theorem mulAut_smul_subgroupOf_eq {G : Type _} [Group G] {N H : Subgroup G}
 def Subgroup.mulEquivOfMulEquiv {G G' : Type _} [Group G] [Group G'] (f : G ≃* G') {H : Subgroup G}
     {H' : Subgroup G'} (h : ∀ g : G, g ∈ H ↔ f g ∈ H') : H ≃* H' :=
   by
-  refine' MonoidHom.toMulEquiv _ _ _ _
+  refine MonoidHom.toMulEquiv ?_ ?_ ?_ ?_
   · apply MonoidHom.codRestrict (MonoidHom.restrict f.toMonoidHom H) H'
     rintro ⟨g, hg⟩
     simp only [MonoidHom.restrict_apply, Subgroup.coe_mk, MulEquiv.coe_toMonoidHom]
@@ -174,7 +174,7 @@ theorem IwConj'_sign {s t : Finset α} {g : Equiv.Perm α}
     (htgs : t = g • s) (k : Equiv.Perm s) :
     sign ((IwConj' htgs) k) = sign k := by
   dsimp only [IwConj', Equiv.permCongr, Equiv.equivCongr]
-  refine' Equiv.Perm.sign_symm_trans_trans k _
+  refine Equiv.Perm.sign_symm_trans_trans k _
 
 theorem Iw_conj_symm'_sign {s t : Finset α} {g : Equiv.Perm α}
     (htgs : t = g • s) (k : Equiv.Perm t) :
@@ -185,7 +185,7 @@ theorem Iw_conj_symm'_sign {s t : Finset α} {g : Equiv.Perm α}
 theorem IwConj_sign (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm s) :
     Equiv.Perm.sign ((IwConj s g) k) = Equiv.Perm.sign k := by
   dsimp only [IwConj, Equiv.permCongr, Equiv.equivCongr]
-  refine' Equiv.Perm.sign_symm_trans_trans k _
+  refine Equiv.Perm.sign_symm_trans_trans k _
 
 theorem IwConj_symm_sign (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm (g • s : Finset α)) :
     Equiv.Perm.sign ((IwConj s g).symm k) = Equiv.Perm.sign k := by
@@ -389,7 +389,7 @@ theorem Iw_is_generator_alt :
     rw [iSup_le_iff]
     rintro ⟨s, hs⟩
     dsimp only [Subgroup.subgroupOf]
-    refine' Subgroup.comap_mono _
+    refine Subgroup.comap_mono ?_
     intro g
     rintro ⟨k, hk, rfl⟩
     simp only [SetLike.mem_coe] at hk
@@ -477,7 +477,7 @@ theorem Iw4T'_is_conj (g : alternatingGroup α) (s : Finset α) :
     rw [Subgroup.map_top_of_surjective]; exact MulEquiv.surjective _
   simp only [htop, Subgroup.map_map, Subgroup.map_commutator]
   suffices this : _ by
-    refine' congr_arg₂ _ this this
+    refine congr_arg₂ _ this this
   · apply congr_arg₂ _ _ rfl
     ext ⟨k, hk⟩ x
     dsimp only [IwConj', AlternatingGroup.ofSubtype, Subgroup.equivMk]
@@ -582,7 +582,7 @@ theorem swap_mul_swap_mem (hα : 5 ≤ Fintype.card α) {g k : Equiv.Perm α} (h
       obtain ⟨a, hag, hak⟩ := h22
       rw [isSwap_eq' hg hag]; rw [isSwap_eq' hk hak]
       by_cases h1 : k a = g a
-      · rw [h1]; rw [Equiv.swap_mul_self]; refine' Subgroup.one_mem _
+      · rw [h1]; rw [Equiv.swap_mul_self]; refine Subgroup.one_mem _
       · suffices ∃ b c : α, b ∉ ({a, g a, k a} : Finset α) ∧ c ∉ ({a, g a, k a} : Finset α) ∧ b ≠ c by
           obtain ⟨b, c, hb, hc, hbc⟩ := this
           simp only [Finset.mem_insert, Finset.mem_singleton] at hb hc
@@ -590,7 +590,7 @@ theorem swap_mul_swap_mem (hα : 5 ≤ Fintype.card α) {g k : Equiv.Perm α} (h
           rw [← one_mul (swap a (k a))]
           rw [← Equiv.swap_mul_self b c]
           nth_rw 1 [mul_assoc]; rw [← mul_assoc]
-          refine' Subgroup.mul_mem _ _ _
+          refine Subgroup.mul_mem _ ?_ ?_
           · rw [Equiv.Perm.mem_support] at hag
             apply hdis _ _
             rw [disjoint_iff_disjoint_support, Equiv.Perm.support_swap _, Equiv.Perm.support_swap _]
@@ -652,7 +652,7 @@ theorem closure_perm22_eq_top (hα : 5 ≤ Fintype.card α) :
   · intro l _ hn
     simp only [Nat.zero_eq, MulZeroClass.mul_zero, List.length_eq_zero] at hn
     rw [hn, List.prod_nil]
-    refine' one_mem _
+    refine one_mem _
   · intro l hl hn
     suffices 2 * n.succ = (2 * n).succ.succ by
       rw [this] at hn
@@ -661,12 +661,12 @@ theorem closure_perm22_eq_top (hα : 5 ≤ Fintype.card α) :
       obtain ⟨b, l2, rfl⟩ := l1.exists_of_length_succ hn
       simp only [List.length, Nat.succ_inj'] at hn
       simp only [List.prod_cons, ← mul_assoc]
-      refine' Subgroup.mul_mem _ _ _
+      refine Subgroup.mul_mem _ ?_ ?_
       · simp only [List.mem_cons, forall_eq_or_imp] at hl
         /- obtain ⟨a1, a2, ha, rfl⟩ := hl.1,
               obtain ⟨b1, b2, hb, rfl⟩ := hl.2.1, -/
         exact swap_mul_swap_mem hα hl.1 hl.2.1
-      refine' hrec l2 _ hn
+      refine hrec l2 ?_ hn
       · intro g hg; apply hl g; apply List.mem_cons_of_mem
         apply List.mem_cons_of_mem; exact hg
     rw [Nat.mul_succ]
@@ -756,7 +756,7 @@ theorem Iw4_is_generator_alt (hα : 5 ≤ Fintype.card α) :
     rw [iSup_le_iff]
     rintro ⟨s, hs⟩
     dsimp only [Subgroup.subgroupOf]
-    refine' Subgroup.comap_mono _
+    refine Subgroup.comap_mono ?_
     intro g
     rintro ⟨k, hk, rfl⟩
     simp only [SetLike.mem_coe] at hk
@@ -796,7 +796,7 @@ theorem normal_subgroups_6
     N = ⊤ := by
   rw [eq_top_iff]
   rw [← alternatingGroup_is_perfect hα]
-  refine' commutator_le_iwasawa _ Iw3 hnN ?_
+  refine commutator_le_iwasawa ?_ Iw3 hnN ?_
   · -- quasipreprimitive action
     apply IsPreprimitive.isQuasipreprimitive
     apply Nat.Combination.isPreprimitive_of_alt
@@ -829,7 +829,7 @@ theorem normal_subgroups_8 {α : Type _} [DecidableEq α] [Fintype α]
   by
   rw [eq_top_iff]
   rw [← alternatingGroup_is_perfect hα]
-  refine' commutator_le_iwasawa _ (Iw4 hα) hnN _
+  refine commutator_le_iwasawa ?_ (Iw4 hα) hnN ?_
   · -- quasipreprimitive action
     apply IsPreprimitive.isQuasipreprimitive
     apply Nat.Combination.isPreprimitive_of_alt

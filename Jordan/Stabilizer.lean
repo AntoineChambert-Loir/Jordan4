@@ -56,7 +56,7 @@ example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α
   · change k • B = B at hB_eq
     apply Or.intro_left; rw [hB_eq]
   · apply Or.intro_right
-    refine' Disjoint.preimage coe hB_dis
+    refine Disjoint.preimage coe hB_dis
   -- g • (coe ⁻¹' B) = coe ⁻¹' (k • B),
   · ext
     simp only [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem]
@@ -258,7 +258,7 @@ theorem isBlock_of_top (H : Subgroup G) {B : Set α} (hB : IsBlock H B) (hH : H 
   by
   rw [is_block.def_one] at hB ⊢
   intro g
-  refine' hB ⟨g, _⟩
+  refine hB ⟨g, _⟩
   rw [hH]; apply Subgroup.mem_top
 
 theorem isBlock_preimage_coe (s : Set α) [DecidablePred s] (H : Subgroup (Equiv.Perm s))
@@ -291,7 +291,7 @@ example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α
     IsBlock (Equiv.Perm s) (coe ⁻¹' B : Set s) :=
   by
   apply isBlock_of_top
-  refine' isBlock_preimage_coe (Equiv.Perm α) s ⊤ _ B hB
+  refine isBlock_preimage_coe (Equiv.Perm α) s ⊤ _ B hB
   · intro g _
     obtain ⟨k, hk⟩ := surjective_of_stabilizer_smul s g
     use k
@@ -311,7 +311,7 @@ theorem surjective_of_stabilizer_smul' [DecidableEq α] [Fintype α] (s : Set α
   have hk_sign : k.sign = -1; simp only [Equiv.Perm.sign_swap', hab, if_false]
   have hk_apply : ∀ x ∈ s, k x = x := by
     intro x hx
-    refine' Equiv.swap_apply_of_ne_of_ne _ _
+    refine Equiv.swap_apply_of_ne_of_ne _ _
     intro hxa; rw [Set.mem_compl_iff] at ha ; apply ha; rw [← hxa]; exact hx
     intro hxb; rw [Set.mem_compl_iff] at hb ; apply hb; rw [← hxb]; exact hx
   have hk_mem : k ∈ stabilizer (Equiv.Perm α) s :=
@@ -384,7 +384,7 @@ example [DecidableEq α] [Fintype α] (s : Set α) [DecidablePred s]
     IsBlock (Equiv.Perm s) (coe ⁻¹' B : Set s) :=
   by
   apply isBlock_of_top
-  refine' isBlock_preimage_coe (alternatingGroup α) s ⊤ _ B hB
+  refine isBlock_preimage_coe (alternatingGroup α) s ⊤ _ B hB
   · intro g _
     obtain ⟨k, hk⟩ := surjective_of_stabilizer_smul' s hsc g
     use k

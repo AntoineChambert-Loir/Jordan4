@@ -47,7 +47,7 @@ theorem stabilizer_compl {s : Set α} : stabilizer G (sᶜ) = stabilizer G s :=
     by
     intro s g h
     rw [mem_stabilizer_iff, smul_compl_set, mem_stabilizer_iff.1 h]
-  refine' le_antisymm _ (this _)
+  refine le_antisymm ?_ (this _)
   convert this _
   exact (compl_compl _).symm
 

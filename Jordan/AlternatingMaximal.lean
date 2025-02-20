@@ -473,7 +473,7 @@ end
       apply Set.Subset.antisymm hBsc hB'
     -- is_trivial_block (coe ⁻¹' B : set (sᶜ : set α)),
     suffices IsPreprimitive (stabilizer G (sᶜ : Set α)) (sᶜ : Set α) by
-      refine' IsPreprimitive.has_trivial_blocks this _
+      refine IsPreprimitive.has_trivial_blocks this ?_
       -- is_block (coe ⁻¹' B : set (sᶜ : set α))
       let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α := {
@@ -524,7 +524,7 @@ end
           exact Disjoint.subset_compl_right h
     -- is_trivial_block (coe ⁻¹' B : set s),
     suffices IsPreprimitive (stabilizer G s) (s : Set α) by
-      refine' IsPreprimitive.has_trivial_blocks this _
+      refine IsPreprimitive.has_trivial_blocks this ?_
       -- is_block (coe ⁻¹' B : set s)
       let φ' : stabilizer G s → G := Subtype.val
       let f' : s →ₑ[φ'] α := {
@@ -640,7 +640,7 @@ theorem isMaximalStab'
         · intro g
           simp only [Subgroup.mem_inf]
           rintro ⟨hg, hg'⟩
-          refine' And.intro _ hg'
+          refine And.intro ?_ hg'
           simp only [Subgroup.mem_map, Subgroup.coeSubtype, exists_prop]
           use ⟨g, hg'⟩
           constructor
@@ -685,7 +685,7 @@ theorem Stabilizer.isMaximal (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     Subgroup.IsMaximal (stabilizer (alternatingGroup α) s) := by
   have hα : 3 ≤ Fintype.card α := by
     rw [← Set.ncard_pos, ← Nat.succ_le_iff] at h0 h1
-    refine' three_le h0 _ hs
+    refine three_le h0 ?_ hs
     rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
     exact Nat.lt_add_of_pos_right h1
   have : Nontrivial α := by

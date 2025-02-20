@@ -64,9 +64,9 @@ theorem subgroup_of_group_of_order_two
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     apply le_antisymm
     · apply Nat.le_of_dvd
-      refine' Fintype.card_pos
+      refine Fintype.card_pos
       rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]
-      refine' Subgroup.card_subgroup_dvd_card H
+      refine Subgroup.card_subgroup_dvd_card H
     · rw [hG]; exact h
 
 namespace Equiv.Perm
@@ -379,7 +379,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       exact hx
     -- IsTrivialBlock (Subtype.val ⁻¹' B : Set (sᶜ : Set α)),
     suffices IsPreprimitive (stabilizer G (sᶜ : Set α)) (sᶜ : Set α) by
-      refine' IsPreprimitive.has_trivial_blocks this _
+      refine IsPreprimitive.has_trivial_blocks this ?_
       -- is_block (coe ⁻¹' B : set (sᶜ : set α))
       let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α := {

@@ -142,7 +142,7 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
   use {
     toFun := fun i => if hi : p i then f ⟨i, hi⟩ else g ⟨i, hi⟩
     inj' := by
-      refine' Function.Injective.dite p _ _ _
+      refine Function.Injective.dite p ?_ ?_ ?_
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
         simpa only [Subtype.mk_eq_mk, Fin.ext_iff] using x.inj' (Subtype.coe_injective hij)
       · rintro ⟨i, hi⟩ ⟨j, hj⟩ hij
