@@ -5,6 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module multiple_transitivity
 -/
+
 import Jordan.Primitive
 import Jordan.IndexNormal
 import Jordan.SubMulActions
@@ -307,7 +308,7 @@ begin
     (by simp only [monoid_hom.mem_range, to_perm_hom_apply, exists_apply_eq_apply])⟩,
     map_one' := begin
       ext, simp only [subgroup.coe_mk, to_perm_apply,
-        one_smul, subgroup.coe_one, equiv.perm.coe_one, id.def],
+        one_smul, subgroup.coe_one, equiv.perm.coe_one, id],
     end,
     map_mul' := λ m n, begin
       ext, simp, rw mul_smul, end },
@@ -394,8 +395,8 @@ theorem is_two_pretransitive_iff :
     intro u v
     specialize h (u 0) (u 1) (v 0) (v 1)
     obtain ⟨m, hm⟩ := h
-      (by rw [Ne.def, Function.Embedding.apply_eq_iff_eq]; exact zero_ne_one)
-      (by rw [Ne.def, Function.Embedding.apply_eq_iff_eq]; exact zero_ne_one)
+      (by rw [Ne, Function.Embedding.apply_eq_iff_eq]; exact zero_ne_one)
+      (by rw [Ne, Function.Embedding.apply_eq_iff_eq]; exact zero_ne_one)
     use m
     ext x
     cases' this x with hx hx
@@ -424,7 +425,7 @@ lemma exists_extends_with_last_eq (a : α) {n : ℕ} (x : Fin n ↪ SubMulAction
       { toFun := fun u => id u
         inj' := fun x y hxy => by simpa using hxy }
     ∃ x' : Fin n.succ ↪ α,
-      (Fin.castLEEmb (Nat.le_succ n)).toEmbedding.trans x' = x.trans j ∧
+      (Fin.castLEEmb (Nat.le_succ n)).trans x' = x.trans j ∧
         x' ⟨n, Nat.lt_succ_self n⟩ = a := by
   intro _
   refine' may_extend_with (x.trans (subtype _)) a _
@@ -435,7 +436,7 @@ lemma exists_extends_with_last_eq (a : α) {n : ℕ} (x : Fin n ↪ SubMulAction
 
 lemma exists_smul_of_last_eq [hα' : IsPretransitive M α] {n : ℕ} (a : α) (x : Fin n.succ ↪ α) :
     ∃ (g : M) (x1 : Fin n ↪ ↥(SubMulAction.ofStabilizer M a)),
-      (Fin.castLEEmb (Nat.le_succ n)).toEmbedding.trans (g • x) =
+      (Fin.castLEEmb (Nat.le_succ n)).trans (g • x) =
           Function.Embedding.trans x1 (subtype _) ∧ g • x (Fin.last n) = a := by
   let hα'eq := hα'.exists_smul_eq
   obtain ⟨g, hgx⟩ := hα'eq (x (Fin.last n)) a
@@ -500,7 +501,7 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
     simp only [smul_apply, SubMulAction.val_smul_of_tower]
     rw [← Function.Embedding.ext_iff] at hx' hy'
     specialize hx' ⟨i, hi⟩; specialize hy' ⟨i, hi⟩
-    simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id.def, coeFn_mk]
+    simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id, coeFn_mk]
       at hx' hy'
     rw [← hx', ← hy', ← hg']; rfl
   · -- if the action of sub_mul_action.of_stabilizer is n-multiply transitive,
@@ -549,8 +550,8 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
     cases' lt_or_eq_of_le (le_of_lt_succ hi) with hi' hi'
     · rw [← Function.Embedding.ext_iff] at hgx hgy hg
       specialize hgx ⟨i, hi'⟩; specialize hgy ⟨i, hi'⟩; specialize hg ⟨i, hi'⟩
-      simp only [Fin.castLEEmb_toEmbedding, trans_apply, coeFn_mk, Fin.castLE_mk,
-        smul_apply, zero_eq, coe_subtype] at hgx hgy hg
+      simp only [succ_eq_add_one, trans_apply, Fin.castLEEmb_apply, Fin.castLE_mk, smul_apply,
+        coe_subtype] at hgx hgy hg
       rw [hgx, mul_smul, inv_smul_eq_iff, hgy, ← hg]; rfl
     · simp only [hi']
       dsimp [Fin.last] at  hga hgb
@@ -600,7 +601,7 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
     simp only [smul_apply, SubMulAction.val_smul_of_tower]
     rw [← Function.Embedding.ext_iff] at hx' hy'
     specialize hx' ⟨i, hi⟩; specialize hy' ⟨i, hi⟩
-    simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id.def, coeFn_mk] at hx' hy'
+    simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id, coeFn_mk] at hx' hy'
     rw [← hx', ← hy', ← hg']; rfl
   · -- if the action of sub_mul_action.of_stabilizer is n-multiply transitive,
     -- then the action is n.succ-multiply transitive.
@@ -640,7 +641,7 @@ theorem remaining_transitivity
     IsMultiplyPretransitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) m := by
 
   have hs : PartENat.card s = s.ncard := by
-    rw [s.ncard_eq_toFinset_card, PartENat.card_eq_coe_nat_card, Set.Nat.card_coe_set_eq, PartENat.natCast_inj, s.ncard_eq_toFinset_card]
+    rw [s.ncard_eq_toFinset_card, PartENat.card_eq_coe_natCard, Set.Nat.card_coe_set_eq, PartENat.natCast_inj, s.ncard_eq_toFinset_card]
 
   -- have hdn : s.ncard ≤ n := by
   --   rw [hmn]
@@ -864,7 +865,7 @@ private theorem IsMultiplyPretransitive.index_of_fixing_subgroup_aux
     simp only [Set.mem_singleton_iff]
     rw [← hb']
   have htcard : t.ncard = k := by
-    rw [← Nat.succ_inj', ← hs, hscard, add_comm]
+    rw [← Nat.succ_inj', Nat.succ_eq_add_one, Nat.succ_eq_add_one, ← hs, hscard, add_comm]
 
   suffices (fixingSubgroup (stabilizer M a) t).index *
     (Fintype.card α - 1 - t.ncard).factorial =
@@ -1027,7 +1028,7 @@ theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
     (hmt : IsMultiplyPretransitive G α (Fintype.card α - 1)) :
     G = ⊤ := by
   let j : Fin (Fintype.card α - 1) ↪ Fin (Fintype.card α) :=
-    (Fin.castLEEmb ((Fintype.card α).sub_le 1)).toEmbedding
+    (Fin.castLEEmb ((Fintype.card α).sub_le 1))
   rw [eq_top_iff]; intro k _
   let x : Fin (Fintype.card α) ↪ α := (Fintype.equivFinOfCardEq rfl).symm.toEmbedding
   let hmt_eq := hmt.exists_smul_eq
@@ -1114,7 +1115,7 @@ theorem IsMultiplyPretransitive.alternatingGroup_of_sub_two [DecidableEq α] :
     suffices (g' * g) • x i = y i by exact this
     simp only [toFun_eq_coe, Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
     rw [← hx', ← hy', ← hg]
-    simp only [smul_apply, Equiv.Perm.smul_def, Fin.castLEEmb_toEmbedding, trans_apply, coeFn_mk]
+    simp only [trans_apply, smul_apply, Equiv.Perm.smul_def]
     have : ∀ i, g (x' i) = y' i := fun i ↦ by
       rw [← hg, smul_apply, Equiv.Perm.smul_def]
     simp only [← Equiv.Perm.smul_def, ← smul_apply, hg]
@@ -1163,6 +1164,7 @@ theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
   rw [← hmt.index_of_fixingSubgroup G α s, hs, Nat.sub_sub_self hα,
     Nat.factorial_two, mul_comm]
   apply Nat.mul_le_mul_left
+  have : Nonempty G := One.instNonempty
   apply Nat.le_of_dvd (Fintype.card_pos)
   apply Subgroup.index_dvd_card
 #align mul_action.alternating_group_le_of_full_minus_two_pretransitive MulAction.IsMultiplyPretransitive.alternatingGroup_le_of_sub_two
@@ -1199,7 +1201,7 @@ theorem alternatingGroup.has_trivial_blocks [DecidableEq α]
       rw [Fintype.one_lt_card_iff] at h2
       -- using h2, get a ≠ b in B
       obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, hab⟩ := h2
-      simp only [Ne.def, Subtype.mk_eq_mk] at hab
+      simp only [Ne, Subtype.mk_eq_mk] at hab
       -- using h3', get c ≠ a, b
       have : ∃ c : α, c ∉ ({a, b}  : Finset α) := by
         by_contra h

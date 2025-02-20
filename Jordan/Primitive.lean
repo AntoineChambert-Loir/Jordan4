@@ -20,7 +20,6 @@ import Jordan.Blocks
 import Mathlib.Data.Setoid.Partition
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.SubMulAction
-import Mathlib.GroupTheory.Subgroup.Pointwise
 import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.Commutator
@@ -30,7 +29,6 @@ import Mathlib.Data.Nat.Prime
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Card
-import Mathlib.Algebra.BigOperators.Order
 import Mathlib.Data.Set.Card
 
 /-!

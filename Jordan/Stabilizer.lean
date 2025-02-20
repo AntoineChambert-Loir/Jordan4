@@ -5,8 +5,8 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module stabilizer
 -/
-import Oneshot.SubMulActions
-import Oneshot.MultipleTransitivity
+import Jordan.SubMulActions
+import Jordan.MultipleTransitivity
 import Mathbin.GroupTheory.GroupAction.Defs
 
 -- import group_theory.group_action.fixing_subgroup
@@ -38,7 +38,7 @@ example (s : Set α) (B : Set α) (hB : IsBlock G B) : IsBlock (stabilizer G s) 
 -- In a first try, I had used this lemma which seems to be useful.
 theorem stabilizer_smul_mem_iff (s : Set α) (g : G) (hg : g ∈ stabilizer G s) (x : α) :
     g • x ∈ s ↔ x ∈ s := by
-  rw [mem_stabilizer_iff] at hg 
+  rw [mem_stabilizer_iff] at hg
   rw [← hg, Set.smul_mem_smul_set_iff, hg]
 #align stabilizer_smul_mem_iff stabilizer_smul_mem_iff
 
@@ -54,7 +54,7 @@ example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α
   obtain ⟨k, hk⟩ := this
   suffices : g • coe ⁻¹' B = coe ⁻¹' (k • B); rw [this]
   cases' hB k with hB_eq hB_dis
-  · change k • B = B at hB_eq 
+  · change k • B = B at hB_eq
     apply Or.intro_left; rw [hB_eq]
   · apply Or.intro_right
     refine' Disjoint.preimage coe hB_dis
@@ -320,7 +320,7 @@ theorem surjective_of_stabilizer_smul' [DecidableEq α] [Fintype α] (s : Set α
   by
   skip
   have : ∃ a b : (sᶜ : Set α), a ≠ b := by rw [← Fintype.one_lt_card_iff]; exact hsc
-  obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, hab⟩ := this; simp at hab 
+  obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, hab⟩ := this; simp at hab
   let k := Equiv.swap a b
   have hk_sign : k.sign = -1; simp only [Equiv.Perm.sign_swap', hab, if_false]
   have hk_apply : ∀ x ∈ s, k x = x := by
@@ -433,4 +433,3 @@ example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α
   apply Function.Bijective.injective
   apply Function.bijective_id
   apply is_block_preimage (equivariantMapOfStabilizerCoe (Equiv.Perm α) s) hB
-

@@ -5,7 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module maximal_subgroups
 -/
-import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.Algebra.Group.Subgroup.Basic
 
 /-! # Maximal subgroups
 
@@ -57,7 +57,7 @@ theorem isMaximal_iff {K : Subgroup G} :
       apply (isMaximal_def.1 hK).2
       rw [← Ne.le_iff_lt]
       exact hKH
-      · rw [Ne.def]
+      · rw [Ne]
         intro z
         rw [z] at hgK
         exact hgK hgH

@@ -157,7 +157,7 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
   · -- a = b, on prend g = 1,
     use 1
     simp only [hab, Subgroup.one_mem, one_smul, eq_self_iff_true, and_self_iff]
-  · rw [← Ne.def] at hab
+  · rw [← Ne] at hab
     cases' le_or_gt (Set.ncard t) 2 with ht ht'
     · -- fintype.card t ≤ 2, alors on prend le produit d'un swap (a b) avec un swap dans tᶜ
       have h : 1 < Set.ncard (tᶜ : Set α) := by
@@ -170,12 +170,12 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         apply add_le_add ht h
       rw [Set.one_lt_ncard_iff] at h
       obtain ⟨c, d, hc, hd, hcd⟩ := h
-      simp only [Ne.def] at hcd
+      simp only [Ne] at hcd
       use Equiv.swap a b * Equiv.swap c d
       constructor
       · simp only [Subgroup.mem_inf]
         constructor
-        · rw [mem_stabilizer_of_finite_iff_smul_le _ _ t.toFinite]
+        · rw [mem_stabilizer_of_finite_iff_smul_le _ t.toFinite]
           rintro _ ⟨x, hx, rfl⟩
           simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
           have hx_ne : ∀ u ∈ tᶜ, x ≠ u := fun u hu h => Set.mem_compl hu (by rw [← h]; exact hx)
@@ -201,21 +201,21 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         constructor
         · simp only [Subgroup.mem_inf]
           constructor
-          · rw [mem_stabilizer_of_finite_iff_smul_le _ _ t.toFinite]
+          · rw [mem_stabilizer_of_finite_iff_smul_le _ t.toFinite]
             rintro _ ⟨x, hx, rfl⟩
             · simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
               by_cases hxa : x = a
               · rw [hxa, Equiv.swap_apply_left]
                 rw [Equiv.swap_apply_of_ne_of_ne hab.symm hcb.symm]
                 exact hb
-              · rw [← Ne.def] at hxa
+              · rw [← Ne] at hxa
                 by_cases hxb : x = b
                 · rw [hxb, Equiv.swap_apply_right, Equiv.swap_apply_left]; exact hc
-                · rw [← Ne.def] at hxb
+                · rw [← Ne] at hxb
                   rw [Equiv.swap_apply_of_ne_of_ne hxa hxb]
                   by_cases hxc : x = c
                   · rw [hxc, Equiv.swap_apply_right]; exact ha
-                  · rw [← Ne.def] at hxc
+                  · rw [← Ne] at hxc
                     rw [Equiv.swap_apply_of_ne_of_ne hxa hxc]
                     exact hx
           · simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.sign_mul]
@@ -260,7 +260,7 @@ theorem has_three_cycle_of_stabilizer' (s : Set α) (hs : 2 < Set.ncard s) :
   constructor
   apply Equiv.Perm.isThreeCycle_swap_mul_swap_same hab hac hbc
   rw [← stabilizer_compl]
-  rw [mem_stabilizer_of_finite_iff_smul_le _ _ sᶜ.toFinite]
+  rw [mem_stabilizer_of_finite_iff_smul_le _ sᶜ.toFinite]
   rintro _ ⟨x, hx, rfl⟩
   simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
   rw [Set.mem_compl_iff] at hx
@@ -314,7 +314,7 @@ begin
   let φ : stabilizer (alternating_group α) s → equiv.perm s := mul_action.to_perm,
   let f : s →ₑ[φ] s := {
   to_fun := id,
-  map_smul' := λ ⟨g, hg⟩ ⟨x, hx⟩, by simp only [id.def, equiv.perm.smul_def, to_perm_apply], },
+  map_smul' := λ ⟨g, hg⟩ ⟨x, hx⟩, by simp only [id, equiv.perm.smul_def, to_perm_apply], },
   have hf : function.bijective f := function.bijective_id,
   rw is_preprimitive_of_bijective_map_iff _ hf,
   exact equiv.perm.is_preprimitive s,

@@ -102,7 +102,7 @@ theorem stabilizer.isPreprimitive (s : Set α) (hs : (sᶜ : Set α).Nontrivial)
     let f : s →ₑ[φ] s := {
       toFun := id
       map_smul' := fun ⟨g, hg⟩ ⟨x, hx⟩ => by
-        simp only [id.def, Equiv.Perm.smul_def]
+        simp only [id, Equiv.Perm.smul_def]
         rw [toPerm_apply] }
     have hf : Function.Bijective f := Function.bijective_id
     rw [isPreprimitive_of_bijective_map_iff hφ hf]

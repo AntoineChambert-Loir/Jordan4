@@ -8,14 +8,13 @@ Authors: Antoine Chambert-Loir
 
 import Jordan.Mathlib.Stabilizer
 import Jordan.SubMulActions
-import Jordan.EquivariantMap
 
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Algebra.BigOperators.Finprod
 import Mathlib.Data.Set.Card
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.SubMulAction
-import Mathlib.GroupTheory.Subgroup.Actions
+import Mathlib.Algebra.Group.Subgroup.Actions
 
 
 /-! # Blocks
@@ -118,7 +117,7 @@ theorem singleton_IsBlock (a : X) : IsBlock G ({a} : Set X) :=
   by
   rw [IsBlock.def]
   intro g g'
-  simp only [Set.smul_set_singleton, Set.singleton_eq_singleton_iff, Set.disjoint_singleton, Ne.def]
+  simp only [Set.smul_set_singleton, Set.singleton_eq_singleton_iff, Set.disjoint_singleton, Ne]
   apply em
 #align mul_action.singleton_is_block MulAction.singleton_IsBlock
 
@@ -450,8 +449,7 @@ theorem IsBlockSystem.of_block [hGX : MulAction.IsPretransitive G X] {B : Set X}
       use b
     use g • B
     constructor
-    · simp only [Set.mem_range, exists_apply_eq_apply, exists_unique_iff_exists, exists_true_left]
-      exact hg
+    · simp only [Set.mem_range, exists_apply_eq_apply, hg, and_self]
     · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
         forall_apply_eq_imp_iff']
       intro B' g' hg' ha
@@ -474,7 +472,7 @@ theorem IsPartition.of_orbits : Setoid.IsPartition (Set.range fun a : X => orbit
     exact Set.Nonempty.ne_empty (MulAction.orbit_nonempty a) ha
   intro a; use orbit G a
   constructor
-  · simp only [Set.mem_range_self, mem_orbit_self, exists_unique_iff_exists, exists_true_left]
+  · simp only [Set.mem_range, exists_apply_eq_apply, mem_orbit_self, and_self]
   · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
       forall_apply_eq_imp_iff']
     rintro B b ⟨rfl⟩ ha
@@ -657,22 +655,20 @@ theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid
   rw [← Fintype.card_sigma]
   refine' Fintype.card_congr (Equiv.ofBijective (fun x => x.snd : (Σ a : ↥c, a) → α) _)
   constructor
-  -- injectivity
-  rintro ⟨⟨x, hx⟩, ⟨a, ha : a ∈ x⟩⟩ ⟨⟨y, hy⟩, ⟨b, hb : b ∈ y⟩⟩ hab
-  dsimp at hab
-  rw [hab] at ha
-  rw [Sigma.subtype_ext_iff]
-  simp only [Subtype.mk_eq_mk, Subtype.coe_mk]
-  apply And.intro _ hab
-  refine' ExistsUnique.unique (hc.2 b) _ _
-  simp only [exists_unique_iff_exists, exists_prop]
-  exact ⟨hx, ha⟩
-  simp only [exists_unique_iff_exists, exists_prop]
-  exact ⟨hy, hb⟩
-  -- surjectivity
-  intro a
-  obtain ⟨x, ⟨hx, ha : a ∈ x, _⟩, _⟩ := hc.2 a
-  use ⟨⟨x, hx⟩, ⟨a, ha⟩⟩
+  · -- injectivity
+    rintro ⟨⟨x, hx⟩, ⟨a, ha : a ∈ x⟩⟩ ⟨⟨y, hy⟩, ⟨b, hb : b ∈ y⟩⟩ hab
+    dsimp at hab
+    rw [hab] at ha
+    rw [Sigma.subtype_ext_iff]
+    simp only [Subtype.mk_eq_mk, Subtype.coe_mk]
+    apply And.intro _ hab
+    refine' ExistsUnique.unique (hc.2 b) _ _
+    · exact ⟨hx, ha⟩
+    · exact ⟨hy, hb⟩
+  · -- surjectivity
+    intro a
+    obtain ⟨x, hx, ha : a ∈ x⟩ := (hc.2 a).exists
+    use ⟨⟨x, hx⟩, ⟨a, ha⟩⟩
 #align mul_action.setoid.nat_sum MulAction.Setoid.nat_sum
 
 /-- The cardinality of the ambient is the product of
@@ -692,7 +688,7 @@ theorem ncard_block_mul_ncard_orbit_eq [Finite X] [IsPretransitive G X] {B : Set
   congr
   rw [Set.ncard_eq_toFinset_card']
   -- this is painful…
-  rw [Finset.card_congr]
+  rw [Finset.card_bij]
   exact fun s hs => ⟨s, Set.mem_toFinset.mp hs⟩
   · intro s hs
     apply Finset.mem_univ
@@ -811,7 +807,7 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     apply symm
     rw [← mem_stabilizer_iff]
     rw [← Subgroup.inv_mem_iff (stabilizer G B')]
-    rw [mem_stabilizer_of_finite_iff_smul_le G B' hfB' g⁻¹]
+    rw [mem_stabilizer_of_finite_iff_smul_le B' hfB' g⁻¹]
     rw [← Set.subset_set_smul_iff]
     exact hag g hg
   rw [IsBlock.mk_notempty_one]

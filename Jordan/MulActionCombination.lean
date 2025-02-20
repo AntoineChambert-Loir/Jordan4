@@ -161,7 +161,7 @@ def EmbeddingToFinset.map : (Fin n ↪ α) →[G] n.Combination α where
   toFun := fun f : Fin n ↪ α =>
     ⟨Finset.univ.map f, by rw [Nat.Combination.mem_iff, Finset.card_map, Finset.card_fin]⟩
   map_smul' g f := by
-    simp only [id.def]
+    simp only [id]
     rw [← Subtype.coe_inj, Subtype.coe_mk]
     simp only [Nat.combination_mulAction.coe_apply']
     rw [Function.Embedding.smul_def]; rw [Finset.smul_finset_def]
@@ -208,8 +208,8 @@ theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
     let h'1 := id h1
     rw [← hs, Finset.card_pos] at h'1 ; obtain ⟨a, ha⟩ := h'1
     let h'2 := id h2
-    rw [← hs, Finset.card_lt_iff_ne_univ, Ne.def, ← Finset.coe_eq_univ, ← Ne.def,
-    Set.ne_univ_iff_exists_not_mem] at h'2
+    rw [← hs, Finset.card_lt_iff_ne_univ, Ne, ← Finset.coe_eq_univ, ← Ne,
+      Set.ne_univ_iff_exists_not_mem] at h'2
     obtain ⟨b, hb⟩ := h'2
     let t : Finset α := insert b (Finset.erase s a)
     rw [nontrivial_iff]

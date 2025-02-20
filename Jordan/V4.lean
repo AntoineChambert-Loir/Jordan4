@@ -319,7 +319,7 @@ theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
     rw [← Finset.card_compl_lt_iff_nonempty, compl_compl, Finset.card_pair hab.symm]
     refine' lt_of_lt_of_le (by norm_num) hα4
   obtain ⟨c, hc⟩ := this
-  simp only [Finset.compl_insert, Finset.mem_erase, Ne.def, Finset.mem_compl,
+  simp only [Finset.compl_insert, Finset.mem_erase, Ne, Finset.mem_compl,
     Finset.mem_singleton] at hc
   have h2trans : MulAction.IsMultiplyPretransitive (alternatingGroup α) α 2 := by
     refine' MulAction.isMultiplyPretransitive_of_higher (alternatingGroup α) α
@@ -346,14 +346,15 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
       apply mul_left_injective₀ _
       dsimp
       rw [← Subgroup.card_eq_card_quotient_mul_card_subgroup, V4_card α hα4, A4_card α hα4]
-      norm_num
+      have : Nonempty (V4 α) := by exact One.instNonempty
+      exact Fintype.card_ne_zero
   have comm_ne_bot : commutator (alternatingGroup α) ≠ ⊥ := by
     have : Nontrivial (Subgroup (alternatingGroup α)) := by
       rw [Subgroup.nontrivial_iff]
       rw [← Fintype.one_lt_card_iff_nontrivial]
       rw [A4_card α hα4]
       norm_num
-    rw [Ne.def, commutator, Subgroup.commutator_eq_bot_iff_le_centralizer,
+    rw [Ne, commutator, Subgroup.commutator_eq_bot_iff_le_centralizer,
       ← eq_top_iff, Subgroup.coe_top, Subgroup.centralizer_univ,
       alternatingGroup.center_bot _]
     exact bot_ne_top

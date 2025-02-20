@@ -39,44 +39,6 @@ section SubMulActions
 
 namespace SubMulAction
 
-section Inclusion
-
-variable {M N α : Type _} [SMul M α]
-
-/-- The inclusion of a SubMulAction into the ambient set, as an equivariant map -/
-def inclusion (s : SubMulAction M α) : s →[M] α where
--- The inclusion map of the inclusion of a SubMulAction
-  toFun := fun x => x.val
--- The commutation property
-  map_smul' _ _ := rfl
-#align sub_mul_action.inclusion SubMulAction.inclusion
-
-theorem inclusion.toFun_eq_coe (s : SubMulAction M α) :
-    s.inclusion.toFun = fun x => x.val := rfl
-#align sub_mul_action.inclusion.to_fun_eq_coe SubMulAction.inclusion.toFun_eq_coe
-
-lemma image_inclusion (s : SubMulAction M α) :
-    Set.range s.inclusion = s.carrier  := by
-  ext a
-  simp only [Set.mem_range, Subtype.exists, mem_carrier, SetLike.mem_coe]
-  constructor
-  · intro ha
-    obtain ⟨a, h, rfl⟩ := ha
-    exact h
-  · intro h
-    use a
-    use h
-    rfl
-
-lemma inclusion_injective (s : SubMulAction M α) :
-    Function.Injective s.inclusion := by
-  rintro ⟨a, ha⟩ ⟨b, hb⟩ h
-  simp only [Subtype.mk.injEq]
-  exact h
-
-
-end Inclusion
-
 section Complements
 
 variable (M : Type _) [Group M] {α : Type _} [MulAction M α]
@@ -220,6 +182,7 @@ theorem fixingSubgroup_of_insert (a : α) (s : Set (SubMulAction.ofStabilizer M 
       simp only [Set.mem_image] at hx
       rcases hx with ⟨y, hy, rfl⟩
       conv_rhs => rw [← hn y hy]
+      rfl
 #align fixing_subgroup_of_insert fixingSubgroup_of_insert
 
 end fixingSubgroup

@@ -5,7 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.group_theory__subgroup__basic
 -/
-import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Data.Fintype.Perm
 
 theorem MonoidHom.range_isCommutative {G H : Type _} [Group G] [Group H] (f : G →* H)
