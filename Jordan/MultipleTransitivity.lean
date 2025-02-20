@@ -1150,13 +1150,14 @@ theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
       rw [this]; exact bot_le
     rw [← Subgroup.card_le_one_iff_eq_bot]
     suffices Fintype.card (alternatingGroup α) ≤ Fintype.card (Equiv.Perm α) by
+      rw [Nat.card_eq_fintype_card]
       apply le_trans this
       rw [Fintype.card_perm]
       exact Nat.factorial_le hα1
     convert Fintype.card_subtype_le (fun x ↦ x ∈ alternatingGroup α)
   apply large_subgroup_of_perm_contains_alternating
   rw [Fintype.card_equiv (Equiv.refl _)]
-  obtain ⟨s, _, hs⟩ := Set.exists_smaller_set (Set.univ : Set α) (Fintype.card α - 2)
+  obtain ⟨s, _, hs⟩ := Set.exists_subset_card_eq (s := (Set.univ : Set α)) (n := Fintype.card α - 2)
     (by
       rw [Set.ncard_univ, Nat.card_eq_fintype_card]
       exact sub_le (Fintype.card α) 2)

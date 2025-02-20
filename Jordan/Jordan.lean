@@ -252,7 +252,7 @@ theorem IsPreprimitive.isPreprimitive_ofFixingSubgroup_inter
     IsPreprimitive (fixingSubgroup G (s ∩ g • s))
       (SubMulAction.ofFixingSubgroup G (s ∩ g • s)) := by
   classical
-  have hts : s ∩ g • s ≤ s := Set.inter_subset_left s _
+  have hts : s ∩ g • s ≤ s := Set.inter_subset_left
   have this : IsPretransitive (fixingSubgroup G (s ∩ g • s))
       (SubMulAction.ofFixingSubgroup G (s ∩ g • s)) :=
     isPretransitive_ofFixingSubgroup_inter hs.toIsPretransitive ha
@@ -426,7 +426,7 @@ theorem is_two_pretransitive_weak_jordan [DecidableEq α]
           simp only [smul_compl_set, Set.mem_compl_iff, Set.not_not_mem] at hgb
           exact hgb
         apply Set.eq_of_subset_of_ncard_le
-        · exact subset_trans h (Set.inter_subset_right _ _)
+        · exact subset_trans h Set.inter_subset_right
         · rw [smul_set_ncard_eq]
         exact Set.toFinite (g • s)
       · rfl
@@ -584,7 +584,7 @@ theorem is_two_preprimitive_weak_jordan [DecidableEq α]
           simp only [smul_compl_set, Set.mem_compl_iff, Set.not_not_mem] at hgb
           exact hgb
         apply Set.eq_of_subset_of_ncard_le
-        · exact subset_trans h (Set.inter_subset_right _ _)
+        · exact subset_trans h Set.inter_subset_right
         · rw [smul_set_ncard_eq]
         exact Set.toFinite (g • s)
       · rfl
@@ -753,14 +753,16 @@ theorem eq_s2_of_nontrivial (hα : Fintype.card α ≤ 2) (hG : Nontrivial G) :
   classical
   apply Subgroup.eq_top_of_card_eq
   apply le_antisymm
-  apply Fintype.card_subtype_le
-  rw [Fintype.card_equiv (Equiv.cast rfl)]
-  refine' le_trans _ _
-  exact (2 : ℕ).factorial
-  exact Nat.factorial_le hα
-  rw [Nat.factorial_two]
-  rw [← Fintype.one_lt_card_iff_nontrivial] at hG
-  exact hG
+  · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    apply Fintype.card_subtype_le
+  · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    rw [Fintype.card_equiv (Equiv.cast rfl)]
+    refine' le_trans _ _
+    exact (2 : ℕ).factorial
+    exact Nat.factorial_le hα
+    rw [Nat.factorial_two]
+    rw [← Fintype.one_lt_card_iff_nontrivial] at hG
+    exact hG
 #align eq_s2_of_nontrivial eq_s2_of_nontrivial
 
 theorem nontrivial_on_equiv_perm_two {K : Type _} [Group K] [MulAction K α]
@@ -779,9 +781,12 @@ theorem nontrivial_on_equiv_perm_two {K : Type _} [Group K] [MulAction K α]
   rw [← MonoidHom.range_top_iff_surjective]
   apply Subgroup.eq_top_of_card_eq
   apply le_antisymm
-  apply Fintype.card_subtype_le
+  · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    apply Fintype.card_subtype_le
   suffices hg : toPerm g ∈ φ.range by
-    rw [Fintype.card_perm, hα, Nat.factorial_two, Nat.succ_le_iff, Subgroup.one_lt_card_iff_ne_bot]
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+    rw [Fintype.card_perm, hα, Nat.factorial_two, Nat.succ_le_iff,
+      ← Nat.card_eq_fintype_card, Subgroup.one_lt_card_iff_ne_bot]
     intro h; apply hga
     rw [h, Subgroup.mem_bot] at hg
     rw [← MulAction.toPerm_apply, hg, Equiv.Perm.coe_one, id_eq]
@@ -841,6 +846,7 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
   · -- trivial case : Fintype.card α ≤ 2
     rw [Nat.lt_succ_iff] at hα3
     apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     apply le_antisymm (Fintype.card_subtype_le _)
     rw [Fintype.card_equiv (Equiv.cast rfl)]
     refine' le_trans (Nat.factorial_le hα3) _
@@ -866,9 +872,7 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
   · rw [← hn']
     apply Nat.sub_lt _ (by norm_num)
     apply lt_of_lt_of_le (by norm_num) hα3
-  have : IsPretransitive _ _ := by
-    apply isPretransitive_of_cycle hg
-    exact Equiv.Perm.IsSwap.isCycle h2g
+  have : IsPretransitive _ _ := isPretransitive_of_cycle hg <| Equiv.Perm.IsSwap.isCycle h2g
   apply isPreprimitive_of_prime
   convert Nat.prime_two
   rw [Fintype.card_subtype]
@@ -892,7 +896,6 @@ theorem jordan_three_cycle [DecidableEq α]
     apply large_subgroup_of_perm_contains_alternating
     rw [Fintype.card_perm]
     apply le_trans (Nat.factorial_le hα4)
-    norm_num
     change 2 * 3 ≤ _
     simp only [mul_le_mul_left, Nat.succ_pos']
     have : Nonempty G := One.instNonempty
@@ -921,9 +924,7 @@ theorem jordan_three_cycle [DecidableEq α]
   · rw [hn, Nat.succ_eq_add_one, add_comm, add_assoc]
     simp only [add_lt_add_iff_left]
     norm_num
-  have : IsPretransitive _ _ := by
-    apply isPretransitive_of_cycle hg
-    exact Equiv.Perm.IsThreeCycle.isCycle h3g
+  have : IsPretransitive _ _ := isPretransitive_of_cycle hg <| Equiv.Perm.IsThreeCycle.isCycle h3g
   apply isPreprimitive_of_prime
   convert Nat.prime_three
   rw [Fintype.card_subtype, ← Equiv.Perm.IsThreeCycle.card_support h3g]

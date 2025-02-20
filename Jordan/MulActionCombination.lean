@@ -226,8 +226,7 @@ theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
     rw [h]
     exact Finset.mem_insert_self b _
 
-  obtain ⟨s, _, hs'⟩ := Finset.exists_smaller_set (Finset.univ : Finset α) n
-    (le_of_lt h2)
+  obtain ⟨s, _, hs'⟩ := Finset.exists_subset_card_eq h2.le
   use s
   exact hs'
 #align nat.finset_nontrivial Nat.Combination_nontrivial

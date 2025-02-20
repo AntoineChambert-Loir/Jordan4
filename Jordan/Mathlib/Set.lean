@@ -146,7 +146,7 @@ variable {α β G X : Type _} {ι : Sort _} {κ : ι → Sort _}
 theorem _root_.Function.Injective.image_iInter_eq [Nonempty ι] {f : α → β} (hf : Injective f) (s : ι → Set α) :
     (f '' ⋂ i : ι, s i) = ⋂ i, f '' s i := by
   -- rw [injOn_of_injective hf]
-  rw [Set.InjOn.image_iInter_eq (Set.injOn_of_injective hf _)]
+  rw [Set.InjOn.image_iInter_eq (Set.injOn_of_injective hf)]
 #align set.image_Inter' Function.Injective.image_iInter_eq
 
 theorem Set.subset_of_eq {α : Type _} {s t : Set α} (h : s = t) : s ⊆ t := by
