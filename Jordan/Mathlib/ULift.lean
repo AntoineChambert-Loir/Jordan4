@@ -14,7 +14,6 @@ set_option pp.universes true
 theorem comp_uLift_eq_uLift_comp {f : α → β} : 
     Equiv.ulift ∘ ULift.map f = f ∘ Equiv.ulift :=
   rfl
-#align ulift.comp_ulift_eq_uift_comp ULift.comp_uLift_eq_uLift_comp
 
 /-
 Note : this involves 4 universes :
@@ -37,17 +36,14 @@ but then the remaining of the file does not compile anymore. -/
 theorem surjective_iff_surjective {f : α → β} :
     Function.Surjective (ULift.map f) ↔ Function.Surjective f := by
   rw [← Equiv.comp_surjective, comp_uLift_eq_uLift_comp, Equiv.surjective_comp]
-#align ulift.surjective_iff_surjective ULift.surjective_iff_surjective
 
 theorem injective_iff_injective {f : α → β} :
     Function.Injective (ULift.map f) ↔ Function.Injective f := by
   rw [← Equiv.comp_injective, comp_uLift_eq_uLift_comp, Equiv.injective_comp]
-#align ulift.injective_iff_injective ULift.injective_iff_injective
 
 theorem bijective_iff_bijective {f : α → β} :
     Function.Bijective (ULift.map f) ↔ Function.Bijective f := by
   rw [← Equiv.comp_bijective, comp_uLift_eq_uLift_comp, Equiv.bijective_comp]
-#align ulift.bijective_iff_bijective ULift.bijective_iff_bijective
 
 /- Alternative lemma, but the proof requires 4 lines :
 

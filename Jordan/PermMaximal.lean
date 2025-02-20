@@ -47,7 +47,6 @@ theorem Nat.add_lt_of_le_lt (a b c d : ℕ) (hab : a ≤ c) (hbd : b < d) : a + 
   apply Nat.lt_of_lt_of_le
   apply Nat.add_lt_add_left _ a; use d; exact hbd
   apply Nat.add_le_add_right hab d
-#align nat.add_lt_of_le_lt Nat.add_lt_of_le_lt
 
 theorem subgroup_of_group_of_order_two
     {G : Type _} [Group G] [Fintype G] (hG : Fintype.card G = 2)
@@ -69,7 +68,6 @@ theorem subgroup_of_group_of_order_two
       rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]
       refine' Subgroup.card_subgroup_dvd_card H
     · rw [hG]; exact h
-#align subgroup_of_group_of_order_two subgroup_of_group_of_order_two
 
 namespace Equiv.Perm
 
@@ -103,7 +101,6 @@ theorem IsPretransitive.of_partition (s : Set α) :
   rintro b ⟨a, ha, hgab⟩
   by_contra hb
   exact hyp a b g ha (Set.mem_compl hb) hgab
-#align equiv.perm.is_pretransitive.of_partition Equiv.Perm.IsPretransitive.of_partition
 
 theorem swap_mem_stabilizer {a b : α} {s : Set α} (ha : a ∈ s) (hb : b ∈ s) :
     Equiv.swap a b ∈ stabilizer (Equiv.Perm α) s := by
@@ -119,7 +116,6 @@ theorem swap_mem_stabilizer {a b : α} {s : Set α} (ha : a ∈ s) (hb : b ∈ s
   cases' em (x = b) with hxb hxb'
   rw [hxb, Equiv.swap_apply_right]; exact ha
   rw [Equiv.swap_apply_of_ne_of_ne hxa' hxb']; exact hx
-#align equiv.perm.swap_mem_stabilizer Equiv.Perm.swap_mem_stabilizer
 
 theorem ne_one_of_isSwap {f : Equiv.Perm α} (hf : f.IsSwap) : f ≠ 1 := by
   intro h1
@@ -127,7 +123,6 @@ theorem ne_one_of_isSwap {f : Equiv.Perm α} (hf : f.IsSwap) : f ≠ 1 := by
   rw [h1] at h ; apply hxy
   rw [← Equiv.swap_apply_left x y]; rw [← h]
   simp only [Equiv.Perm.coe_one, id]
-#align equiv.perm.ne_one_of_is_swap Equiv.Perm.ne_one_of_isSwap
 
 theorem swap_isSwap_iff {a b : α} : (Equiv.swap a b).IsSwap ↔ a ≠ b :=
   by
@@ -139,7 +134,6 @@ theorem swap_isSwap_iff {a b : α} : (Equiv.swap a b).IsSwap ↔ a ≠ b :=
       ext x; simp only [Equiv.coe_refl, Equiv.Perm.coe_one]
     exact ne_one_of_isSwap h
   · intro h; use a; use b;
-#align equiv.perm.swap_is_swap_iff Equiv.Perm.swap_isSwap_iff
 
 variable [Fintype α]
 
@@ -154,7 +148,6 @@ theorem _root_.Fintype.card_add_compl (s : Set α) :
   rw [add_comm]
   rw [Nat.sub_add_cancel]
   exact set_fintype_card_le_univ s
-#align fintype.card_add_compl Fintype.card_add_compl
 
 theorem card_smul_eq (s : Set α) (g : Equiv.Perm α) :
     Fintype.card (g • s : Set α) = Fintype.card s := by
@@ -165,7 +158,6 @@ theorem card_smul_eq (s : Set α) (g : Equiv.Perm α) :
   simp_rw [← Finset.coe_image]
   simp only [Finset.toFinset_coe]
   rw [Finset.card_image_of_injective _ (MulAction.injective g)]
-#align equiv.perm.card_smul_eq Equiv.Perm.card_smul_eq
 -/
 
 theorem moves_in
@@ -178,7 +170,6 @@ theorem moves_in
     simp only [Equiv.Perm.smul_def, Equiv.swap_apply_left]
   · apply le_of_lt hGt
     apply swap_mem_stabilizer ha hb
-#align equiv.perm.moves_in Equiv.Perm.moves_in
 
 theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty) :
     stabilizer (Equiv.Perm α) s ≠ ⊤ := by
@@ -191,7 +182,6 @@ theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty) :
   rw [← hg]
   rw [Set.mem_smul_set]
   use a; use ha; apply Equiv.swap_apply_left
-#align equiv.perm.stabilizer_ne_top Equiv.Perm.stabilizer_ne_top
 
 theorem stabilizer_empty_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G α] :
     stabilizer G (∅ : Set α) = ⊤ := by
@@ -199,7 +189,6 @@ theorem stabilizer_empty_eq_top (G : Type _) [Group G] (α : Type _) [MulAction 
   intro g; apply imp_intro
   rw [mem_stabilizer_iff]
   simp only [Set.smul_set_empty]
-#align equiv.perm.stabilizer_empty_eq_top Equiv.Perm.stabilizer_empty_eq_top
 
 theorem stabilizer_univ_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G α] :
     stabilizer G (_root_.Set.univ : Set α) = ⊤ := by
@@ -207,7 +196,6 @@ theorem stabilizer_univ_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G
   intro g; apply imp_intro
   rw [mem_stabilizer_iff]
   simp only [Set.smul_set_univ]
-#align equiv.perm.stabilizer_univ_eq_top Equiv.Perm.stabilizer_univ_eq_top
 
 example : ↑(Nat.card α) ≤ PartENat.card α := by
   simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
@@ -225,7 +213,6 @@ theorem stabilizer_nonempty_ne_top (α : Type _) (s : Set α) (hs : s.Nonempty) 
   rw [← h']
   use a
   exact And.intro ha (Equiv.swap_apply_left a b)
-#align equiv.perm.stabilizer_nonempty_ne_top Equiv.Perm.stabilizer_nonempty_ne_top
 
 theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     (hG : stabilizer (Equiv.Perm α) s < G) :
@@ -275,7 +262,6 @@ theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     apply this
     rw [Set.ncard_univ, hα]
     norm_num
-#align equiv.perm.has_swap_of_lt_stabilizer Equiv.Perm.has_swap_of_lt_stabilizer
 
 theorem Subtype.image_preimage_of_val {α : Type*} {s B : Set α} (h : B ⊆ s) :
     Subtype.val '' (Subtype.val ⁻¹' B : Set s) = B := by
@@ -573,7 +559,6 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     simp only [← two_mul]
     apply Nat.mul_le_mul_left
     exact Set.ncard_le_ncard hsc_le_B (Set.toFinite B)
-#align equiv.perm.is_maximal_stab' Equiv.Perm.isMaximalStab'
 
 
 /-- stabilizer (equiv.perm α) s is a maximal subgroup of equiv.perm α,
@@ -591,7 +576,6 @@ theorem isMaximalStab (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     apply Equiv.Perm.isMaximalStab' (sᶜ) h1 h0
     rw [compl_compl]
     exact hs
-#align equiv.perm.is_maximal_stab Equiv.Perm.isMaximalStab
 
 end Equiv.Perm
 
@@ -656,6 +640,5 @@ theorem Nat.Combination_isPreprimitive
   · simp only [Set.ncard_coe_Finset, ne_eq]
     simp only [Finset.coe_sort_coe, Fintype.card_coe, hs]
     exact hα
-#align mul_action.nat.finset_is_preprimitive_of MulAction.Nat.Combination_isPreprimitive
 
 end MulAction

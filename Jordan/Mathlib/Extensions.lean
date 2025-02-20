@@ -31,12 +31,10 @@ theorem gimme_some {m : ℕ} (hα : ↑m ≤ PartENat.card α) : Nonempty (Fin m
     apply Function.Embedding.injective
   rw [← Cardinal.le_def, Cardinal.mk_fintype, Fintype.card_ulift, Fintype.card_fin]
   exact Iff.mp Cardinal.natCast_le_toPartENat_iff hα
-#align gimme_some gimme_some
 
 theorem gimme_some_equiv {m : ℕ} [Fintype α] (hα : m = Fintype.card α) : Nonempty (Fin m ≃ α) := by
   exact ⟨(Fintype.equivFinOfCardEq hα.symm).symm⟩
 
-#align gimme_some_equiv gimme_some_equiv
 
 
 theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) :
@@ -64,7 +62,6 @@ theorem gimme_another {m : ℕ} (f : Fin m → α) (hα : ↑m < PartENat.card �
   exact fun n ↦ f (n.down)
   ext a
   simp only [Set.mem_range, ULift.exists]
-#align gimme_another gimme_another
 
 /-- Extend a fin embedding by another element -/
 theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.range x.toFun) :
@@ -102,7 +99,6 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
     coeFn_mk, lt_self_iff_false, ↓reduceDite, p, f, f']
 
 
-#align may_extend_with may_extend_with
 
 /-- Extend an embedding from Fin given a PartENat.card inequality -/
 theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α) (x : Fin m ↪ α) :
@@ -129,7 +125,6 @@ theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α)
       obtain ⟨x', hx', _⟩ := may_extend_with y a ha
       use x'; rw [← hy]; rw [← hx']
       ext ⟨i, hi⟩; rfl
-#align may_extend may_extend
 
 /-- Join two disjoint embeddings from Fin _ types -/
 theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m + k)
@@ -176,6 +171,5 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
       trans_apply, Fin.natAddEmb_apply, Fin.natAdd_mk, Equiv.coe_toEmbedding, RelIso.coe_fn_toEquiv,
       Fin.cast_mk, coeFn_mk, add_lt_iff_neg_left, not_lt_zero', ↓reduceDite, Fin.subNat_mk,
       add_tsub_cancel_left, p, f, g, subtype]
-#align may_extend_with' may_extend_with'
 
 end Extensions

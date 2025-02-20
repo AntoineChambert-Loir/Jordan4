@@ -46,7 +46,6 @@ theorem isPretransitive_of_submonoid {K : Submonoid M} (h : IsPretransitive K α
   intro x y
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   exact ⟨k, hk'⟩
-#align mul_action.is_pretransitive_of_submonoid MulAction.isPretransitive_of_submonoid
 
 theorem isPretransitive_of_submonoid_le {G K : Submonoid M} (hKG : K ≤ G)
     (h : IsPretransitive K α) : IsPretransitive G α :=
@@ -57,7 +56,6 @@ theorem isPretransitive_of_submonoid_le {G K : Submonoid M} (hKG : K ≤ G)
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   use ⟨k, hKG hk⟩
   exact hk'
-#align mul_action.is_pretransitive_of_submonoid_le MulAction.isPretransitive_of_submonoid_le
 
 end Monoid
 
@@ -71,7 +69,6 @@ theorem card_orbit_eq_stabilizer_index {a : α} :
   rw [← Set.Nat.card_coe_set_eq]
   apply Nat.card_congr
   exact orbitEquivQuotientStabilizer M a
-#align mul_action.card_orbit_eq_stabilizer_index MulAction.card_orbit_eq_stabilizer_index
 
 variable {α}
 /-- Cardinal vs index of stabilizers, for a pretransitive action, in nat.card -/
@@ -80,7 +77,6 @@ theorem stabilizer_index_of_pretransitive (h : IsPretransitive M α) (a : α) :
   rw [← card_orbit_eq_stabilizer_index]
   convert Set.ncard_univ α
   exact orbit_eq_univ M a
-#align mul_action.stabilizer_index_of_pretransitive MulAction.stabilizer_index_of_pretransitive
 
 variable {M}
 
@@ -89,7 +85,6 @@ theorem isPretransitive_of_subgroup {K : Subgroup M} (h : IsPretransitive K α) 
   apply isPretransitive_of_submonoid
   swap; exact K.toSubmonoid
   exact h
-#align mul_action.is_pretransitive_of_subgroup MulAction.isPretransitive_of_subgroup
 
 theorem isPretransitive_of_subgroup_le {G K : Subgroup M} (hKG : K ≤ G) (h : IsPretransitive K α) :
     IsPretransitive G α := by
@@ -99,7 +94,6 @@ theorem isPretransitive_of_subgroup_le {G K : Subgroup M} (hKG : K ≤ G) (h : I
   obtain ⟨⟨k, hk⟩, hk'⟩ := h_eq x y
   use ⟨k, hKG hk⟩
   exact hk'
-#align mul_action.is_pretransitive_of_subgroup_le MulAction.isPretransitive_of_subgroup_le
 
 end Group
 
@@ -114,7 +108,6 @@ variable (M α : Type _) [Group M] [MulAction M α]
 /-- An action of a group on a type α is n-pretransitive if the associated
 action on (fin n ↪ α) is pretransitive -/
 def IsMultiplyPretransitive (n : ℕ) := IsPretransitive M (Fin n ↪ α)
-#align mul_action.is_multiply_pretransitive MulAction.IsMultiplyPretransitive
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /-- The equivariant map from (fin 1 ↪ α) to α -/
@@ -122,7 +115,6 @@ def finOneToMap : (Fin 1 ↪ α) →ₑ[@id M] α
     where
   toFun x := x ⟨0, Nat.one_pos⟩
   map_smul' _ _ := rfl
-#align mul_action.fin_one_to_map MulAction.finOneToMap
 
 theorem finOneToMap_bijective : Function.Bijective (finOneToMap M α) := by
   constructor
@@ -136,7 +128,6 @@ theorem finOneToMap_bijective : Function.Bijective (finOneToMap M α) := by
       inj' := fun i j _ => by
         rw [Fin.eq_zero i, Fin.eq_zero j] }
     rfl
-#align mul_action.fin_one_to_map_bijective MulAction.finOneToMap_bijective
 
 variable {M α}
 
@@ -145,13 +136,11 @@ theorem isMultiplyPretransitive_of_subgroup {n : ℕ} {K : Subgroup M}
   by
   unfold IsMultiplyPretransitive at *
   exact isPretransitive_of_subgroup h
-#align mul_action.is_multiply_pretransitive_of_subgroup MulAction.isMultiplyPretransitive_of_subgroup
 
 theorem isMultiplyPretransitive_of_le {n : ℕ} {H K : Subgroup M} (hHK : K ≤ H)
     (h : IsMultiplyPretransitive K α n) : IsMultiplyPretransitive H α n := by
   unfold IsMultiplyPretransitive at *
   refine' isPretransitive_of_subgroup_le hHK h
-#align mul_action.is_multiply_pretransitive_of_le MulAction.isMultiplyPretransitive_of_le
 
 
 /-- Given an equivariant map α → β, get an equivariant map on function types (ι ↪ α) → (ι ↪ β)-/
@@ -164,13 +153,11 @@ def EquivariantMap.embeddingOfEquivariantMap {N β : Type _} [Group N] [MulActio
     ext i
     simp only [smul_apply, coeFn_mk, Function.comp_apply, toFun_eq_coe, smul_apply]
     rw [f.map_smul']
-#align mul_action.equivariant_map.embedding_of_equivariant_map MulAction.EquivariantMap.embeddingOfEquivariantMap
 
 theorem EquivariantMap.embeddingOfEquivariantMap_apply {N β : Type _} [Group N] [MulAction N β]
     {σ : M → N} {f : α →ₑ[σ] β} (hf : Function.Injective f) {ι : Type _} {x : ι ↪ α} {i : ι} :
     (EquivariantMap.embeddingOfEquivariantMap hf ι) x i = f (x i) :=
   rfl
-#align mul_action.equivariant_map.embedding_of_equivariant_map_apply MulAction.EquivariantMap.embeddingOfEquivariantMap_apply
 
 theorem EquivariantMap.embeddingOfEquivariantMap_is_injective {N β : Type _} [Group N]
     [MulAction N β] {σ : M → N} {f : α →ₑ[σ] β} (hf : Function.Injective f) {ι : Type _} :
@@ -181,7 +168,6 @@ theorem EquivariantMap.embeddingOfEquivariantMap_is_injective {N β : Type _} [G
   apply hf
   simp only [← EquivariantMap.embeddingOfEquivariantMap_apply hf]
   rw [hxy]
-#align mul_action.equivariant_map.embedding_of_equivariant_map_is_injective MulAction.EquivariantMap.embeddingOfEquivariantMap_is_injective
 
 theorem EquivariantMap.embeddingOfEquivariantMap_is_bijective {N β : Type _} [Group N]
     [MulAction N β] {σ : M → N} (f : α →ₑ[σ] β) (hf : Function.Bijective f) {ι : Type _} :
@@ -195,7 +181,6 @@ theorem EquivariantMap.embeddingOfEquivariantMap_is_bijective {N β : Type _} [G
   rw [EquivariantMap.embeddingOfEquivariantMap_apply]
   simp only [coeFn_mk, Function.comp_apply]
   rw [hfg]
-#align mul_action.equivariant_map.embedding_of_equivariant_map_is_bijective MulAction.EquivariantMap.embeddingOfEquivariantMap_is_bijective
 
 /-- Multiple transitivity of an image by an equivariant map of a multiply transitive action -/
 theorem isMultiplyPretransitive_of_surjective_map
@@ -222,7 +207,6 @@ theorem isMultiplyPretransitive_of_surjective_map
   rw [DFunLike.ext_iff] at hg
   simp only [smul_apply]
   simp only [← aux_apply, ← hg, smul_apply, MulActionHom.map_smul']
-#align mul_action.is_multiply_pretransitive_of_surjective_map MulAction.isMultiplyPretransitive_of_surjective_map
 
 theorem isMultiplyPretransitive_of_bijective_map_iff
     {N β : Type _} [Group N] [MulAction N β]
@@ -244,7 +228,6 @@ theorem isMultiplyPretransitive_of_bijective_map_iff
   simp only [smul_apply, map_smulₛₗ, hg]
   change g' • (x' i) = y' i
   simp only [← hg, coeFn_mk, Function.comp_apply, ← hg', smul_apply]
-#align mul_action.is_multiply_pretransitive_of_bijective_map_iff MulAction.isMultiplyPretransitive_of_bijective_map_iff
 
 /-
 lemma subgroup_is_multiply_pretransitive_via_bijective_bihom_iff {N β : Type*} [group N] [mul_action N β] {n : ℕ}
@@ -344,7 +327,6 @@ theorem is_zero_pretransitive : IsMultiplyPretransitive M α 0 :=
   intro x y; use 1; rw [one_smul]
   ext i; exfalso
   exact IsEmpty.false i
-#align mul_action.is_zero_pretransitive MulAction.is_zero_pretransitive
 
 /-- An action is 1-pretransitive iff it is pretransitive -/
 theorem isPretransitive_iff_is_one_pretransitive :
@@ -352,7 +334,6 @@ theorem isPretransitive_iff_is_one_pretransitive :
   by
   unfold IsMultiplyPretransitive
   rw [isPretransitive.of_bijective_map_iff Function.surjective_id (finOneToMap_bijective M α)]
-#align mul_action.is_pretransitive_iff_is_one_pretransitive MulAction.isPretransitive_iff_is_one_pretransitive
 
 /-- An action is 2-pretransitive iff it is two_pretransitive… -/
 theorem is_two_pretransitive_iff :
@@ -402,7 +383,6 @@ theorem is_two_pretransitive_iff :
     cases' this x with hx hx
     simpa only [hx] using hm.left
     simpa only [hx] using hm.right
-#align mul_action.is_two_pretransitive_iff MulAction.is_two_pretransitive_iff
 
 /-- An n-pretransitive action is m-pretransitive for any m ≤ n -/
 theorem isMultiplyPretransitive_of_higher {n : ℕ} (hn : IsMultiplyPretransitive M α n) {m : ℕ}
@@ -417,7 +397,6 @@ theorem isMultiplyPretransitive_of_higher {n : ℕ} (hn : IsMultiplyPretransitiv
   obtain ⟨g, hg⟩ := hn_eq x' y'
   use g
   ext; rw [← hy', ← hx', ← hg]; rfl
-#align mul_action.is_multiply_pretransitive_of_higher MulAction.isMultiplyPretransitive_of_higher
 
 variable {α}
 lemma exists_extends_with_last_eq (a : α) {n : ℕ} (x : Fin n ↪ SubMulAction.ofStabilizer M a) :
@@ -557,7 +536,6 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
       dsimp [Fin.last] at  hga hgb
       rw [hga, mul_smul, inv_smul_eq_iff, hgb]
       rw [← mem_stabilizer_iff]; exact SetLike.coe_mem g
-#align mul_action.stabilizer.is_multiply_pretransitive' MulAction.stabilizer.isMultiplyPretransitive'
 
 /-- Multiple transitivity of a pretransitive action
   is equivalent to one less transitivity of stabilizer of a point
@@ -630,7 +608,6 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
       dsimp only [Fin.last] at hga hgb
       rw [hga, mul_smul, inv_smul_eq_iff, hgb]
       rw [← mem_stabilizer_iff]; exact SetLike.coe_mem g
-#align mul_action.stabilizer.is_multiply_pretransitive MulAction.stabilizer.isMultiplyPretransitive
 
 /-- The fixator of a subset of cardinal d in a k-transitive action
 acts (k-d) transitively on the remaining -/
@@ -680,7 +657,6 @@ theorem remaining_transitivity
   conv_lhs => rw [← hx'2]
   rw [← hy'2, ← hg]
   simp only [trans_apply, smul_apply]
-#align mul_action.remaining_transitivity MulAction.remaining_transitivity
 
 theorem remaining_transitivity' {m n : ℕ} (s : Set α) [Finite s]
     (h : IsMultiplyPretransitive M α n)
@@ -694,7 +670,6 @@ theorem remaining_transitivity' {m n : ℕ} (s : Set α) [Finite s]
   -- exact PartENat.card_eq_coe_fintype_card
   exact isMultiplyPretransitive_of_higher M α h hmn hn
   rfl
-#align mul_action.remaining_transitivity' MulAction.remaining_transitivity'
 
 /- -- TODO : can one do an induction on s
 private theorem IsMultiplyPretransitive.index_of_fixing_subgroup_aux
@@ -896,7 +871,6 @@ theorem IsMultiplyPretransitive.index_of_fixingSubgroup
     (fixingSubgroup M s).index * (Fintype.card α - s.ncard).factorial =
       (Fintype.card α).factorial :=
   hMk.index_of_fixing_subgroup_aux M α s.ncard rfl
-#align mul_action.index_of_fixing_subgroup_of_multiply_pretransitive MulAction.IsMultiplyPretransitive.index_of_fixingSubgroup
 
  /-- For a multiply pretransitive action,
   computes the index of the fixing_subgroup of a subset of adequate cardinality -/
@@ -952,7 +926,6 @@ theorem IsMultiplyPretransitive.isPreprimitive_of_two
         exact Set.smul_mem_smul_set ha
       · rw [← hgb]
         exact Set.smul_mem_smul_set hb
-#align mul_action.is_preprimitive_of_two_pretransitive MulAction.IsMultiplyPretransitive.isPreprimitive_of_two
 
 section Finite
 
@@ -964,7 +937,6 @@ theorem _root_.Equiv.Perm.isPretransitive [DecidableEq α] :
   use Equiv.swap x y
   simp only [Equiv.Perm.smul_def]
   rw [Equiv.swap_apply_left x y]
-#align mul_action.equiv.perm.is_pretransitive Equiv.Perm.isPretransitive
 
 variable [Fintype α]
 
@@ -999,7 +971,6 @@ theorem _root_.Equiv.Perm.isMultiplyPretransitive (n : ℕ) :
   apply Function.Embedding.isEmpty_of_card_lt
   simp only [Fintype.card_fin]
   exact hn
-#align mul_action.equiv_perm_is_multiply_pretransitive Equiv.Perm.isMultiplyPretransitive
 
 /-- The action of the permutation group of α on α is preprimitive -/
 theorem _root_.Equiv.Perm.isPreprimitive : IsPreprimitive (Equiv.Perm α) α := by
@@ -1007,7 +978,6 @@ theorem _root_.Equiv.Perm.isPreprimitive : IsPreprimitive (Equiv.Perm α) α := 
   · exact IsPreprimitive.on_subsingleton
   apply IsMultiplyPretransitive.isPreprimitive_of_two
   apply Equiv.Perm.isMultiplyPretransitive
-#align mul_action.equiv.perm.is_preprimitive Equiv.Perm.isPreprimitive
 
 variable {α}
 
@@ -1020,7 +990,6 @@ theorem aux_lt_iff_lt_or_eq {m n : ℕ} (hmn : m < n) : m < n - 1 ∨ m = n - 1 
     · exact Nat.le_pred_of_lt hmn
     · intro h; apply h'
       exact Nat.le_antisymm (Nat.le_pred_of_lt hmn) h
-#align mul_action.aux_lt_iff_lt_or_eq MulAction.aux_lt_iff_lt_or_eq
 
 /-- A subgroup of Equiv.Perm α is ⊤ iff it is (Fintype.card α - 1)-pretransitive -/
 theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
@@ -1064,7 +1033,6 @@ theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
   simp only [Function.Embedding.toFun_eq_coe]
   rw [← zi]
   rfl
-#align mul_action.eq_top_of_is_full_minus_one_pretransitive MulAction.IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
 
 variable (α)
 
@@ -1132,7 +1100,6 @@ theorem IsMultiplyPretransitive.alternatingGroup_of_sub_two [DecidableEq α] :
       apply lt_irrefl n
       convert i.prop
       exact h.symm
-#align mul_action.alternating_group_is_fully_minus_two_pretransitive MulAction.IsMultiplyPretransitive.alternatingGroup_of_sub_two
 
 variable {α}
 
@@ -1168,7 +1135,6 @@ theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
   have : Nonempty G := One.instNonempty
   apply Nat.le_of_dvd (Fintype.card_pos)
   apply Subgroup.index_dvd_card
-#align mul_action.alternating_group_le_of_full_minus_two_pretransitive MulAction.IsMultiplyPretransitive.alternatingGroup_le_of_sub_two
 
 /-- The alternating group on 3 letters or more acts transitively -/
 theorem alternatingGroup.isPretransitive [DecidableEq α] (h : 3 ≤ Fintype.card α) :
@@ -1181,7 +1147,6 @@ theorem alternatingGroup.isPretransitive [DecidableEq α] (h : 3 ≤ Fintype.car
   simp only [ge_iff_le, PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe,
     tsub_le_iff_right, le_add_iff_nonneg_right]
   norm_num
-#align mul_action.alternating_group.is_pretransitive MulAction.alternatingGroup.isPretransitive
 
 /- This lemma proves the trivial blocks property for the alternating group.
   This holds even when `Fintype.card α ≤ 2`
@@ -1267,7 +1232,6 @@ theorem alternatingGroup.has_trivial_blocks [DecidableEq α]
   apply le_trans _ (Nat.sub_le_sub_right h4 2); norm_num
   simp only [PartENat.card_eq_coe_fintype_card, cast_le, tsub_le_iff_right, le_add_iff_nonneg_right,
     _root_.zero_le]
-#align mul_action.alternating_group.has_trivial_blocks MulAction.alternatingGroup.has_trivial_blocks
 
 /-- The alternating group on 3 letters or more acts primitively -/
 theorem AlternatingGroup.isPreprimitive [DecidableEq α] (h : 3 ≤ Fintype.card α) :
@@ -1275,7 +1239,6 @@ theorem AlternatingGroup.isPreprimitive [DecidableEq α] (h : 3 ≤ Fintype.card
   have := alternatingGroup.isPretransitive h
   apply IsPreprimitive.mk
   apply alternatingGroup.has_trivial_blocks
-#align mul_action.alternating_group.is_preprimitive MulAction.AlternatingGroup.isPreprimitive
 
 end Finite
 

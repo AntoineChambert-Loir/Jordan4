@@ -33,7 +33,6 @@ variable {α G H : Type _} [Group G] [Group H] [MulAction G α] {N : Subgroup G}
 
 theorem Subgroup.map_subgroupOf_eq {K : Subgroup N} : (K.map N.subtype).subgroupOf N = K := by
   rw [← Subgroup.comap_subtype, Subgroup.comap_map_eq, Subgroup.ker_subtype, sup_bot_eq]
-#align subgroup.map_subgroup_of_eq Subgroup.map_subgroupOf_eq
 
 theorem MulAction.stabilizer_subgroupOf_eq {a : α} :
     stabilizer N a = (stabilizer G a).subgroupOf N :=
@@ -41,7 +40,6 @@ theorem MulAction.stabilizer_subgroupOf_eq {a : α} :
   ext n
   simp only [Subgroup.mem_subgroupOf, mem_stabilizer_iff]
   rfl
-#align mul_action.stabilizer_subgroup_of_eq MulAction.stabilizer_subgroupOf_eq
 
 example (K K' : Subgroup G) : K < K' ↔ K ≤ K' ∧ K ≠ K' :=
   lt_iff_le_and_ne
@@ -60,20 +58,17 @@ theorem Subgroup.map_iff_mono_of_injective {f : G →* H} {K K' : Subgroup G}
     apply h
     rw [Subgroup.mem_map]
     exact ⟨x, hx, rfl⟩
-#align subgroup.map_iff_mono_of_injective Subgroup.map_iff_mono_of_injective
 
 theorem Subgroup.map_strict_mono_of_injective {f : G →* H} {K K' : Subgroup G}
     (hf : Function.Injective f) :
     K < K' ↔ Subgroup.map f K < Subgroup.map f K' := by
   simp only [lt_iff_le_not_le]
   simp_rw [← Subgroup.map_iff_mono_of_injective hf]
-#align subgroup.map_strict_mono_of_injective Subgroup.map_strict_mono_of_injective
 
 theorem Subgroup.map_injective_of_injective {f : G →* H} {K K' : Subgroup G}
     (hf : Function.Injective f) :
     Subgroup.map f K = Subgroup.map f K' ↔ K = K' := by
   simp only [le_antisymm_iff, ← Subgroup.map_iff_mono_of_injective hf]
-#align subgroup.map_injective_of_injective Subgroup.map_injective_of_injective
 
 end Junk
 
@@ -100,7 +95,6 @@ theorem isPretransitive_ofFixingSubgroup (s : Set α) (h0 : s.Nontrivial)
     exact h1'
   · rw [PartENat.card_eq_coe_fintype_card]
     simp only [Nat.cast_le, tsub_le_iff_right, le_add_iff_nonneg_right, zero_le]
-#align alternating_group.is_pretransitive_of_fixing_subgroup alternatingGroup.isPretransitive_ofFixingSubgroup
 
 theorem stabilizer_ne_top' (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nontrivial) :
     stabilizer (alternatingGroup α) s ≠ ⊤ :=
@@ -127,7 +121,6 @@ theorem stabilizer_ne_top' (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nontrivial
     rw [Equiv.swap_apply_of_ne_of_ne hac.symm hbc.symm]
   change (⟨g, hg⟩ : alternatingGroup α) • s = s
   rw [← MulAction.mem_stabilizer_iff]; erw [h]; apply Subgroup.mem_top
-#align alternating_group.stabilizer_ne_top' alternatingGroup.stabilizer_ne_top'
 
 theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty)
     (hssc : s.Nontrivial ∨ (sᶜ : Set α).Nontrivial) : stabilizer (alternatingGroup α) s ≠ ⊤ :=
@@ -137,7 +130,6 @@ theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty)
     rw [← compl_compl s] at hs'
     exact stabilizer_ne_top' (sᶜ) hsc hs'
   exact stabilizer_ne_top' s hs hsc'
-#align alternating_group.stabilizer_ne_top alternatingGroup.stabilizer_ne_top
 
 -- open_locale classical
 example (s t : Set α) (h : s ⊆ t) : Fintype.card s ≤ Fintype.card t :=
@@ -236,7 +228,6 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
       apply ht'
       convert Set.ncard_le_ncard ht
       rw [(Set.ncard_pair hab).symm]
-#align alternating_group.moves_in alternatingGroup.moves_in
 
 theorem moves_in' (hα : 4 ≤ Fintype.card α) (G : Subgroup (Equiv.Perm α)) (t : Set α)
     (hGt : stabilizer (Equiv.Perm α) t ⊓ alternatingGroup α ≤ G) :
@@ -247,7 +238,6 @@ theorem moves_in' (hα : 4 ≤ Fintype.card α) (G : Subgroup (Equiv.Perm α)) (
   use! g
   exact hGt hg
   exact H
-#align alternating_group.moves_in' alternatingGroup.moves_in'
 
 theorem ne_of_prop_ne {α : Type*} {p : α → Prop} {a b : α} (ha : ¬ p a) (hb : p b) :
     a ≠ b := fun H ↦ ha (H ▸ hb)
@@ -269,7 +259,6 @@ theorem has_three_cycle_of_stabilizer' (s : Set α) (hs : 2 < Set.ncard s) :
     rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h b hb)]
     exact hx
   intro u hu; exact ne_of_prop_ne hx hu
-#align alternating_group.has_three_cycle_of_stabilizer' alternatingGroup.has_three_cycle_of_stabilizer'
 
 
 theorem has_three_cycle_of_stabilizer [DecidableEq α] (s : Set α) (hα : 4 < Fintype.card α) :
@@ -285,7 +274,6 @@ theorem has_three_cycle_of_stabilizer [DecidableEq α] (s : Set α) (hα : 4 < F
     intro hs'; apply hα
     rw [← Nat.card_eq_fintype_card, ← Set.ncard_add_ncard_compl s]
     exact Nat.add_le_add hs hs'
-#align alternating_group.has_three_cycle_of_stabilizer alternatingGroup.has_three_cycle_of_stabilizer
 
 theorem le_of_isPreprimitive (s : Set α) (hα : 4 < Fintype.card α)
     -- (h0 : s.nonempty) (h1 : sᶜ.nonempty)
@@ -306,7 +294,6 @@ theorem le_of_isPreprimitive (s : Set α) (hα : 4 < Fintype.card α)
   · apply hG
     simp only [Subgroup.mem_inf, hg, true_and_iff]
     exact Equiv.Perm.IsThreeCycle.mem_alternatingGroup hg3
-#align alternating_group.le_of_is_preprimitive alternatingGroup.le_of_isPreprimitive
 
 /- lemma stabilizer.is_preprimitive (s : set α) (hs : (sᶜ : set α).nontrivial):
   is_preprimitive (stabilizer (alternating_group α) s) s :=
@@ -616,7 +603,6 @@ end
     apply le_of_eq
     rw [MulAction.smul_set_ncard_eq]
   exact Set.ncard_le_ncard hsc_le_B
-#align alternating_group.is_preprimitive_of_stabilizer_lt alternatingGroup.isPreprimitive_of_stabilizer_lt
 
 theorem isMaximalStab'
     -- (hα : 4 < fintype.card α)
@@ -681,7 +667,6 @@ theorem isMaximalStab'
   exact Nat.add_le_add_right h0 2
   apply Nat.add_lt_add_left
   exact lt_of_le_of_lt h0 hs
-#align alternating_group.is_maximal_stab' alternatingGroup.isMaximalStab'
 
 theorem three_le {c n : ℕ} (h : 1 ≤ n) (h' : n < c) (hh' : c ≠ 2 * n) : 3 ≤ c :=
   by
@@ -692,7 +677,6 @@ theorem three_le {c n : ℕ} (h : 1 ≤ n) (h' : n < c) (hh' : c ≠ 2 * n) : 3 
     exact h'
   rw [Nat.succ_le_iff]
   exact lt_of_le_of_lt h h'
-#align alternating_group.three_le alternatingGroup.three_le
 
 /-- stabilizer (alternating_group α) s is a maximal subgroup of alternating_group α,
   provided s ≠ ⊥, s ≠ ⊤ and fintype.card α ≠ 2 * fintype.card ↥s) -/
@@ -743,7 +727,6 @@ theorem Stabilizer.isMaximal (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
   -- h0' : ¬(s.nontrivial),
   · simp only [Set.not_nontrivial_iff] at h0'
     exact h s h0 h0'
-#align alternating_group.stabilizer.is_maximal alternatingGroup.Stabilizer.isMaximal
 
 /-- The action of alternating_group α on the n-element subsets of α is preprimitive
 provided 0 < n < #α and #α ≠ 2*n -/
@@ -795,6 +778,5 @@ theorem Nat.Combination.isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
     exact hn
   · simp only [Set.ncard_coe_Finset, hs]
     exact hα
-#align alternating_group.nat.finset_is_preprimitive_of_alt alternatingGroup.Nat.Combination.isPreprimitive_of_alt
 
 end alternatingGroup

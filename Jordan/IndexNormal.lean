@@ -29,7 +29,6 @@ theorem alternatingGroup_of_subsingleton [Subsingleton α] :
     alternatingGroup α = ⊥  :=
   Subgroup.eq_bot_of_subsingleton (alternatingGroup α)
 
-#align alternating_group_of_subsingleton alternatingGroup_of_subsingleton
 
 variable (α)
 
@@ -76,7 +75,6 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
     obtain ⟨u, hu⟩ := Equiv.Perm.isConj_swap hxy hab
     apply mul_left_cancel (a := s u)
     rw [← s.map_mul, SemiconjBy.eq hu, s.map_mul, hk, mul_one, one_mul]
-#align alternating_is_characteristic alternatingGroup_is_characteristic
 
 /-- A finite group of prime order is commutative -/
 theorem isCommutative_of_prime_order {G : Type _} [Group G] [Fintype G]
@@ -221,7 +219,6 @@ theorem Equiv.Perm.is_prod_swap_list (g : Equiv.Perm α) :
       exact hl s hs
     rw [List.prod_cons]
     rw [hf]
-#align equiv.perm.is_prod_swap_list Equiv.Perm.is_prod_swap_list
 
 /-- The alternating group is the only subgroup of index 2 of the permutation group -/
 theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index = 2) :
@@ -313,6 +310,5 @@ theorem contains_alternating_of_index_le_2'
   apply large_subgroup_of_perm_contains_alternating
   rw [← Subgroup.index_mul_card G]
   apply Nat.mul_le_mul_right _ hG
-#align contains_alternating_of_index_le_2' contains_alternating_of_index_le_2'
 
 #lint

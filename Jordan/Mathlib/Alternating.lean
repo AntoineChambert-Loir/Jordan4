@@ -42,7 +42,6 @@ theorem three_cycle_is_commutator
   apply mem_commutatorSet_of_isConj_sq
   apply alternatingGroup.isThreeCycle_isConj h5 hg
   exact hg.isThreeCycle_sq
-#align three_cycle_is_commutator three_cycle_is_commutator
 
 theorem three_cycle_is_commutator' (h5 : 5 ≤ Fintype.card α) {g : Perm α} (hg : g.IsThreeCycle) :
     ∃ p q : alternatingGroup α, g = p * q * p⁻¹ * q⁻¹ := by
@@ -50,7 +49,6 @@ theorem three_cycle_is_commutator' (h5 : 5 ≤ Fintype.card α) {g : Perm α} (h
   obtain ⟨p, q, h⟩ := three_cycle_is_commutator h5 hg
   use p; use q
   simp only [← Subgroup.coe_mul, ← Subgroup.coe_inv, ← commutatorElement_def, h, coe_mk]
-#align three_cycle_is_commutator' three_cycle_is_commutator'
 
 theorem three_cycle_mem_commutator (h5 : 5 ≤ Fintype.card α)
     {g : alternatingGroup α} (hg : IsThreeCycle (g : Perm α)) :
@@ -58,7 +56,6 @@ theorem three_cycle_mem_commutator (h5 : 5 ≤ Fintype.card α)
   rw [commutator_eq_closure]
   apply Subgroup.subset_closure
   exact three_cycle_is_commutator h5 hg
-#align three_cycle_mem_commutator three_cycle_mem_commutator
 
 end ThreeCycles
 
@@ -79,14 +76,12 @@ theorem alternatingGroup_is_perfect (h5 : 5 ≤ Fintype.card α) :
     exact three_cycle_mem_commutator h5 hb
   rw [← closure_three_cycles_eq_alternating]
   apply Subgroup.closure_closure_coe_preimage
-#align alternating_group_is_perfect alternatingGroup_is_perfect
 
 /-- If n ≥ 5, then the alternating group on n letters is perfect (subgroup version)-/
 theorem alternatingGroup_is_perfect' (h5 : 5 ≤ Fintype.card α) :
     ⁅alternatingGroup α, alternatingGroup α⁆ = alternatingGroup α := by
   rw [← Subgroup.commutator_eq', alternatingGroup_is_perfect h5, Subgroup.map_top_eq_range,
     Subgroup.subtype_range]
-#align alternating_group_is_perfect' alternatingGroup_is_perfect'
 
 theorem alternatingGroup.commutator_group_le :
     commutator (Perm α) ≤ alternatingGroup α := by
@@ -96,7 +91,6 @@ theorem alternatingGroup.commutator_group_le :
   simp only [SetLike.mem_coe, mem_alternatingGroup, map_commutatorElement,
     commutatorElement_eq_one_iff_commute]
   apply Commute.all
-#align alternating_group.commutator_group_le alternatingGroup.commutator_group_le
 
 /-- The commutator subgroup of the permutation group is the alternating group -/
 theorem alternatingGroup.commutator_group_eq (h5 : 5 ≤ Fintype.card α) :
@@ -104,6 +98,5 @@ theorem alternatingGroup.commutator_group_eq (h5 : 5 ≤ Fintype.card α) :
   apply le_antisymm alternatingGroup.commutator_group_le
   rw [← alternatingGroup_is_perfect' h5]
   exact commutator_mono le_top le_top
-#align alternating_group.commutator_group_eq alternatingGroup.commutator_group_eq
 
 end Perfect

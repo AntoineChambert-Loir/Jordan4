@@ -67,7 +67,6 @@ theorem commutator_le_iwasawa (is_qprim : IsQuasipreprimitive M α) (IwaS : Iwas
   have hg' : ↑g ∈ N ⊔ IwaS.T a := Subgroup.mem_sup_left (Subtype.mem g)
   have hk' : k ∈ N ⊔ IwaS.T a := Subgroup.mem_sup_right hk
   exact (N ⊔ IwaS.T a).mul_mem ((N ⊔ IwaS.T a).mul_mem hg' hk') ((N ⊔ IwaS.T a).inv_mem hg')
-#align commutator_le_iwasawa commutator_le_iwasawa
 
 /-- The Iwasawa criterion for simplicity -/
 theorem is_simple_iwasawa
@@ -84,6 +83,5 @@ theorem is_simple_iwasawa
     rw [one_smul]
     exact Set.eq_univ_iff_forall.mp h x ⟨n, hn⟩
    | inr h => exact Or.inr (top_le_iff.mp (le_trans (ge_of_eq is_perfect) h))
-#align is_simple_iwasawa is_simple_iwasawa
 
 end Iwasawa

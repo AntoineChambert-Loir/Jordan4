@@ -40,7 +40,6 @@ theorem stabilizer_smul_mem_iff (s : Set α) (g : G) (hg : g ∈ stabilizer G s)
     g • x ∈ s ↔ x ∈ s := by
   rw [mem_stabilizer_iff] at hg
   rw [← hg, Set.smul_mem_smul_set_iff, hg]
-#align stabilizer_smul_mem_iff stabilizer_smul_mem_iff
 
 /- However, it does not seem easy to use this result later on,
 because (stabilizer G s) has not be given its action on s.
@@ -116,7 +115,6 @@ instance SMul.stabilizer (s : Set α) : SMul (↥(stabilizer G s)) ↥s
     ⟨g • x, by
       rw [← mem_stabilizer_iff.mp hg]
       exact Set.smul_mem_smul_set hx⟩
-#align has_smul.stabilizer SMul.stabilizer
 
 @[simp]
 theorem SMul.stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :
@@ -125,7 +123,6 @@ theorem SMul.stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :
   rw [← Subtype.coe_eta g g.prop]
   rw [← Subtype.coe_eta x x.prop]
   rfl
-#align has_smul.stabilizer_def SMul.stabilizer_def
 
 /-- The mul_action of stabilizer a set on that set -/
 instance MulAction.ofStabilizer' (s : Set α) : MulAction (stabilizer G s) s
@@ -136,16 +133,13 @@ instance MulAction.ofStabilizer' (s : Set α) : MulAction (stabilizer G s) s
     by
     rw [← Subtype.coe_inj, Submonoid.mk_mul_mk]
     simp only [SMul.stabilizer_def, Subtype.coe_mk, MulAction.mul_smul]
-#align mul_action.of_stabilizer' MulAction.ofStabilizer'
 
 theorem MulAction.of_stabilizer_def' (s : Set α) (g : stabilizer G s) (x : s) :
     (g : G) • (x : α) = g • (x : α) :=
   rfl
-#align mul_action.of_stabilizer_def' MulAction.of_stabilizer_def'
 
 theorem MulAction.of_stabilizer_set_def' (s : Set α) (g : stabilizer G s) (t : Set α) :
     (g : G) • t = g • t := by rfl
-#align mul_action.of_stabilizer_set_def' MulAction.of_stabilizer_set_def'
 
 theorem Equiv.Perm.ofSubtype.mem_stabilizer (s : Set α) [DecidablePred s] (g : Equiv.Perm ↥s) :
     Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s :=
@@ -165,7 +159,6 @@ theorem Equiv.Perm.ofSubtype.mem_stabilizer (s : Set α) [DecidablePred s] (g : 
       eq_self_iff_true, and_self_iff]
     obtain ⟨y⟩ := Equiv.surjective g (⟨x, hx⟩ : ↥s)
     use y; simp only [← h, Equiv.Perm.smul_def]
-#align equiv.perm.of_subtype.mem_stabilizer Equiv.Perm.ofSubtype.mem_stabilizer
 
 -- So let's do it !
 example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α) B) :
@@ -199,7 +192,6 @@ variable (α)
 def equivariantMapId : α →[G] α where
   toFun := id
   map_smul' g x := rfl
-#align equivariant_map_id equivariantMapId
 
 variable {α}
 
@@ -209,7 +201,6 @@ def equivariantMapOfStabilizerCoe (s : Set α) [DecidablePred s] :
     where
   toFun := coe
   map_smul' g x := by simp
-#align equivariant_map_of_stabilizer_coe equivariantMapOfStabilizerCoe
 
 def equivariantMapOfStabilizerToPerm (s : Set α) [DecidablePred s] :
     let φ : stabilizer G s → Equiv.Perm s := toPerm
@@ -217,7 +208,6 @@ def equivariantMapOfStabilizerToPerm (s : Set α) [DecidablePred s] :
     where
   toFun := id
   map_smul' g x := rfl
-#align equivariant_map_of_stabilizer_to_perm equivariantMapOfStabilizerToPerm
 
 theorem surjective_of_stabilizer_smul (s : Set α) [DecidablePred s] :
     Function.Surjective (equivariantMapOfStabilizerToPerm (Equiv.Perm α) s).toSmulMap :=
@@ -244,7 +234,6 @@ theorem surjective_of_stabilizer_smul (s : Set α) [DecidablePred s] :
     rw [equivariantMapOfStabilizerToPerm, EquivariantMap.toSmulMap]
     simp only [Equiv.Perm.smul_def, Equiv.Perm.ofSubtype_apply_coe, to_perm_apply,
       SMul.stabilizer_def, Subgroup.coe_mk]
-#align surjective_of_stabilizer_smul surjective_of_stabilizer_smul
 
 example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α) B) :
     IsBlock (Equiv.Perm s) (coe ⁻¹' B : Set s) :=
@@ -264,7 +253,6 @@ theorem Le.isBlock {H K : Subgroup G} (hHK : H ≤ K) {B : Set α} (hfB : IsBloc
   by
   rw [is_block.def_one]; rintro ⟨g, hg⟩
   simpa only using is_block.def_one.mp hfB ⟨g, hHK hg⟩
-#align le.is_block Le.isBlock
 
 theorem isBlock_of_top (H : Subgroup G) {B : Set α} (hB : IsBlock H B) (hH : H = ⊤) : IsBlock G B :=
   by
@@ -272,7 +260,6 @@ theorem isBlock_of_top (H : Subgroup G) {B : Set α} (hB : IsBlock H B) (hH : H 
   intro g
   refine' hB ⟨g, _⟩
   rw [hH]; apply Subgroup.mem_top
-#align is_block_of_top isBlock_of_top
 
 theorem isBlock_preimage_coe (s : Set α) [DecidablePred s] (H : Subgroup (Equiv.Perm s))
     -- (hH : ∀ g ∈ H, ∃ (k : stabilizer G s), (to_perm k: equiv.perm s) = g)
@@ -299,7 +286,6 @@ theorem isBlock_preimage_coe (s : Set α) [DecidablePred s] (H : Subgroup (Equiv
     { toFun := coe
       map_smul' := fun g x => by simp only [SMul.stabilizer_def] }
   apply is_block_preimage k hB
-#align is_block_preimage_coe isBlock_preimage_coe
 
 example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α) B) :
     IsBlock (Equiv.Perm s) (coe ⁻¹' B : Set s) :=
@@ -392,7 +378,6 @@ theorem surjective_of_stabilizer_smul' [DecidableEq α] [Fintype α] (s : Set α
     simp only [Equiv.Perm.smul_def]
     rw [hk_apply, Equiv.Perm.ofSubtype_apply_coe]
     exact x.prop
-#align surjective_of_stabilizer_smul' surjective_of_stabilizer_smul'
 
 example [DecidableEq α] [Fintype α] (s : Set α) [DecidablePred s]
     (hsc : 2 ≤ Fintype.card (sᶜ : Set α)) (B : Set α) (hB : IsBlock (alternatingGroup α) B) :
@@ -422,7 +407,6 @@ theorem isBlock_preimage_comap {H : Type _} [Group H] {β : Type _} [MulAction H
         change f (m • x) = _; rw [f.map_smul]
         apply congr_arg; rfl }
   apply MulAction.isBlock_preimage f' hB
-#align is_block_preimage_comap isBlock_preimage_comap
 
 example (s : Set α) [DecidablePred s] (B : Set α) (hB : IsBlock (Equiv.Perm α) B) :
     IsBlock (Equiv.Perm s) (coe ⁻¹' B : Set s) :=
