@@ -123,7 +123,7 @@ theorem ne_one_of_isSwap {f : Equiv.Perm α} (hf : f.IsSwap) : f ≠ 1 := by
   obtain ⟨x, y, hxy, h⟩ := hf
   rw [h1] at h ; apply hxy
   rw [← Equiv.swap_apply_left x y]; rw [← h]
-  simp only [Equiv.Perm.coe_one, id.def]
+  simp only [Equiv.Perm.coe_one, id]
 #align equiv.perm.ne_one_of_is_swap Equiv.Perm.ne_one_of_isSwap
 
 theorem swap_isSwap_iff {a b : α} : (Equiv.swap a b).IsSwap ↔ a ≠ b :=
@@ -232,7 +232,7 @@ theorem has_swap_of_lt_stabilizer (s : Set α) (G : Subgroup (Equiv.Perm α))
     intro t ht
     rw [Set.one_lt_ncard_iff] at ht
     obtain ⟨a, b, ha, hb, h⟩ := ht
-    simp only [Ne.def, Subtype.mk_eq_mk] at h
+    simp only [Ne, Subtype.mk_eq_mk] at h
     use Equiv.swap a b
     constructor
     rw [swap_isSwap_iff]; exact h
@@ -403,7 +403,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     let f : (sᶜ : Set α) →ₑ[φ] (sᶜ : Set α) := {
       toFun := id
       map_smul' := fun g x => by
-        simp only [φ, id.def, Equiv.Perm.smul_def, toPerm_apply] }
+        simp only [φ, id, Equiv.Perm.smul_def, toPerm_apply] }
     have hf : Function.Bijective f := Function.bijective_id
     rw [isPreprimitive_of_bijective_map_iff _ hf]
     apply Equiv.Perm.isPreprimitive
@@ -480,7 +480,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
     let f : s →ₑ[φ] s := {
         toFun := id
         map_smul' := fun g x => by
-          simp only [φ, id.def, Equiv.Perm.smul_def, toPerm_apply] }
+          simp only [φ, id, Equiv.Perm.smul_def, toPerm_apply] }
     have hf : Function.Bijective f := Function.bijective_id
     rw [isPreprimitive_of_bijective_map_iff _ hf]
     apply Equiv.Perm.isPreprimitive

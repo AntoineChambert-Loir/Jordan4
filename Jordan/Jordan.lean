@@ -100,7 +100,7 @@ theorem isPretransitive_ofFixingSubgroup_inter
     {s : Set α} (hs : IsPretransitive (fixingSubgroup G s) (SubMulAction.ofFixingSubgroup G s))
     {g : G} (ha : s ∪ g • s ≠ ⊤) :  -- {a : α} (ha : a ∉ s ∪ g • s) :
     IsPretransitive (fixingSubgroup G (s ∩ g • s)) (SubMulAction.ofFixingSubgroup G (s ∩ g • s)) := by
-  rw [Ne.def, Set.top_eq_univ, ← Set.compl_empty_iff, ← Ne.def, ← Set.nonempty_iff_ne_empty] at ha
+  rw [Ne, Set.top_eq_univ, ← Set.compl_empty_iff, ← Ne, ← Set.nonempty_iff_ne_empty] at ha
   obtain ⟨a, ha⟩ := ha
   have ha' : a ∈ (s ∩ g • s)ᶜ := by
     rw [Set.compl_inter]
@@ -723,7 +723,7 @@ theorem isMultiplyPreprimitive_jordan
     rw [Set.insert_eq]
     simp only [Subtype.range_coe_subtype, Set.singleton_union, Set.mem_inter_iff, Set.mem_setOf_eq]
     simp_rw [SubMulAction.mem_ofStabilizer_iff]
-    simp only [Ne.def]
+    simp only [Ne]
     ext x
     --    apply subset_antisymm,
     · rw [Set.mem_insert_iff]
@@ -845,6 +845,7 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
     rw [Fintype.card_equiv (Equiv.cast rfl)]
     refine' le_trans (Nat.factorial_le hα3) _
     rw [Nat.factorial_two]
+    have : Nonempty G := One.instNonempty
     apply Nat.le_of_dvd Fintype.card_pos
     rw [← h2g.orderOf, orderOf_submonoid ⟨g, hg⟩]
     exact orderOf_dvd_card
@@ -894,6 +895,7 @@ theorem jordan_three_cycle [DecidableEq α]
     norm_num
     change 2 * 3 ≤ _
     simp only [mul_le_mul_left, Nat.succ_pos']
+    have : Nonempty G := One.instNonempty
     apply Nat.le_of_dvd Fintype.card_pos
     suffices 3 = orderOf (⟨g, hg⟩ : G) by
       rw [this]

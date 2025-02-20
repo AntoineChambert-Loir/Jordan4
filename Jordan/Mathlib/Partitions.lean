@@ -6,7 +6,7 @@ Authors: Antoine Chambert-Loir
 ! This file was ported from Lean 3 source module for_mathlib.partitions
 -/
 import Mathlib.Data.Setoid.Partition
-import Mathlib.Algebra.BigOperators.Order
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Finite.Card
 
 /-!
@@ -53,12 +53,12 @@ theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)}
     simp only [exists_unique_iff_exists, exists_prop, and_imp] at ht
     use Subtype.val ⁻¹' t
     constructor
-    · simp only [Ne.def, Set.mem_setOf_eq, Set.mem_preimage, exists_unique_iff_exists, exists_prop]
+    · simp only [Ne, Set.mem_setOf_eq, Set.mem_preimage, exists_unique_iff_exists, exists_prop]
       refine ⟨⟨t, ht.1.1, rfl, ?_⟩, ht.1.2⟩
       intro h
       rw [← Set.mem_empty_iff_false (a : α), ← h]
       exact Set.mem_inter ht.left.right (Subtype.mem a)
-    · simp only [Ne.def, Set.mem_setOf_eq, exists_unique_iff_exists,
+    · simp only [Ne, Set.mem_setOf_eq, exists_unique_iff_exists,
         exists_prop, and_imp, forall_exists_index]
       intro y x hxP hxy _ hay
       rw [← hxy, Subtype.preimage_coe_eq_preimage_coe_iff]
@@ -171,7 +171,7 @@ theorem Setoid.IsPartition.card_finset_eq_sum_parts {α : Type _} {P : Set (Set 
   rw [← this]
   apply congr_arg₂
   · apply Finset.coe_injective
-    simp only [Ne.def, Set.coe_toFinset]
+    simp only [Ne, Set.coe_toFinset]
     exact rfl
   · ext; apply congr_arg; rw [Set.toFinset_inj]
 #align setoid.is_partition.card_finset_eq_sum_parts Setoid.IsPartition.card_finset_eq_sum_parts
@@ -192,7 +192,6 @@ theorem Partition.card_of_partition'' [DecidableEq α] [Fintype α] {c : Finset 
   rw [Finset.card_eq_one]
   obtain ⟨s, ⟨hs, has⟩, hs'⟩ := hc.right a
   simp only [Set.mem_setOf_eq] at hs
-  simp only [Finset.mem_coe, Set.mem_setOf_eq, Finset.coe_inj, exists_eq_left', implies_true, and_true] at has
   simp only [Set.mem_setOf_eq, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index] at hs'
   obtain ⟨t, rfl, ht⟩ := hs
   use t

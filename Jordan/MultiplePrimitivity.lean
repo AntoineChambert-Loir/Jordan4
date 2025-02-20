@@ -312,7 +312,7 @@ theorem isMultiplyPreprimitive_of_bijective_map
   have hs' : f '' s = t := Set.image_preimage_eq t hf.surjective
   let φ' : fixingSubgroup M s → fixingSubgroup N t := fun ⟨m, hm⟩ =>
     ⟨φ m, fun ⟨y, hy⟩ => by
-      rw [← hs', Set.mem_image_iff_bex] at hy
+      rw [← hs', Set.mem_image] at hy
       obtain ⟨x, hx, hx'⟩ := hy
       simp only [Subtype.coe_mk]
       rw [← hx', ← map_smulₛₗ]

@@ -302,6 +302,7 @@ theorem large_subgroup_of_perm_contains_alternating
   swap
   · rw [mul_comm, Subgroup.index_mul_card, mul_comm]
     exact hG
+  have : Nonempty G := One.instNonempty
   exact Fintype.card_pos
 
 /-- A subgroup of the permutation group of index ≤ 2 contains the alternating group -/

@@ -648,7 +648,7 @@ theorem swap_mul_swap_mem (hα : 5 ≤ Fintype.card α) {g k : Equiv.Perm α} (h
             apply hdis _ _
             rw [disjoint_iff_disjoint_support, Equiv.Perm.support_swap _, Equiv.Perm.support_swap _]
             simp only [Finset.disjoint_insert_right, Finset.mem_insert, Finset.mem_singleton,
-              Finset.disjoint_insert_left, Finset.disjoint_singleton, Ne.def, not_or]
+              Finset.disjoint_insert_left, Finset.disjoint_singleton, Ne, not_or]
             exact ⟨⟨hb.1, hb.2.1⟩, ⟨Ne.symm hc.1, Ne.symm hc.2.1⟩⟩
             exact hbc
             exact Ne.symm hag
@@ -658,7 +658,7 @@ theorem swap_mul_swap_mem (hα : 5 ≤ Fintype.card α) {g k : Equiv.Perm α} (h
             apply hdis _ _
             rw [disjoint_iff_disjoint_support, Equiv.Perm.support_swap _, Equiv.Perm.support_swap _]
             simp only [Finset.disjoint_insert_right, Finset.mem_insert, Finset.mem_singleton,
-              Finset.disjoint_insert_left, Finset.disjoint_singleton, Ne.def, not_or]
+              Finset.disjoint_insert_left, Finset.disjoint_singleton, Ne, not_or]
             exact ⟨⟨Ne.symm hb.1, Ne.symm hc.1⟩, ⟨hb.2.2, hc.2.2⟩⟩
             exact Ne.symm hak
             exact hbc

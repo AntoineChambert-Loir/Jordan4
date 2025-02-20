@@ -9,7 +9,6 @@ Authors: Antoine Chambert-Loir
 import Jordan.Mathlib.Commutators
 import Mathlib.Tactic.Group
 import Mathlib.GroupTheory.Solvable
-import Mathlib.GroupTheory.Subgroup.Basic
 import Mathlib.GroupTheory.SpecificGroups.Alternating
 
 /-!
@@ -89,7 +88,7 @@ theorem alternatingGroup_is_perfect' (h5 : 5 ≤ Fintype.card α) :
     Subgroup.subtype_range]
 #align alternating_group_is_perfect' alternatingGroup_is_perfect'
 
-theorem alternatingGroup.commutator_group_le : 
+theorem alternatingGroup.commutator_group_le :
     commutator (Perm α) ≤ alternatingGroup α := by
   rw [commutator_eq_closure, Subgroup.closure_le]
   intro x
@@ -108,4 +107,3 @@ theorem alternatingGroup.commutator_group_eq (h5 : 5 ≤ Fintype.card α) :
 #align alternating_group.commutator_group_eq alternatingGroup.commutator_group_eq
 
 end Perfect
-
