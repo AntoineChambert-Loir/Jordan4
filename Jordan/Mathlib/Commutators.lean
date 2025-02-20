@@ -54,7 +54,6 @@ theorem surj_to_comm {G H : Type _} [Mul G] [Mul H] (φ : MulHom G H)
 
 theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) :
     Std.Commutative (· * · : G ⧸ N → _ → _) ↔ commutator G ≤ N := by
-  skip
   constructor
   · intro hcomm
     rw [commutator_eq_normalClosure]

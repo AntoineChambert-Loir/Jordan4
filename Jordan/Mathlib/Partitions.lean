@@ -140,7 +140,7 @@ theorem Setoid.IsPartition.card_set_eq_sum_parts {α : Type _} [Fintype α] (s :
     simp only [Set.mem_toFinset] at ht hu
     simp only [← Finset.disjoint_coe, Set.coe_toFinset]
     exact
-      Set.disjoint_of_subset (Set.inter_subset_right s t) (Set.inter_subset_right s u)
+      Set.disjoint_of_subset Set.inter_subset_right Set.inter_subset_right
         (Setoid.IsPartition.pairwiseDisjoint hP ht hu htu)
 #align setoid.is_partition.card_set_eq_sum_parts Setoid.IsPartition.card_set_eq_sum_parts
 

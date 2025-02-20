@@ -40,7 +40,6 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
   · rw [alternatingGroup_of_subsingleton]
     exact Subgroup.botCharacteristic
   -- hα : nontrivial α
-  skip
   apply Subgroup.Characteristic.mk
   intro φ
   rw [alternatingGroup_eq_sign_ker]
@@ -141,7 +140,8 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor
     · have hf := Subgroup.index_ker f; rw [Nat.card_eq_fintype_card] at hf
       rw [hf, ← hHp]
       unfold Subgroup.index
-      rw [Nat.card_eq_fintype_card, ← Fintype.card_perm]
+      rw [Nat.card_eq_fintype_card, ← Fintype.card_perm, ← Nat.card_eq_fintype_card,
+        ← Nat.card_eq_fintype_card]
       apply f.range.card_subgroup_dvd_card
     -- Condition on prime factors of f.ker.index : hypothesis on G
     · intro l hl hl'; apply hp' hl
@@ -182,8 +182,9 @@ theorem Subgroup.normal_of_index_eq_two {G : Type _} [Group G]
     apply Nat.eq_of_lt_succ_of_not_lt
     rw [Subgroup.index_ker f, Nat.card_eq_fintype_card, Nat.lt_succ_iff]
     apply Nat.le_of_dvd two_pos
+    rw [← Nat.card_eq_fintype_card]
     apply dvd_trans f.range.card_subgroup_dvd_card
-    rw [Fintype.card_perm, ← Nat.card_eq_fintype_card]
+    rw [Nat.card_eq_fintype_card, Fintype.card_perm, ← Nat.card_eq_fintype_card]
     unfold Subgroup.index at hH ; rw [hH]; norm_num
   -- ¬(f.ker.index < 2)
     intro h

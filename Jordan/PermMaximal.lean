@@ -57,13 +57,16 @@ theorem subgroup_of_group_of_order_two
   | inl h =>
     apply Or.intro_left
     apply Subgroup.eq_bot_of_card_le
+    rw [Nat.card_eq_fintype_card]
     exact h
   | inr h =>
     apply Or.intro_right
     apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     apply le_antisymm
     · apply Nat.le_of_dvd
       refine' Fintype.card_pos
+      rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]
       refine' Subgroup.card_subgroup_dvd_card H
     · rw [hG]; exact h
 #align subgroup_of_group_of_order_two subgroup_of_group_of_order_two

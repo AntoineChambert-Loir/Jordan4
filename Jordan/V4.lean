@@ -345,9 +345,10 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
     · apply isCommutative_of_prime_order (hp := Nat.fact_prime_three) _
       apply mul_left_injective₀ _
       dsimp
-      rw [← Subgroup.card_eq_card_quotient_mul_card_subgroup, V4_card α hα4, A4_card α hα4]
+      rw [← Nat.card_eq_fintype_card, ← Subgroup.card_eq_card_quotient_mul_card_subgroup,
+        Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,V4_card α hα4, A4_card α hα4]
       have : Nonempty (V4 α) := by exact One.instNonempty
-      exact Fintype.card_ne_zero
+      exact Nat.card_pos.ne'
   have comm_ne_bot : commutator (alternatingGroup α) ≠ ⊥ := by
     have : Nontrivial (Subgroup (alternatingGroup α)) := by
       rw [Subgroup.nontrivial_iff]

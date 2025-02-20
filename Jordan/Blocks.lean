@@ -317,7 +317,7 @@ theorem SubMulAction.IsBlock_coe {C : SubMulAction G X} {B : Set C} :
   apply or_congr (Set.image_eq_image Subtype.coe_injective).symm
   simp only [Set.disjoint_iff, Set.subset_empty_iff]
   rw [←
-    Set.InjOn.image_inter (Set.injOn_of_injective Subtype.coe_injective _) (Set.subset_univ _)
+    Set.InjOn.image_inter (Set.injOn_of_injective Subtype.coe_injective) (Set.subset_univ _)
       (Set.subset_univ _)]
   simp only [Set.image_eq_empty]
 #align mul_action.sub_mul_action.is_block_coe MulAction.SubMulAction.IsBlock_coe

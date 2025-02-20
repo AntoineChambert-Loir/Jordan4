@@ -2981,12 +2981,12 @@ theorem Equiv.Perm.conj_stabilizer_card (g : Equiv.Perm α) :
       (Fintype.card α - g.cycleType.sum).factorial * g.cycleType.prod *
         (g.cycleType.dedup.map
           fun n : ℕ => (g.cycleType.count n).factorial).prod := by
-  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (φ g).ker]
-  rw [Fintype.card_congr (QuotientGroup.quotientKerEquivRange (φ g)).toEquiv]
+  rw [← Nat.card_eq_fintype_card, Subgroup.card_eq_card_quotient_mul_card_subgroup (φ g).ker]
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange (φ g)).toEquiv]
   rw [← Nat.card_eq_fintype_card, hφ_range_card]
   rw [mul_comm]
   apply congr_arg₂ (· * ·) _ rfl
-  rw [← hψ_range_card]
+  rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, ← hψ_range_card]
   rw [hψ_range_card']
 #align on_cycle_factors.equiv.perm.conj_stabilizer_card OnCycleFactors.Equiv.Perm.conj_stabilizer_card
 
