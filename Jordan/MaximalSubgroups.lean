@@ -6,6 +6,7 @@ Authors: Antoine Chambert-Loir
 ! This file was ported from Lean 3 source module maximal_subgroups
 -/
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.Order.Atoms
 
 /-! # Maximal subgroups
 

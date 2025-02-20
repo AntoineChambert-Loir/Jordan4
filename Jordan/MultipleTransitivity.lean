@@ -1134,6 +1134,7 @@ theorem IsMultiplyPretransitive.alternatingGroup_le_of_sub_two [DecidableEq α]
   apply Nat.mul_le_mul_left
   have : Nonempty G := One.instNonempty
   apply Nat.le_of_dvd (Fintype.card_pos)
+  rw [← Nat.card_eq_fintype_card]
   apply Subgroup.index_dvd_card
 
 /-- The alternating group on 3 letters or more acts transitively -/

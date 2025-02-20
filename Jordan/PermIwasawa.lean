@@ -77,7 +77,7 @@ lemma Equiv.Perm.ofSubtype_range_eq (s : Set α) [DecidablePred fun a ↦ a ∈ 
   · intro h
     have hks : s = k • s := by
       apply le_antisymm
-      . intro x hx
+      · intro x hx
         rw [Set.mem_smul_set_iff_inv_smul_mem, Perm.smul_def]
         by_contra hx'
         rw [← h _ hx', apply_inv_self] at hx'

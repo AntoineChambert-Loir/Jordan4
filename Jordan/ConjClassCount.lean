@@ -509,7 +509,7 @@ theorem Equiv.permWithCycleType_nonempty_iff {m : Multiset ℕ} :
       rw [← Multiset.coe_toList m]
       apply congr_arg
       rw [List.map_map]; rw [← hp_length]
-      apply List.map_congr
+      apply List.map_congr_left
       intro x hx; simp only [Function.comp_apply]
       rw [List.support_formPerm_of_nodup x (hp_nodup x hx)]
       ·-- length
@@ -1070,7 +1070,7 @@ theorem Equiv.Perm.cycle_zpow_mem_support_iff {g : Equiv.Perm α}
   cases' dec_em (m = 0) with hm0 hm0'
   · simp only [hm0, pow_zero, Nat.cast_zero]
   · simp only [Nat.cast_eq_zero, hm0', iff_false]
-    exact pow_ne_one_of_lt_orderOf' hm0' div_euc.2
+    exact pow_ne_one_of_lt_orderOf hm0' div_euc.2
 
 
 theorem Equiv.Perm.zpow_eq_zpow_on_iff (g : Equiv.Perm α)
@@ -2065,10 +2065,9 @@ lemma θAux_apply_of_mem_fixedPoints_mem {k} {v} {x}
 
 lemma θAux_apply_of_cycleOf_eq {k} {v} {x} (c : g.cycleFactorsFinset)
     (hx : g.cycleOf x = ↑c) : θAux g k v x = (v c : Equiv.Perm α) x := by
-  suffices c = ⟨g.cycleOf x, ?_⟩ by
+  suffices c = ⟨g.cycleOf x, by simp only [hx, c.prop]⟩ by
     rw [this, θAux, dif_pos]
-    rw [hx]; exact c.prop
-  simp only [← Subtype.coe_inj, hx]
+  simp only [hx, Subtype.coe_eta]
 
 lemma θAux_apply_of_cycleOf_eq_mem {k} {v} {x} (c : g.cycleFactorsFinset)
     (hx : g.cycleOf x = ↑c) :
@@ -3147,7 +3146,7 @@ theorem sign_ψ
   · rw [θ_apply_fst, Equiv.Perm.sign_ofSubtype]
   · rw [← MonoidHom.inr_apply, ← MonoidHom.comp_apply]
     conv_lhs => rw [← Finset.noncommProd_mul_single v]
-    simp only [Finset.noncommProd_map]
+    simp only [Finset.map_noncommProd]
     rw [Finset.noncommProd_eq_prod]
     apply Finset.prod_congr rfl
     intro c _

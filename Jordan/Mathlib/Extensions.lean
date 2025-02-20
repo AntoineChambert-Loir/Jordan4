@@ -96,7 +96,7 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
     rw [dite_eq_iff]
     apply Or.intro_left; use hi; rfl
   · simp only [gt_iff_lt, Set.coe_setOf, Set.mem_setOf_eq, toFun_eq_coe,
-    coeFn_mk, lt_self_iff_false, ↓reduceDite, p, f, f']
+      coeFn_mk, lt_self_iff_false, ↓reduceDIte, p, f, f']
 
 
 
@@ -169,7 +169,7 @@ theorem may_extend_with' {m n k : ℕ} {s : Set α} (z : Fin k ↪ s) (h : n = m
   · ext ⟨j, hj⟩
     simp only [gt_iff_lt, Set.coe_setOf, Set.mem_setOf_eq, toFun_eq_coe, Fin.castOrderIso_apply,
       trans_apply, Fin.natAddEmb_apply, Fin.natAdd_mk, Equiv.coe_toEmbedding, RelIso.coe_fn_toEquiv,
-      Fin.cast_mk, coeFn_mk, add_lt_iff_neg_left, not_lt_zero', ↓reduceDite, Fin.subNat_mk,
-      add_tsub_cancel_left, p, f, g, subtype]
+      Fin.cast_mk, coeFn_mk, add_lt_iff_neg_left, not_lt_zero', ↓reduceDIte, Fin.subNat_mk,
+      add_tsub_cancel_left, subtype, p, f, g]
 
 end Extensions

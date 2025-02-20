@@ -25,7 +25,6 @@ import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.Commutator
 import Mathlib.GroupTheory.QuotientGroup
 import Mathlib.Data.Set.Pointwise.Basic
-import Mathlib.Data.Nat.Prime
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Card

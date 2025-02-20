@@ -166,9 +166,9 @@ theorem fixingSubgroup_of_insert (a : α) (s : Set (SubMulAction.ofStabilizer M 
     intro x hx
     rw [Set.mem_insert_iff] at hx
     cases' hx with hx hx
-    . -- x = a
+    · -- x = a
       simpa [hx] using hn'
-    . -- x ∈ s
+    · -- x ∈ s
       simp only [Set.mem_image] at hx
       rcases hx with ⟨y, hy, rfl⟩
       conv_rhs => rw [← hn y hy]
