@@ -75,6 +75,7 @@ open MulAction
 
 variable {α : Type _} [DecidableEq α] (G : Type _) [Group G] [MulAction G α]
 
+omit [DecidableEq α] in
 theorem IsPretransitive.of_partition (s : Set α) :
     (∀ a ∈ s, ∀ b ∈ s, ∃ g : G, g • a = b) →
       (∀ a ∈ sᶜ, ∀ b ∈ sᶜ, ∃ g : G, g • a = b) →
@@ -160,6 +161,7 @@ theorem card_smul_eq (s : Set α) (g : Equiv.Perm α) :
   rw [Finset.card_image_of_injective _ (MulAction.injective g)]
 -/
 
+omit [DecidableEq α] [Fintype α] in
 theorem moves_in
     (G : Subgroup (Equiv.Perm α)) (t : Set α) (hGt : stabilizer (Equiv.Perm α) t < G) :
     ∀ a ∈ t, ∀ b ∈ t, ∃ g : G, g • a = b :=
@@ -171,6 +173,7 @@ theorem moves_in
   · apply le_of_lt hGt
     apply swap_mem_stabilizer ha hb
 
+omit [DecidableEq α] [Fintype α] in
 theorem stabilizer_ne_top (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nonempty) :
     stabilizer (Equiv.Perm α) s ≠ ⊤ := by
   obtain ⟨a, ha⟩ := hs
@@ -271,6 +274,7 @@ theorem Subtype.image_preimage_of_val {α : Type*} {s B : Set α} (h : B ⊆ s) 
   simp only [hx, Set.mem_preimage, Subtype.coe_mk, eq_self_iff_true, and_self_iff]
 
 -- Move to Blocks.lean
+omit [DecidableEq α] in
 theorem _root_.MulAction.isTrivialBlock_or_2_mul_ncard_le_card  {G : Type*} [Group G] [MulAction G α] [IsPretransitive G α]
     {B : Set α} (hB : IsBlock G B) :
     IsTrivialBlock B ∨ (2 * Set.ncard B ≤ Nat.card α) := by
@@ -585,6 +589,7 @@ open Pointwise
 
 variable {α : Type _} [DecidableEq α] [Fintype α]
 
+omit [Fintype α] in
 theorem Nat.Combination.stabilizer_eq
     {G : Type*} [Group G] [MulAction G α] (s : Nat.Combination α n) :
     stabilizer G s = stabilizer G (s : Set α) := by

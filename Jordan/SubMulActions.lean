@@ -8,7 +8,7 @@ Authors: Antoine Chambert-Loir
 -- ==> Mathlib.GroupTheory.GroupAction.SubMulAction.Invariant
 import Jordan.EquivariantMap
 
-import Mathlib.Data.Finset.Pointwise
+import Mathlib.Data.Finset.Pointwise.Basic
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.Tactic.Group
@@ -102,7 +102,7 @@ def ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α
     rw [← Subgroup.inv_mem_iff] at hc
     simp only [Set.mem_compl_iff, not_imp_not]
     intro (hcx : c • x ∈ s)
-    rw [← one_smul M x, ← inv_mul_self c, mul_smul]
+    rw [← one_smul M x, ← inv_mul_cancel c, mul_smul]
     rw [(mem_fixingSubgroup_iff M).mp hc (c • x) hcx]
     exact hcx
 
@@ -392,7 +392,7 @@ theorem SubMulAction.conjMap_ofFixingSubgroup_bijective {s t : Set α} {g : M} (
     use (SubMulAction.conjMap_ofFixingSubgroup M hst') ⟨x, hx⟩
     rw [← SetLike.coe_eq_coe]
     change g • g⁻¹ • x = x
-    rw [← mul_smul, mul_inv_self, one_smul]
+    rw [← mul_smul, mul_inv_cancel, one_smul]
 
 /-- Conjugation induces an equivariant map between the sub_mul_action of
 the stabilizer of a pint and that of its translate -/

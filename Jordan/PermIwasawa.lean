@@ -50,6 +50,7 @@ lemma fixingSubgroup_conj {G α : Type*} [Group G] [MulAction G α]
   rw [← Set.mem_smul_set_iff_inv_smul_mem]
   simp only [MulAut.smul_def, MulAut.conj_inv_apply, mul_smul, smul_inv_smul, smul_left_cancel_iff]
 
+omit [Fintype α] in
 lemma IwasawaT'_isConj (s : Finset α) (g : Equiv.Perm α) :
     IwasawaT' (g • s) = MulAut.conj g • (IwasawaT' s) := by
   ext k
@@ -64,6 +65,7 @@ lemma IwasawaT'_isConj (s : Finset α) (g : Equiv.Perm α) :
     MulAut.conj_inv_apply, coe_mul, Function.comp_apply, apply_inv_self,
     EmbeddingLike.apply_eq_iff_eq]
 
+omit [DecidableEq α] [Fintype α] in
 lemma Equiv.Perm.ofSubtype_range_eq (s : Set α) [DecidablePred fun a ↦ a ∈ s]:
   (Equiv.Perm.ofSubtype : Equiv.Perm s →* Equiv.Perm α).range =
     fixingSubgroup (Equiv.Perm α) (sᶜ : Set α) := by
@@ -115,6 +117,7 @@ def Equiv.permCongrMul {α β : Type*} (e : α ≃ β) :
   Equiv.permCongr e with
   map_mul' := fun f g ↦ by ext b; simp }
 
+omit [Fintype α] in
 theorem IwasawaT_is_conj' (s : Finset α) (g : Equiv.Perm α) :
     IwasawaT (g • s) = MulAut.conj g • (IwasawaT s) := by
   unfold IwasawaT
@@ -123,6 +126,7 @@ theorem IwasawaT_is_conj' (s : Finset α) (g : Equiv.Perm α) :
   simp only [Finset.coe_smul_finset, ← smul_compl_set]
   apply Equiv.Perm.fixingSubgroup_conj
 
+omit [Fintype α] in
 theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) :
     IwasawaT (g • s) = MulAut.conj g • (IwasawaT s) := by
   unfold IwasawaT
@@ -179,7 +183,12 @@ theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) :
 def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
   T := fun s ↦ IwasawaT (s.val)
   is_comm := fun s ↦ by
-    apply MonoidHom.range_isCommutative
+    simp only [IwasawaT, Finset.coe_sort_coe, Iwt]
+    suffices Std.Commutative (α := Perm s) (· * ·) by
+      let _ : CommGroup (Perm s) :=
+      { __ := (inferInstance : Group (Perm s)),
+        mul_comm := this.comm }
+      apply MonoidHom.range_isCommutative
     rw [Equiv.Perm.isCommutative_iff]
     apply le_of_eq
     simp only [Finset.mem_coe, Fintype.card_coe]

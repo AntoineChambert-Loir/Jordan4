@@ -22,8 +22,8 @@ import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Abelianization
-import Mathlib.GroupTheory.Commutator
-import Mathlib.GroupTheory.QuotientGroup
+import Mathlib.GroupTheory.Commutator.Basic
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.Data.Set.Pointwise.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card

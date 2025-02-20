@@ -72,7 +72,7 @@ def Subgroup.mulEquivOfMulEquiv {G G' : Type _} [Group G] [Group G'] (f : G ≃*
   · ext; simp
   · ext; simp
 
-variable {α : Type _} [Fintype α] [DecidableEq α]
+variable {α : Type _} [DecidableEq α]
 
 namespace Equiv.Perm
 
@@ -201,6 +201,8 @@ theorem IwConj_symm_sign (s : Finset α) (g : Equiv.Perm α) (k : Equiv.Perm (g 
   · intro k; rfl
 
 end Equiv.Perm
+
+variable [Fintype α]
 
 namespace alternatingGroup
 
@@ -784,6 +786,7 @@ def Iw4 (hα : 5 ≤ Fintype.card α) : IwasawaStructure (alternatingGroup α) (
   is_conj := fun g ⟨s, hs⟩ => Iw4T_is_conj g s hs
   is_generator := Iw4_is_generator_alt hα
 
+omit [Fintype α] in
 theorem Finset.mem_doubleton_iff (a b x : α) : x ∈ ({a, b} : Finset α) ↔ x = a ∨ x = b := by
   rw [Finset.mem_insert, Finset.mem_singleton]
 
