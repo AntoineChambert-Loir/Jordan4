@@ -85,7 +85,7 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   -- Q is a quotient of H
   let φ : H →* G ⧸ N := MonoidHom.comp (QuotientGroup.mk' N) (Subgroup.subtype H)
   -- Il suffit de prouver que φ est surjective
-  refine' surj_to_comm φ.toMulHom _ hH.is_comm
+  refine surj_to_comm φ.toMulHom ?_ hH.is_comm
   simp only [MulHom.coe_mk, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe]
   -- On prouve que l'image de φ est égale à ⊤
   rw [← MonoidHom.range_top_iff_surjective]

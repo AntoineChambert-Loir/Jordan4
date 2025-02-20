@@ -33,7 +33,7 @@ theorem ofSubtype_mem_stabilizer (s : Set α) (g : Equiv.Perm s) :
   rintro ⟨y, hy, rfl⟩
   simp only [Equiv.Perm.smul_def]
   rw [Equiv.Perm.ofSubtype_apply_of_mem g hy]
-  refine' Subtype.mem _
+  refine Subtype.mem _
   exact s.toFinite
 
 theorem ofSubtype_mem_stabilizer' (s : Set α) (g : Equiv.Perm (sᶜ : Set α)) :

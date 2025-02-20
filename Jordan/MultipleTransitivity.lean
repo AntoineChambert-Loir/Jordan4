@@ -140,7 +140,7 @@ theorem isMultiplyPretransitive_of_subgroup {n : ℕ} {K : Subgroup M}
 theorem isMultiplyPretransitive_of_le {n : ℕ} {H K : Subgroup M} (hHK : K ≤ H)
     (h : IsMultiplyPretransitive K α n) : IsMultiplyPretransitive H α n := by
   unfold IsMultiplyPretransitive at *
-  refine' isPretransitive_of_subgroup_le hHK h
+  refine isPretransitive_of_subgroup_le hHK h
 
 
 /-- Given an equivariant map α → β, get an equivariant map on function types (ι ↪ α) → (ι ↪ β)-/
@@ -407,7 +407,7 @@ lemma exists_extends_with_last_eq (a : α) {n : ℕ} (x : Fin n ↪ SubMulAction
       (Fin.castLEEmb (Nat.le_succ n)).trans x' = x.trans j ∧
         x' ⟨n, Nat.lt_succ_self n⟩ = a := by
   intro _
-  refine' may_extend_with (x.trans (subtype _)) a _
+  refine may_extend_with (x.trans (subtype _)) a ?_
   rintro ⟨u, hu⟩
   simp only [toFun_eq_coe, trans_apply, Function.Embedding.coe_subtype] at hu
   apply SubMulAction.neq_of_mem_ofStabilizer M a
@@ -462,7 +462,7 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
           (Fin.castLEEmb (Nat.le_succ n)).toEmbedding.trans x' = x.trans j ∧
             x' ⟨n, Nat.lt_succ_self n⟩ = a := by
       intro x
-      refine' may_extend_with (x.trans (subtype _)) a _
+      refine may_extend_with (x.trans (subtype _)) a _
       rintro ⟨u, hu⟩
       simp only [toFun_eq_coe, trans_apply, Function.Embedding.coe_subtype] at hu
       apply SubMulAction.ofStabilizer_neq M a
@@ -561,7 +561,7 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
             x' ⟨n, Nat.lt_succ_self n⟩ = a :=
       by
       intro x
-      refine' may_extend_with (x.trans (subtype _)) a _
+      refine may_extend_with (x.trans (subtype _)) a _
       rintro ⟨u, hu⟩
       simp only [toFun_eq_coe, trans_apply, Function.Embedding.coe_subtype] at hu
       apply (SubMulAction.ofStabilizer_neq M a)
@@ -1020,7 +1020,7 @@ theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
     · obtain ⟨j, hxj : (k • x) j = (g • x) i⟩ := hx (k • x) ((g • x) i)
       cases' aux_lt_iff_lt_or_eq j.prop with hj hj
       · exfalso
-        suffices i = j by rw [← this, ← hi] at hj ; refine' lt_irrefl _ hj
+        suffices i = j by rw [← this, ← hi] at hj ; refine lt_irrefl _ hj
         apply EmbeddingLike.injective (g • x)
         rw [hgk' j hj]; rw [hxj]
       · rw [← hxj]

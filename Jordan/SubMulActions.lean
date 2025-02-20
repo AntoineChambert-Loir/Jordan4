@@ -253,7 +253,7 @@ instance  (a : α) (s : Set (SubMulAction.ofStabilizer M a)) :
           apply Set.mem_insert⟩,
       fun ⟨x, hx⟩ => by
         simp only [← SetLike.coe_eq_coe]
-        refine' (mem_fixingSubgroup_iff M).mp m.prop _ _
+        refine (mem_fixingSubgroup_iff M).mp m.prop _ _
         apply Set.mem_insert_of_mem
         use ⟨x, (SubMulAction.mem_ofStabilizer_iff  M a).mp x.prop⟩⟩ -/
 
@@ -268,7 +268,7 @@ def SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer
           apply Set.mem_insert⟩,
       fun ⟨x, hx⟩ => by
         simp only [← SetLike.coe_eq_coe]
-        refine' (mem_fixingSubgroup_iff M).mp m.prop _ _
+        refine (mem_fixingSubgroup_iff M).mp m.prop _ ?_
         apply Set.mem_insert_of_mem
         use ⟨x, (SubMulAction.mem_ofStabilizer_iff  M a).mp x.prop⟩⟩
     SubMulAction.ofFixingSubgroup M (insert a (Subtype.val '' s)) →ₑ[φ]
@@ -298,7 +298,7 @@ theorem SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_bijective
     rw [← SubMulAction.equivariantMap_ofFixingSubgroup_to_ofStabilizer_coe M hy]
     rw [h]
   · rintro ⟨⟨x, hx1⟩, hx2⟩
-    refine' ⟨⟨x, _⟩, rfl⟩
+    refine ⟨⟨x, ?_⟩, rfl⟩
     -- ⊢ x ∈ sub_mul_action_of_fixing_subgroup M (insert a (coe '' s))
     rw [SubMulAction.mem_ofFixingSubgroup_iff]
     intro h; cases Set.mem_insert_iff.mp h with

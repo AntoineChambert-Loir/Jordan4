@@ -57,7 +57,7 @@ theorem commutator_le_iwasawa (is_qprim : IsQuasipreprimitive M α) (IwaS : Iwas
   have is_transN := is_qprim.pretransitive_of_normal nN hNX
   have ntα : Nontrivial α := isnontrivial_of_nontrivial_action hNX
   obtain a : α := Nontrivial.to_nonempty.some
-  refine' contains_commutators_of N nN (IwaS.T a) _ (IwaS.is_comm a)
+  refine contains_commutators_of N nN (IwaS.T a) ?_ (IwaS.is_comm a)
   -- by contains_commutators_of, it suffices to prove that N ⊔ IwaS.T x = ⊤
   rw [eq_top_iff, ← IwaS.is_generator, iSup_le_iff]
   intro x
@@ -77,7 +77,7 @@ theorem is_simple_iwasawa
   intro N nN
   cases or_iff_not_imp_left.mpr (commutator_le_iwasawa is_qprim IwaS nN) with
   | inl h =>
-    refine' Or.inl (N.eq_bot_iff_forall.mpr fun n hn => _)
+    refine Or.inl (N.eq_bot_iff_forall.mpr fun n hn => ?_)
     apply is_faithful.eq_of_smul_eq_smul
     intro x
     rw [one_smul]

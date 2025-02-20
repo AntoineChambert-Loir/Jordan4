@@ -286,7 +286,7 @@ theorem List.ranges_nodup (l : List ℕ) :
     -- s ∈ l
     rw [List.mem_map] at hs ;
     obtain ⟨t, ht, rfl⟩ := hs
-    refine' List.Nodup.map (fun u v => Nat.add_left_cancel) (hl t ht)
+    refine List.Nodup.map (fun u v => Nat.add_left_cancel) (hl t ht)
 
 /-- The lengths of the members of `l.ranges` are those given by `l` -/
 theorem List.ranges_length (l : List ℕ) :
@@ -367,7 +367,7 @@ theorem List.exists_pw_disjoint_with_card [Fintype α] [DecidableEq α]
     rw [hl u hu]; apply List.ranges_nodup c u hu
   · -- pairwise disjoint
     suffices : List.Pairwise List.Disjoint l
-    refine' List.Pairwise.map _ _ this
+    refine List.Pairwise.map _ _ this
     · intro s t hst
       apply List.disjoint_map
       exact Equiv.injective _
@@ -471,7 +471,7 @@ theorem Equiv.permWithCycleType_empty {c : Multiset ℕ} (hc : Fintype.card α <
   simp only [Set.toFinset_univ, Finset.mem_filter, Finset.mem_univ, true_and_iff]
   intro hg; apply lt_iff_not_le.mp hc; rw [← hg]
   rw [Equiv.Perm.sum_cycleType]
-  refine' (Equiv.Perm.support g).card_le_univ
+  exact (Equiv.Perm.support g).card_le_univ
 
 /-- There are permutations with cycleType `m` if and only if
   its sum is at most `Fintype.card α` and its members are at least 2. -/
@@ -1704,7 +1704,7 @@ theorem k_bij {τ : Equiv.Perm g.cycleFactorsFinset}
     (hτ : ∀ c, (τ c : Equiv.Perm α).support.card = (c : Equiv.Perm α).support.card) :
     Function.Bijective (k a τ) := by
   rw [Fintype.bijective_iff_surjective_and_card]
-  refine' And.intro _ rfl
+  refine And.intro ?_ rfl
   rw [Function.surjective_iff_hasRightInverse]
   use k a τ⁻¹
   rw [Function.rightInverse_iff_comp]
@@ -2898,7 +2898,7 @@ theorem Equiv.Perm.conj_class_card (g : Equiv.Perm α) :
   -- This is the cardinal of the centralizer
   rw [← Equiv.Perm.conj_stabilizer_card g]
   have : Nonempty (MulAction.stabilizer (ConjAct (Equiv.Perm α)) g) := One.instNonempty
-  refine' Fintype.card_pos
+  refine Fintype.card_pos
 
 variable (α)
 

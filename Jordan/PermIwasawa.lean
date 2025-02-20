@@ -210,7 +210,7 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
     (hα : 5 ≤ Fintype.card α) {N : Subgroup (Equiv.Perm α)} (hnN : N.Normal) (ntN : Nontrivial N) :
     alternatingGroup α ≤ N := by
   rw [← alternatingGroup.commutator_group_eq hα]
-  refine' commutator_le_iwasawa _ iwasawa_two hnN _
+  refine commutator_le_iwasawa ?_ iwasawa_two hnN ?_
   · -- quasipreprimitive action
     apply IsPreprimitive.isQuasipreprimitive
     apply Nat.Combination_isPreprimitive

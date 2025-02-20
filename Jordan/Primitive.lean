@@ -180,7 +180,7 @@ theorem IsPreprimitive.mk_mem [htGX : IsPretransitive G X] (a : X)
     obtain ⟨b, hb⟩ := h
     obtain ⟨g, hg⟩ := exists_smul_eq G b a
     rw [isTrivialBlock_of_block_iff g]
-    refine' H (g • B) _ (IsBlock_of_block g hB)
+    refine H (g • B) ?_ (IsBlock_of_block g hB)
     use b
 
 /-- If the action is not trivial, then the trivial blocks condition implies preprimitivity
@@ -206,7 +206,7 @@ theorem IsPreprimitive.mk_mem' (a : X) (ha : a ∉ fixedPoints G X)
     obtain ⟨b, hb⟩ := h
     obtain ⟨g, hg⟩ := exists_smul_eq G b a
     rw [isTrivialBlock_of_block_iff g]
-    refine' H (g • B) _ (IsBlock_of_block g hB)
+    refine H (g • B) ?_ (IsBlock_of_block g hB)
     use b
 
 /-- If the action is not trivial, then the trivial blocks condition implies preprimitivity
@@ -621,7 +621,7 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
   rw [Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
       (IsBlockSystem.of_block hB hB_ne).left]
   rw [Finset.card_eq_sum_ones]
-  refine' Finset.sum_le_sum _
+  refine Finset.sum_le_sum _
   intro t ht
   rw [Set.toFinset_card, Fintype.card_le_one_iff_subsingleton, Set.inter_comm,
     ← Set.image_preimage_eq_inter_range, Set.subsingleton_coe]
@@ -646,7 +646,7 @@ theorem isPreprimitive_of_large_image [Fintype β] [htβ : IsPretransitive N β]
   rw [← smul_set_card_eq g B]
   -- This last step is disgusting :
   -- the types are identical, but not the proofs that they are finite
-  refine' le_trans _ (le_trans (Set.card_le_of_subset h') _)
+  refine le_trans _ (le_trans (Set.card_le_of_subset h') _)
   all_goals {
     simp only [Nat.card_eq_fintype_card]
     rfl }
@@ -697,7 +697,7 @@ theorem isPreprimitive_of_large_image
   rw [Setoid.IsPartition.card_set_eq_sum_parts (Set.range f)
       (IsBlockSystem.of_block hB hB_ne).left]
   rw [Finset.card_eq_sum_ones]
-  refine' Finset.sum_le_sum _
+  refine Finset.sum_le_sum ?_
   intro t ht
   rw [← Set.ncard_eq_toFinset_card', ← Set.subsingleton_iff_ncard_le_one,
     Set.inter_comm, ← Set.image_preimage_eq_inter_range]

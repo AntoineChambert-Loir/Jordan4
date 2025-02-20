@@ -137,7 +137,7 @@ theorem stabilizer.isMultiplyPreprimitive
         obtain ⟨g, hg : g • b = a⟩ := h_eq b a
         apply isPreprimitive_of_surjective_map
           (SubMulAction.conjMap_ofFixingSubgroup_bijective M (inv_smul_smul g s)).surjective
-        refine' this (g • s) _ ⟨b, hb, hg⟩
+        refine this (g • s) ?_ ⟨b, hb, hg⟩
         rw [smul_set_encard_eq, hs]
 
       intro s hs has
@@ -151,7 +151,7 @@ theorem stabilizer.isMultiplyPreprimitive
           rw [hxa]; apply Set.mem_insert
           apply Set.mem_insert_of_mem
           use ⟨x, ?_⟩
-          refine' And.intro _ rfl
+          refine And.intro ?_ rfl
           · simp only [t, Set.mem_preimage]
             exact hxs
           exact hxa
@@ -287,7 +287,7 @@ theorem isMultiplyPreprimitive_of_higher
     · rw [hmn]; exact hn
     -- m < n + 1 : use induction hypothesis
     · apply hrec (Nat.lt_succ_iff.mp hmn')
-      refine' le_trans _ hα; rw [PartENat.coe_le_coe]; exact Nat.le_succ n
+      refine le_trans ?_ hα; rw [PartENat.coe_le_coe]; exact Nat.le_succ n
       -- get one step by transitivity
       apply isMultiplyPreprimitive_of_multiply_pretransitive_succ M α hα hn.left
 

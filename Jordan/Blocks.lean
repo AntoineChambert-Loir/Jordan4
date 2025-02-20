@@ -63,7 +63,7 @@ theorem IsBlock.def {B : Set X} :
   constructor
   · intro hB g g'
     by_cases h : g • B = g' • B
-    · refine' Or.intro_left _ h
+    · refine Or.intro_left _ h
     · apply Or.intro_right
       exact hB (Set.mem_range_self g) (Set.mem_range_self g') h
   · intro hB
@@ -350,7 +350,7 @@ theorem IsBlock.iInter {ι : Type _} {B : ι → Set X} (hB : ∀ i : ι, IsBloc
   · obtain ⟨j, hj⟩ := h
     apply Or.intro_right
     -- rw set.smul_Inter h,
-    refine' Disjoint.mono _ _ hj
+    refine Disjoint.mono ?_ ?_ hj
     apply Set.iInter_subset
     apply Set.iInter_subset
   simp only [not_exists] at h
@@ -615,7 +615,7 @@ theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid
   have := Fintype.ofFinite α
   simp only [finsum_eq_sum_of_fintype, Nat.card_eq_fintype_card]
   rw [← Fintype.card_sigma]
-  refine' Fintype.card_congr (Equiv.ofBijective (fun x => x.snd : (Σ a : ↥c, a) → α) _)
+  refine Fintype.card_congr (Equiv.ofBijective (fun x => x.snd : (Σ a : ↥c, a) → α) ?_)
   constructor
   · -- injectivity
     rintro ⟨⟨x, hx⟩, ⟨a, ha : a ∈ x⟩⟩ ⟨⟨y, hy⟩, ⟨b, hb : b ∈ y⟩⟩ hab
@@ -624,7 +624,7 @@ theorem Setoid.nat_sum {α : Type _} [Finite α] {c : Set (Set α)} (hc : Setoid
     rw [Sigma.subtype_ext_iff]
     simp only [Subtype.mk_eq_mk, Subtype.coe_mk]
     apply And.intro _ hab
-    refine' ExistsUnique.unique (hc.2 b) _ _
+    refine ExistsUnique.unique (hc.2 b) ?_ ?_
     · exact ⟨hx, ha⟩
     · exact ⟨hy, hb⟩
   · -- surjectivity
@@ -720,7 +720,7 @@ theorem IsBlock.is_subsingleton [Finite X] [IsPretransitive G X]
     · exfalso
       rw [← hk, lt_iff_not_ge] at hB'
       apply hB'
-      refine' Nat.mul_le_mul_right _ hb
+      refine Nat.mul_le_mul_right _ hb
 
 -- TODO : Is the assumption B.finite necessary ?
 /-- The intersection of the translates of a *finite* subset which contain a given point

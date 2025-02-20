@@ -57,7 +57,7 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
   ext g
   simp only [MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply]
   apply congr_arg
-  refine' Equiv.Perm.swap_induction_on g _ _
+  refine Equiv.Perm.swap_induction_on g ?_ ?_
   · rw [map_one, Equiv.Perm.sign.map_one]
   · intro f x y hxy hf
     simp only [map_mul, hf]
@@ -69,7 +69,7 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
     rw [Equiv.Perm.sign_swap hab] at hk
     let hk := Or.resolve_right (Int.units_eq_one_or (s _)) hk
     apply hg'
-    refine' Equiv.Perm.swap_induction_on g' s.map_one _
+    refine Equiv.Perm.swap_induction_on g' s.map_one ?_
     intro f x y hxy hf
     rw [s.map_mul, hf, mul_one]
     obtain ⟨u, hu⟩ := Equiv.Perm.isConj_swap hxy hab
@@ -131,7 +131,7 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor
     rw [one_mul]
     rw [Subgroup.normalCore_eq_ker]; rw [hHp]
     change f.ker.index = p
-    refine' Or.resolve_left (Nat.Prime.eq_one_or_self_of_dvd hp f.ker.index _) _
+    refine Or.resolve_left (Nat.Prime.eq_one_or_self_of_dvd hp f.ker.index ?_) ?_
     --  f.ker.index ∣ p,
     apply aux_dvd_lemma hp
     -- f.ker.index ∣ p.factorial : Lagrange on range
@@ -230,7 +230,7 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
   simp only [Equiv.Perm.sign.mem_ker, (QuotientGroup.mk' G).mem_ker]
   have h2 : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
   have hG'' : Std.Commutative (· * · : Equiv.Perm α ⧸ G → _ → _) := by
-    refine' isCommutative_of_prime_order (hp := h2) _
+    refine isCommutative_of_prime_order (hp := h2) ?_
     rw [← Nat.card_eq_fintype_card]
     exact hG
   have : ∃ g : Equiv.Perm α, g.IsSwap ∧ g ∉ G := by
@@ -295,9 +295,8 @@ theorem large_subgroup_of_perm_contains_alternating
   rw [← Nat.succ_le_iff] at h ; norm_num at h
   apply le_of_eq
   apply is_alternating_of_index_2
-  refine' le_antisymm _ h
-  refine' Nat.le_of_mul_le_mul_left _ _
-  swap
+  refine le_antisymm ?_ h
+  apply Nat.le_of_mul_le_mul_left
   · rw [mul_comm, Subgroup.index_mul_card, mul_comm]
     exact hG
   have : Nonempty G := One.instNonempty
