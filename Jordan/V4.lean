@@ -36,8 +36,6 @@ variable (α : Type _) [DecidableEq α] [Fintype α]
 
 def V4 : Subgroup (alternatingGroup α) :=
   Subgroup.closure {g : alternatingGroup α | (g : Equiv.Perm α).cycleType = {2, 2}}
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4 alternatingGroup.V4
 
 theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
     (hg0 : g ∈ alternatingGroup α) (n : ℕ) (hg : orderOf g ∣ 2 ^ n) :
@@ -120,8 +118,6 @@ theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
     apply Nat.lt_irrefl 1
     exact Equiv.Perm.one_lt_of_mem_cycleType hi
     exact Nat.prime_two
-set_option linter.uppercaseLean3 false in
-#align alternating_group.mem_V4_of_order_two_pow alternatingGroup.mem_V4_of_order_two_pow
 
 open scoped Classical
 
@@ -136,15 +132,11 @@ theorem A4_card (hα4 : Fintype.card α = 4) :
   all_goals
     norm_num
   rfl
-set_option linter.uppercaseLean3 false in
-#align alternating_group.A4_card alternatingGroup.A4_card
 
 theorem A4_sylow_card (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     Fintype.card S = 4 := by
   rw [Sylow.card_eq_multiplicity, ← Nat.factors_count_eq, A4_card α hα4]
   rfl
-set_option linter.uppercaseLean3 false in
-#align alternating_group.A4_sylow_card alternatingGroup.A4_sylow_card
 
 theorem A4_sylow_carrier (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     S.carrier =
@@ -166,8 +158,6 @@ theorem A4_sylow_carrier (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingG
   simp only [OnCycleFactors.AlternatingGroup.card_of_cycleType, hα4]
   norm_num
   rfl
-set_option linter.uppercaseLean3 false in
-#align alternating_group.A4_sylow_carrier alternatingGroup.A4_sylow_carrier
 
 theorem V4_is_unique_sylow (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     V4 α = S := by
@@ -190,8 +180,6 @@ theorem V4_is_unique_sylow (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatin
       apply Subgroup.subset_closure
       simp only [Set.mem_setOf_eq]
       exact hk
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_is_unique_sylow alternatingGroup.V4_is_unique_sylow
 
 theorem A4_card_two_sylow_eq_one (hα4 : Fintype.card α = 4) :
     Fintype.card (Sylow 2 (alternatingGroup α)) = 1 := by
@@ -202,8 +190,6 @@ theorem A4_card_two_sylow_eq_one (hα4 : Fintype.card α = 4) :
   rw [Sylow.ext_iff]
   rw [← V4_is_unique_sylow α hα4 S]
   rw [V4_is_unique_sylow α hα4 T]
-set_option linter.uppercaseLean3 false in
-#align alternating_group.A4_card_two_sylow_eq_one alternatingGroup.A4_card_two_sylow_eq_one
 
 theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characteristic := by
   obtain ⟨S : Sylow 2 (alternatingGroup α)⟩ := Sylow.nonempty (G := alternatingGroup α)
@@ -213,8 +199,6 @@ theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characterist
   rw [← Subgroup.index_eq_one]
   rw [← card_sylow_eq_index_normalizer]
   exact A4_card_two_sylow_eq_one α hα4
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_is_characteristic alternatingGroup.V4_is_characteristic
 
 /- rw ← V4_is_unique_sylow α hα4 S,
   exact V4_is_normal α hα4, -/
@@ -222,8 +206,6 @@ theorem V4_is_normal (hα4 : Fintype.card α = 4) : (V4 α).Normal :=
   by
   haveI := V4_is_characteristic α hα4
   infer_instance
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_is_normal alternatingGroup.V4_is_normal
 
 /-  obtain ⟨S : sylow 2 (alternating_group α)⟩ := sylow.nonempty ,
   rw V4_is_unique_sylow α hα4 S,
@@ -236,8 +218,6 @@ theorem V4_card (hα4 : Fintype.card α = 4) : Fintype.card (V4 α) = 4 := by
   rw [V4_is_unique_sylow α hα4 S]
   change Fintype.card S = 4
   exact A4_sylow_card α hα4 S
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_card alternatingGroup.V4_card
 
 theorem isCommutative_of_exponent_two {G : Type _} [Group G] (hG2 : ∀ g : G, g ^ 2 = 1) :
     Std.Commutative (α := G) (· * ·) := by
@@ -247,7 +227,6 @@ theorem isCommutative_of_exponent_two {G : Type _} [Group G] (hG2 : ∀ g : G, g
     rw [← mul_inv_eq_iff_eq_mul, ← mul_inv_eq_one, this, this, ← hG2 (a * b), pow_two,
       mul_assoc (a * b) a b]
   intro g; rw [← mul_eq_one_iff_inv_eq, ← hG2 g, pow_two]
-#align alternating_group.is_commutative_of_exponent_two alternatingGroup.isCommutative_of_exponent_two
 
 theorem V4_carrier_eq (hα4 : Fintype.card α = 4) :
     (V4 α).carrier =
@@ -256,8 +235,6 @@ theorem V4_carrier_eq (hα4 : Fintype.card α = 4) :
   obtain ⟨S : Sylow 2 (alternatingGroup α)⟩ := Sylow.nonempty (G := alternatingGroup α)
   rw [V4_is_unique_sylow α hα4 S]
   rw [A4_sylow_carrier α hα4 S]
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_carrier_eq alternatingGroup.V4_carrier_eq
 
 theorem V4_is_of_exponent_two (hα4 : Fintype.card α = 4) :
     ∀ g : V4 α, g ^ 2 = 1 := by
@@ -271,14 +248,10 @@ theorem V4_is_of_exponent_two (hα4 : Fintype.card α = 4) :
     simp only [Subgroup.coe_mk] at hg'
     rw [← Equiv.Perm.lcm_cycleType, hg']
     norm_num
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_is_of_exponent_two alternatingGroup.V4_is_of_exponent_two
 
 theorem V4_isCommutative (hα4 : Fintype.card α = 4) :
     (V4 α).IsCommutative := by
   refine' { is_comm := isCommutative_of_exponent_two (V4_is_of_exponent_two α hα4) }
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_is_commutative alternatingGroup.V4_isCommutative
 
 theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G] (H : Subgroup G)
     [nH : H.Normal] : Std.Commutative (α := G ⧸ H) (· * ·) ↔ commutator G ≤ H := by
@@ -302,7 +275,6 @@ theorem Subgroup.quotient_isCommutative_iff_commutator_le {G : Type _} [Group G]
     apply Subgroup.commutator_mem_commutator
     refine' Subgroup.mem_top g1
     refine' Subgroup.mem_top g2
-#align alternating_group.subgroup.quotient_is_commutative_iff_commutator_le alternatingGroup.Subgroup.quotient_isCommutative_iff_commutator_le
 
 theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
     Subgroup.center (alternatingGroup α) = ⊥ := by
@@ -335,7 +307,6 @@ theorem center_bot (hα4 : 4 ≤ Fintype.card α) :
   rw [Subgroup.mem_center_iff] at hg'
   specialize hg' k
   simp only [smul_smul, hg']
-#align alternating_group.alternating_group.center_bot alternatingGroup.center_bot
 
 theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
     V4 α = commutator (alternatingGroup α) := by
@@ -390,7 +361,5 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
     rw [Equiv.Perm.cycleType_eq_zero] at hk2
     simp only [← Subtype.coe_inj, hk2, Subgroup.coe_one]
   · exact hk2
-set_option linter.uppercaseLean3 false in
-#align alternating_group.V4_eq_commutator alternatingGroup.V4_eq_commutator
 
 end alternatingGroup

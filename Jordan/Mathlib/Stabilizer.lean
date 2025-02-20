@@ -50,14 +50,12 @@ theorem stabilizer_compl {s : Set α} : stabilizer G (sᶜ) = stabilizer G s :=
   refine' le_antisymm _ (this _)
   convert this _
   exact (compl_compl _).symm
-#align mul_action.stabilizer_compl MulAction.stabilizer_compl
 
 /-- The instance that makes the stabilizer of a set acting on that set -/
 instance _root_.SMul.ofStabilizer (s : Set α) : SMul (stabilizer G s) s where
   smul g x := ⟨g • ↑x, by
     conv_rhs => rw [← mem_stabilizer_iff.mp g.prop]
     exact Set.smul_mem_smul_set x.prop⟩
-#align mul_action.has_smul.of_stabilizer SMul.ofStabilizer
 
 @[simp]
 theorem _root_.SMul.smul_stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :
@@ -73,11 +71,9 @@ instance ofStabilizer (s : Set α) : MulAction (stabilizer G s) s where
 
 theorem of_stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :
     (g : G) • (x : α) = g • (x : α) := rfl
-#align mul_action.of_stabilizer_def MulAction.of_stabilizer_def
 
 theorem of_stabilizer_set_def (s : Set α) (g : stabilizer G s) (t : Set α) :
   (g : G) • t = g • t := rfl
-#align mul_action.of_stabilizer_set_def MulAction.of_stabilizer_set_def
 
 theorem fixingSubgroup_le_stabilizer (s : Set α) : fixingSubgroup G s ≤ stabilizer G s := by
   intro k hk
@@ -88,7 +84,6 @@ theorem fixingSubgroup_le_stabilizer (s : Set α) : fixingSubgroup G s ≤ stabi
   apply Set.image_congr
   simp only [id]
   exact hk
-#align mul_action.fixing_subgroup_le_stabilizer MulAction.fixingSubgroup_le_stabilizer
 
 end MulAction
 

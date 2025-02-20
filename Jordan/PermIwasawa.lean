@@ -36,8 +36,6 @@ variable {α : Type _} [DecidableEq α] [Fintype α]
 
 def Iwt (s : Finset α) := (Equiv.Perm.ofSubtype : Equiv.Perm (s : Set α) →* Equiv.Perm α)
 def IwasawaT (s : Finset α) : Subgroup (Equiv.Perm α) := (Iwt s).range
-set_option linter.uppercaseLean3 false in
-#align equiv.perm.Iw_T Equiv.Perm.IwasawaT
 
 def IwasawaT' (s : Finset α) := fixingSubgroup (Equiv.Perm α) (sᶜ : Set α)
 
@@ -176,8 +174,6 @@ theorem IwasawaT_is_conj (s : Finset α) (g : Equiv.Perm α) :
       simp only [apply_inv_self]
     rw [← Finset.inv_smul_mem_iff]
     exact hx
-set_option linter.uppercaseLean3 false in
-#align equiv.perm.IwT_is_conj Equiv.Perm.IwasawaT_is_conj
 
 -- The Iwasawa structure for the symmetric group acting on ordered pairs
 def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
@@ -207,8 +203,6 @@ def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
     simp only [Set.mem_singleton_iff, Set.mem_compl_iff, Set.mem_insert_iff] at hx
     rw [not_or] at hx
     apply Equiv.swap_apply_of_ne_of_ne hx.left hx.right
-set_option linter.uppercaseLean3 false in
-#align equiv.perm.Iw2 Equiv.Perm.iwasawa_two
 
 /-- If α has at least 5 elements, then
 the only nontrivial normal sugroup of (perm α) is the alternating_group. -/
@@ -239,6 +233,5 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
     exact this ⟨g, hgN⟩
   rw [h, Set.top_eq_univ]
   apply Set.mem_univ
-#align equiv.perm.equiv.perm.normal_subgroups Equiv.Perm.Equiv.Perm.normal_subgroups
 
 end Equiv.Perm

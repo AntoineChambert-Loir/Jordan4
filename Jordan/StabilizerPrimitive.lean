@@ -35,7 +35,6 @@ theorem ofSubtype_mem_stabilizer (s : Set α) (g : Equiv.Perm s) :
   rw [Equiv.Perm.ofSubtype_apply_of_mem g hy]
   refine' Subtype.mem _
   exact s.toFinite
-#align equiv.perm.of_subtype_mem_stabilizer Equiv.Perm.ofSubtype_mem_stabilizer
 
 theorem ofSubtype_mem_stabilizer' (s : Set α) (g : Equiv.Perm (sᶜ : Set α)) :
     Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s := by
@@ -53,7 +52,6 @@ theorem ofSubtype_mem_stabilizer' (s : Set α) (g : Equiv.Perm (sᶜ : Set α)) 
     rw [Equiv.Perm.ofSubtype_apply_of_not_mem g (Set.not_mem_compl_iff.mpr hy)]
     exact hy
   exact s.toFinite
-#align equiv.perm.of_subtype_mem_stabilizer' Equiv.Perm.ofSubtype_mem_stabilizer'
 
 theorem stabilizer_isPreprimitive (s : Set α) : IsPreprimitive (stabilizer (Equiv.Perm α) s) s :=
   by
@@ -75,7 +73,6 @@ theorem stabilizer_isPreprimitive (s : Set α) : IsPreprimitive (stabilizer (Equ
     change Equiv.Perm.ofSubtype g • x = _
     simp only [Equiv.Perm.smul_def]
     rw [Equiv.Perm.ofSubtype_apply_of_mem]
-#align equiv.perm.stabilizer_is_preprimitive Equiv.Perm.stabilizer_isPreprimitive
 
 theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv.Perm α))
     (hG : stabilizer (Equiv.Perm α) s ≤ G) : IsPreprimitive (stabilizer G s) s := by
@@ -89,7 +86,6 @@ theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv
   have : Function.Surjective f := Function.surjective_id
   apply isPreprimitive_of_surjective_map this
   apply stabilizer_isPreprimitive
-#align equiv.perm.equiv.perm.stabilizer.is_preprimitive' Equiv.Perm.Equiv.Perm.Stabilizer.is_preprimitive'
 
 end Equiv.Perm
 
@@ -145,7 +141,6 @@ theorem stabilizer.isPreprimitive (s : Set α) (hs : (sᶜ : Set α).Nontrivial)
   rw [Equiv.Perm.sign_swap _]
   rw [← Function.Injective.ne_iff Subtype.coe_injective]
   simp only [Subtype.coe_mk]; exact hab
-#align alternating_group.stabilizer.is_preprimitive alternatingGroup.stabilizer.isPreprimitive
 
 theorem stabilizer.isPreprimitive' (s : Set α) (hsc : sᶜ.Nontrivial)
     (G : Subgroup (Equiv.Perm α))
@@ -166,6 +161,5 @@ theorem stabilizer.isPreprimitive' (s : Set α) (hsc : sᶜ.Nontrivial)
   apply isPreprimitive_of_surjective_map hf
   apply stabilizer.isPreprimitive
   exact hsc
-#align alternating_group.stabilizer.is_preprimitive' alternatingGroup.stabilizer.isPreprimitive'
 
 end alternatingGroup

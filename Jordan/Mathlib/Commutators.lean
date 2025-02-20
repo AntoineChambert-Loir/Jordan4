@@ -19,7 +19,6 @@ theorem mem_commutatorSet_of_isConj_sq
   use ↑h; use g
   rw [commutatorElement_def, hg]
   simp only [IsUnit.mul_inv_cancel_right, Units.isUnit, mul_inv_eq_iff_eq_mul, pow_two]
-#align mem_commutator_set_of_is_conj_sq mem_commutatorSet_of_isConj_sq
 
 theorem Subgroup.map_top_eq_range {G H : Type _} [Group H] [Group G] (f : H →* G) :
     Subgroup.map f ⊤ = f.range := by
@@ -28,12 +27,10 @@ theorem Subgroup.map_top_eq_range {G H : Type _} [Group H] [Group G] (f : H →*
 theorem Subgroup.map_commutator_eq {G H : Type _} [Group H] [Group G] (f : H →* G) :
     Subgroup.map f (_root_.commutator H) = ⁅f.range, f.range⁆ := by
   rw [_root_.commutator_def, Subgroup.map_commutator, Subgroup.map_top_eq_range]
-#align subgroup.map_commutator_eq Subgroup.map_commutator_eq
 
 theorem Subgroup.commutator_eq' {G : Type _} [Group G] (H : Subgroup G) :
     Subgroup.map H.subtype (_root_.commutator H) = ⁅H, H⁆ := by
   simp only [map_commutator_eq, subtype_range]
-#align subgroup.commutator_eq' Subgroup.commutator_eq'
 
 /-- If G and H have multiplications *
 and φ : G → H is a surjective multiplicative map,
@@ -50,7 +47,6 @@ theorem surj_to_comm {G H : Type _} [Mul G] [Mul H] (φ : MulHom G H)
     obtain ⟨b', hb'⟩ := is_surj b
     simp only [← ha', ← hb', ← map_mul]
     rw [is_comm.comm]
-#align surj_to_comm surj_to_comm
 
 theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) :
     Std.Commutative (· * · : G ⧸ N → _ → _) ↔ commutator G ≤ N := by
@@ -78,7 +74,6 @@ theorem quotient_comm_contains_commutators_iff {N : Subgroup G} (nN : N.Normal) 
     rw [commutator_eq_closure]
     apply Subgroup.subset_closure
     exact commutator_mem_commutatorSet x y
-#align quotient_comm_contains_commutators_iff quotient_comm_contains_commutators_iff
 
 /-- If N is a normal subgroup, H a commutative subgroup such that H ⊔ N = ⊤,
 then N contains the derived subgroup. -/
@@ -119,4 +114,3 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
     simp only [mem_comap, QuotientGroup.mk'_apply, MonoidHom.mem_range, MonoidHom.coe_comp,
       QuotientGroup.coe_mk', coeSubtype, Function.comp_apply, Subtype.exists, exists_prop, φ]
     use h
-#align contains_commutators_of contains_commutators_of

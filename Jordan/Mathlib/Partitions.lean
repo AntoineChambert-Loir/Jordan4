@@ -64,7 +64,6 @@ theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)}
       rw [← hxy, Subtype.preimage_coe_eq_preimage_coe_iff]
       congr
       apply ht.right x hxP; rw [← Set.mem_preimage, hxy]; exact hay
-#align setoid.is_partition_on Setoid.isPartition_on
 
 
 
@@ -96,7 +95,6 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
   · intro ht
     simp only [ht, Set.mem_toFinset]
     exact hs
-#align partition.card_of_partition' Partition.card_of_partition'
 
 /-- The cardinal of ambient fintype equals
   the sum of cardinals of the parts of a partition (set style)-/
@@ -122,7 +120,6 @@ theorem Partition.card_of_partition [Fintype α] {c : Set (Set α)} (hc : Setoid
     exact ha
   rw [Finset.sum_bij' _ _ hi hj _ _]
   all_goals { intros; simp only [Set.coe_toFinset, Finset.toFinset_coe] }
-#align partition.card_of_partition Partition.card_of_partition
 
 /-- Given a partition of the ambient finite type,
 the cardinal of a set is the sum of the cardinalities of its trace on the parts of the partition -/
@@ -142,7 +139,6 @@ theorem Setoid.IsPartition.card_set_eq_sum_parts {α : Type _} [Fintype α] (s :
     exact
       Set.disjoint_of_subset Set.inter_subset_right Set.inter_subset_right
         (Setoid.IsPartition.pairwiseDisjoint hP ht hu htu)
-#align setoid.is_partition.card_set_eq_sum_parts Setoid.IsPartition.card_set_eq_sum_parts
 
 /-- The cardinality of a finite type is
   the sum of the cardinalities of the parts of any partition -/
@@ -156,7 +152,6 @@ theorem Setoid.IsPartition.card_eq_sum_parts {α : Type _} [Fintype α] {P : Set
     congr
     simp only [eq_iff_true_of_subsingleton]
   · rw [Set.univ_inter]
-#align setoid.is_partition.card_eq_sum_parts Setoid.IsPartition.card_eq_sum_parts
 
 /-- The cardinality of a finset is the sum of the cardinalities
 of the traces of any partition of the ambient type  -/
@@ -174,7 +169,6 @@ theorem Setoid.IsPartition.card_finset_eq_sum_parts {α : Type _} {P : Set (Set 
     simp only [Ne, Set.coe_toFinset]
     exact rfl
   · ext; apply congr_arg; rw [Set.toFinset_inj]
-#align setoid.is_partition.card_finset_eq_sum_parts Setoid.IsPartition.card_finset_eq_sum_parts
 
 
 end Classical

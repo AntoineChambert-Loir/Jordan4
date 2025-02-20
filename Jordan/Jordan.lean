@@ -151,7 +151,6 @@ theorem isPretransitive_ofFixingSubgroup_inter
     apply hx
     rw [Set.mem_smul_set_iff_inv_smul_mem]
     exact h
-#align is_pretransitive_of_fixing_subgroup_inter isPretransitive_ofFixingSubgroup_inter
 
 lemma _root_.SubMulAction.add_encard_ofStabilizer_eq
     {G : Type _} [Group G] [MulAction G α] (a : α) :
@@ -240,7 +239,6 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
     apply Subgroup.normalClosure_normal.conj_mem
     apply Subgroup.le_normalClosure
     exact hg
-#align normal_closure_of_stabilizer_eq_top normalClosure_of_stabilizer_eq_top
 
 variable [Fintype α]
 
@@ -280,7 +278,6 @@ theorem IsPreprimitive.isPreprimitive_ofFixingSubgroup_inter
     rw [← SubMulAction.image_inclusion]
     congr
     simp only [Set.image_univ]
-#align is_preprimitive_of_fixing_subgroup_inter IsPreprimitive.isPreprimitive_ofFixingSubgroup_inter
 
 -- α = Ω, s = Δ, α \ s = Γ
 -- 1 ≤ #Δ < #Ω, 1 < #Γ < #Ω
@@ -443,7 +440,6 @@ theorem is_two_pretransitive_weak_jordan [DecidableEq α]
       apply Set.eq_of_subset_of_ncard_le (Set.subset_univ _) _ Set.finite_univ
       simp only [Set.ncard_univ, Nat.card_eq_fintype_card]
       exact h
-#align is_two_pretransitive_weak_jordan is_two_pretransitive_weak_jordan
 
 /- -- TODO : prove
 theorem strong_jordan_of_preprimitive (hG : is_preprimitive G α)
@@ -601,7 +597,6 @@ theorem is_two_preprimitive_weak_jordan [DecidableEq α]
       apply Set.eq_of_subset_of_ncard_le (Set.subset_univ _) _ Set.finite_univ
       simp only [Set.ncard_univ, Nat.card_eq_fintype_card]
       exact h
-#align is_two_preprimitive_weak_jordan is_two_preprimitive_weak_jordan
 
 /- These theorems will be deduced from the strong one
 theorem is_two_pretransitive_weak_jordan' (hG : is_preprimitive G α)
@@ -738,7 +733,6 @@ theorem isMultiplyPreprimitive_jordan
       exact hx
   rw [← Set.ncard_pos, hsn]
   apply Nat.succ_pos
-#align is_multiply_preprimitive_jordan isMultiplyPreprimitive_jordan
 
 end Jordan
 
@@ -763,7 +757,6 @@ theorem eq_s2_of_nontrivial (hα : Fintype.card α ≤ 2) (hG : Nontrivial G) :
     rw [Nat.factorial_two]
     rw [← Fintype.one_lt_card_iff_nontrivial] at hG
     exact hG
-#align eq_s2_of_nontrivial eq_s2_of_nontrivial
 
 theorem nontrivial_on_equiv_perm_two {K : Type _} [Group K] [MulAction K α]
     (hα : Fintype.card α = 2) {g : K} {a : α} (hga : g • a ≠ a) : IsMultiplyPretransitive K α 2 := by
@@ -792,7 +785,6 @@ theorem nontrivial_on_equiv_perm_two {K : Type _} [Group K] [MulAction K α]
     rw [← MulAction.toPerm_apply, hg, Equiv.Perm.coe_one, id_eq]
   use g
   rfl
-#align nontrivial_on_equiv_perm_two nontrivial_on_equiv_perm_two
 
 theorem isPretransitive_of_cycle [DecidableEq α] {g : Equiv.Perm α}
     (hg : g ∈ G) (hgc : g.IsCycle) :
@@ -825,18 +817,15 @@ theorem isPretransitive_of_cycle [DecidableEq α] {g : Equiv.Perm α}
   let g' : fixingSubgroup (↥G) ((↑g.support : Set α)ᶜ) := ⟨(⟨g, hg⟩ : ↥G), hg'⟩
   obtain ⟨i, hi⟩ := hgc ((hs x).mpr hx)
   use g' ^ i; exact hi.symm
-#align is_pretransitive_of_cycle isPretransitive_of_cycle
 
 theorem Equiv.Perm.IsSwap.cycleType [DecidableEq α] {σ : Equiv.Perm α} (h : σ.IsSwap) :
     σ.cycleType = {2} := by
   simp only [h.isCycle.cycleType, Equiv.Perm.card_support_eq_two.mpr h]
   simp only [Multiset.coe_singleton]
-#align equiv.perm.is_swap.cycle_type Equiv.Perm.IsSwap.cycleType
 
 theorem Equiv.Perm.IsSwap.orderOf [DecidableEq α] {σ : Equiv.Perm α} (h : σ.IsSwap) :
     orderOf σ = 2 := by
   rw [← Equiv.Perm.lcm_cycleType, h.cycleType, Multiset.lcm_singleton, normalize_eq]
-#align equiv.perm.is_swap.order_of Equiv.Perm.IsSwap.orderOf
 
 /-- A primitive permutation group that contains a swap is the full permutation group (Jordan)-/
 theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm α)
@@ -882,7 +871,6 @@ theorem jordan_swap [DecidableEq α] (hG : IsPreprimitive G α) (g : Equiv.Perm 
   simp only [SubMulAction.mem_ofFixingSubgroup_iff, Set.mem_compl_iff, Finset.mem_coe,
     Equiv.Perm.mem_support, ne_eq, not_not, Finset.mem_univ, forall_true_left,
     Finset.mem_filter, true_and]
-#align jordan_swap jordan_swap
 
 /-- A primitive permutation that contains a 3-cycle contains the alternating group (Jordan) -/
 theorem jordan_three_cycle [DecidableEq α]
@@ -931,7 +919,6 @@ theorem jordan_three_cycle [DecidableEq α]
   apply congr_arg
   ext x
   simp [SubMulAction.mem_ofFixingSubgroup_iff]
-#align jordan_three_cycle jordan_three_cycle
 
 /- -- TODO : prove
 theorem jordan_prime_cycle [decidable_eq α] (hG : is_preprimitive G α)

@@ -45,7 +45,6 @@ theorem IsPretransitive.mk_base_iff (a : X) : IsPretransitive G X ↔ ∀ x : X,
     use h * g⁻¹
     rw [← hx]; rw [smul_smul, inv_mul_cancel_right]
     exact hy
-#align mul_action.is_pretransitive.mk_base_iff MulAction.IsPretransitive.mk_base_iff
 
 theorem IsPretransitive.mk_base (a : X) (hG : ∀ x : X, ∃ g : G, g • a = x) : IsPretransitive G X :=
   by
@@ -56,7 +55,6 @@ theorem IsPretransitive.mk_base (a : X) (hG : ∀ x : X, ∃ g : G, g • a = x)
   use h * g⁻¹
   rw [← hx]; rw [smul_smul, inv_mul_cancel_right]
   exact hy
-#align mul_action.is_pretransitive.mk_base MulAction.IsPretransitive.mk_base
 
 /-- An action is pretransitive iff the orbit of every given element is full -/
 theorem orbit.isPretransitive_iff (a : X) : orbit G a = ⊤ ↔ IsPretransitive G X :=
@@ -67,7 +65,6 @@ theorem orbit.isPretransitive_iff (a : X) : orbit G a = ⊤ ↔ IsPretransitive 
   intro x
   simp_rw [Set.top_eq_univ, Set.mem_univ, iff_true_iff]
   rw [mem_orbit_iff]
-#align mul_action.orbit.is_pretransitive_iff MulAction.orbit.isPretransitive_iff
 
 end MulAction
 

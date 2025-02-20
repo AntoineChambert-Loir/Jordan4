@@ -46,7 +46,6 @@ def IsMultiplyPreprimitive (n : ℕ) :=
   IsMultiplyPretransitive M α n ∧
     ∀ (s : Set α) (_ : s.encard + 1 = n),
       IsPreprimitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s)
-#align mul_action.is_multiply_preprimitive MulAction.IsMultiplyPreprimitive
 
 example (p q: Prop) (h : q → False): q → p  := by
   exact fun a => (h a).elim
@@ -56,7 +55,6 @@ theorem isMultiplyPreprimitive_zero : IsMultiplyPreprimitive M α 0 := by
   · apply MulAction.is_zero_pretransitive
   · intro s
     simp
-#align mul_action.is_multiply_preprimitive_zero MulAction.isMultiplyPreprimitive_zero
 
 /-- An action is preprimitive iff it is 1-preprimitive -/
 theorem isPreprimitive_iff_is_one_preprimitive :
@@ -84,7 +82,6 @@ theorem isPreprimitive_iff_is_one_preprimitive :
           (SubMulAction.ofFixingSubgroupEmpty_equivariantMap_bijective M α))
     apply h1'
     simp only [Set.encard_empty, zero_add, Nat.cast_one]
-#align mul_action.is_preprimitive_iff_is_one_preprimitive MulAction.isPreprimitive_iff_is_one_preprimitive
 
 /-- A multiply preprimitive action is multiply pretransitive -/
 theorem IsMultiplyPreprimitive.toIsMultiplyPretransitive
@@ -172,7 +169,6 @@ theorem stabilizer.isMultiplyPreprimitive
         rintro ⟨x, hx⟩
         apply x.prop; rw [hx.right]; simp only [Set.mem_singleton]
 
-#align mul_action.is_multiply_preprimitive_of_stabilizer MulAction.stabilizer.isMultiplyPreprimitive
 
 /- lemma is_multiply_preprimitive_of_subgroup {H : subgroup M}
   {n : ℕ} (hn : n ≥ 1) (hH : is_multiply_preprimitive H α n) :
@@ -250,7 +246,6 @@ theorem remaining_primitivity
       rintro ⟨hbs, ⟨b, _, rfl⟩⟩
       exfalso
       exact b.prop hbs
-#align mul_action.remaining_primitivity MulAction.remaining_primitivity
 
 /-- n.succ-fold pretransitivity implies n-fold preprimitivity -/
 theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
@@ -274,7 +269,6 @@ theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
   apply remaining_transitivity M α s h
   unfold Set.ncard
   rw [hs, hm, ENat.toNat_coe, ← Nat.succ_add]
-#align mul_action.is_multiply_preprimitive_of_multiply_pretransitive_succ MulAction.isMultiplyPreprimitive_of_multiply_pretransitive_succ
 
 /-- An n-fold preprimitive action is m-fold preprimitive for m ≤ n -/
 theorem isMultiplyPreprimitive_of_higher
@@ -296,7 +290,6 @@ theorem isMultiplyPreprimitive_of_higher
       refine' le_trans _ hα; rw [PartENat.coe_le_coe]; exact Nat.le_succ n
       -- get one step by transitivity
       apply isMultiplyPreprimitive_of_multiply_pretransitive_succ M α hα hn.left
-#align mul_action.is_multiply_preprimitive_of_higher MulAction.isMultiplyPreprimitive_of_higher
 
 variable {M α}
 
@@ -338,7 +331,6 @@ theorem isMultiplyPreprimitive_of_bijective_map
       exact ⟨x, h, hx⟩
   refine isPreprimitive_of_surjective_map hf' (h.right s ?_)
   rw [← ht, ← hs', hf.injective.encard_image]
-#align mul_action.is_multiply_preprimitive_of_bijective_map MulAction.isMultiplyPreprimitive_of_bijective_map
 
 end MulAction
 

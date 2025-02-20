@@ -15,12 +15,10 @@ theorem MonoidHom.range_isCommutative {G H : Type _} [Group G] [Group H] (f : G 
   rintro ⟨_, a, rfl⟩ ⟨_, b, rfl⟩
   rw [← Subtype.coe_inj]
   simp only [Submonoid.coe_mul, ← map_mul, hG.comm]
-#align monoid_hom.range_is_commutative MonoidHom.range_isCommutative
 
 theorem Equiv.perm_is_nontrivial {α : Type _} [DecidableEq α] [Fintype α] :
     1 < Fintype.card α ↔ Nontrivial (Equiv.Perm α) := by
   rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_perm, Nat.one_lt_factorial]
-#align equiv.perm_is_nontrivial Equiv.perm_is_nontrivial
 
 theorem Monoid.isCommutative_of_fintype_card_le_2
     {G : Type _} [DecidableEq G] [Fintype G] [Monoid G] (hG : Fintype.card G ≤ 2) :
@@ -39,7 +37,6 @@ theorem Monoid.isCommutative_of_fintype_card_le_2
   obtain ⟨a, b, ha1, hb1, hab⟩ := h
   rw [Fintype.two_lt_card_iff]
   exact ⟨a, b, 1, hab, ha1, hb1⟩
-#align monoid.is_commutative_of_order_le_2 Monoid.isCommutative_of_fintype_card_le_2
 
 theorem Equiv.Perm.isCommutative_iff {α : Type _} [DecidableEq α] [Fintype α] :
     Std.Commutative (α := Equiv.Perm α) (· * ·) ↔ Fintype.card α ≤ 2 := by
@@ -60,4 +57,3 @@ theorem Equiv.Perm.isCommutative_iff {α : Type _} [DecidableEq α] [Fintype α]
     apply Monoid.isCommutative_of_fintype_card_le_2
     rw [← Nat.factorial_two, Fintype.card_perm]
     exact Nat.factorial_le hα
-#align equiv.perm.is_commutative_iff Equiv.Perm.isCommutative_iff

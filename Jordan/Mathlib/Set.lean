@@ -147,11 +147,9 @@ theorem _root_.Function.Injective.image_iInter_eq [Nonempty ι] {f : α → β} 
     (f '' ⋂ i : ι, s i) = ⋂ i, f '' s i := by
   -- rw [injOn_of_injective hf]
   rw [Set.InjOn.image_iInter_eq (Set.injOn_of_injective hf)]
-#align set.image_Inter' Function.Injective.image_iInter_eq
 
 theorem Set.subset_of_eq {α : Type _} {s t : Set α} (h : s = t) : s ⊆ t := by
   rw [h]
-#align set.set.subset_of_eq Set.subset_of_eq
 
 
 namespace MulAction
@@ -161,7 +159,6 @@ variable [Group α] [MulAction α β]
 @[simp]
 theorem smul_compl_set (a : α) (s : Set β) : a • sᶜ = (a • s)ᶜ :=
   Set.image_compl_eq <| MulAction.bijective _
-#align mul_action.smul_compl_set MulAction.smul_compl_set
 
 theorem smul_set_iInter (a : α) (s : ι → Set β) : (a • ⋂ i, s i) = ⋂ i, a • s i :=
   by
@@ -170,12 +167,10 @@ theorem smul_set_iInter (a : α) (s : ι → Set β) : (a • ⋂ i, s i) = ⋂ 
     rw [Set.iInter_of_empty]
     exact Set.smul_set_univ
   · exact (MulAction.injective _).image_iInter_eq _
-#align mul_action.smul_set_Inter MulAction.smul_set_iInter
 
 theorem smul_set_iInter₂ (a : α) (s : ∀ i, κ i → Set β) :
     (a • ⋂ (i) (j), s i j) = ⋂ (i) (j), a • s i j := by
     simp_rw [smul_set_iInter]
-#align mul_action.smul_set_Inter₂ MulAction.smul_set_iInter₂
 
 theorem smul_set_encard_eq (a : α) (s : Set β) :
     Set.encard (a • s) = Set.encard s :=
@@ -193,7 +188,6 @@ theorem smul_set_card_eq' [DecidableEq β] (a : α) (s : Set β) [Fintype s] :
   rw [Set.card_range_of_injective]
   apply Subtype.restrict_injective
   exact MulAction.injective a
-#align mul_action.smul_set_card_eq MulAction.smul_set_card_eq'
 
 
 theorem smul_set_card_eq [DecidableEq β] (a : α) (s : Set β) :
