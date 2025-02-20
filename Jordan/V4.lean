@@ -135,7 +135,9 @@ theorem A4_card (hα4 : Fintype.card α = 4) :
 
 theorem A4_sylow_card (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
     Fintype.card S = 4 := by
-  rw [Sylow.card_eq_multiplicity, ← Nat.factors_count_eq, A4_card α hα4]
+  rw [← Nat.card_eq_fintype_card]
+  rw [Sylow.card_eq_multiplicity, ← Nat.primeFactorsList_count_eq, Nat.card_eq_fintype_card,
+    A4_card α hα4]
   rfl
 
 theorem A4_sylow_carrier (hα4 : Fintype.card α = 4) (S : Sylow 2 (alternatingGroup α)) :
@@ -198,6 +200,7 @@ theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characterist
   rw [← Subgroup.normalizer_eq_top]
   rw [← Subgroup.index_eq_one]
   rw [← card_sylow_eq_index_normalizer]
+  rw [Nat.card_eq_fintype_card]
   exact A4_card_two_sylow_eq_one α hα4
 
 /- rw ← V4_is_unique_sylow α hα4 S,

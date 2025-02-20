@@ -143,6 +143,7 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor
       apply f.range.card_subgroup_dvd_card
     -- Condition on prime factors of f.ker.index : hypothesis on G
     · intro l hl hl'; apply hp' hl
+      rw [← Nat.card_eq_fintype_card]
       exact dvd_trans hl' f.ker.index_dvd_card
     -- f.ker.index ≠ 1
     · intro hf
@@ -298,8 +299,10 @@ theorem large_subgroup_of_perm_contains_alternating
   refine le_antisymm ?_ h
   apply Nat.le_of_mul_le_mul_left
   · rw [mul_comm, Subgroup.index_mul_card, mul_comm]
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     exact hG
   have : Nonempty G := One.instNonempty
+  rw [Nat.card_eq_fintype_card]
   exact Fintype.card_pos
 
 /-- A subgroup of the permutation group of index ≤ 2 contains the alternating group -/
@@ -307,7 +310,9 @@ theorem contains_alternating_of_index_le_2'
     {G : Subgroup (Equiv.Perm α)} (hG : G.index ≤ 2) :
     alternatingGroup α ≤ G := by
   apply large_subgroup_of_perm_contains_alternating
+  rw [← Nat.card_eq_fintype_card]
   rw [← Subgroup.index_mul_card G]
+  rw [Nat.card_eq_fintype_card]
   apply Nat.mul_le_mul_right _ hG
 
 #lint

@@ -507,7 +507,7 @@ theorem is_two_preprimitive_weak_jordan [DecidableEq α]
     suffices ∃ m, m < n ∧ t.ncard = Nat.succ m by
       obtain ⟨m, hmn, htm⟩ := this
       apply hrec m hmn hG htm _ ht_prim
-      . apply lt_trans _ hsn'
+      · apply lt_trans _ hsn'
         rw [add_lt_add_iff_left, Nat.succ_lt_succ_iff]
         exact hmn
 
