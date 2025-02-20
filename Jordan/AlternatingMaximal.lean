@@ -222,7 +222,7 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         use c
   -- apply And.intro h.left
   -- exact h.right
-      rw [Set.nonempty_diff]
+      rw [Set.diff_nonempty]
       intro ht
       rw [gt_iff_lt, ← not_le] at ht'
       apply ht'
@@ -260,7 +260,7 @@ theorem has_three_cycle_of_stabilizer' (s : Set α) (hs : 2 < Set.ncard s) :
     exact hx
   intro u hu; exact ne_of_prop_ne hx hu
 
-
+omit [DecidableEq α] in
 theorem has_three_cycle_of_stabilizer [DecidableEq α] (s : Set α) (hα : 4 < Fintype.card α) :
     ∃ g : Equiv.Perm α, g.IsThreeCycle ∧ g ∈ stabilizer (Equiv.Perm α) s := by
   cases' Nat.lt_or_ge 2 (Set.ncard s) with hs hs
@@ -483,7 +483,7 @@ end
     apply stabilizer.isPreprimitive'
     · rw [compl_compl]; exact h0
     · rw [stabilizer_compl]
-      exact le_trans (le_of_lt hG) inf_le_left
+      convert le_trans (le_of_lt hG) inf_le_left
 
  -- Step 3 : A block contained in s is a subsingleton
   have hB_not_le_s : ∀ (B : Set α) (_ : IsBlock G B), B ⊆ s → B.Subsingleton := by
@@ -532,7 +532,7 @@ end
         map_smul' := fun ⟨m, _⟩ x => by simp }
       apply MulAction.IsBlock_preimage f' hB
     apply stabilizer.isPreprimitive' s h1
-    apply le_trans (le_of_lt hG) inf_le_left
+    convert le_trans (le_of_lt hG) inf_le_left
   intro B hB
   unfold IsTrivialBlock
   rw [or_iff_not_imp_left]

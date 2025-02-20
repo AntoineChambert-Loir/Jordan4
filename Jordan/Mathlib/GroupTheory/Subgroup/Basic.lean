@@ -8,14 +8,6 @@ Authors: Antoine Chambert-Loir
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Data.Fintype.Perm
 
-theorem MonoidHom.range_isCommutative {G H : Type _} [Group G] [Group H] (f : G →* H)
-    (hG : Std.Commutative (α := G) (· * ·)) : f.range.IsCommutative := by
-  apply Subgroup.IsCommutative.mk
-  constructor
-  rintro ⟨_, a, rfl⟩ ⟨_, b, rfl⟩
-  rw [← Subtype.coe_inj]
-  simp only [Submonoid.coe_mul, ← map_mul, hG.comm]
-
 theorem Equiv.perm_is_nontrivial {α : Type _} [DecidableEq α] [Fintype α] :
     1 < Fintype.card α ↔ Nontrivial (Equiv.Perm α) := by
   rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_perm, Nat.one_lt_factorial]

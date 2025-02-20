@@ -15,7 +15,7 @@ import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.GroupTheory.GroupAction.Embedding
 import Mathlib.GroupTheory.GroupAction.Basic
 
-variable (G : Type*) [Group G] (α : Type*) [DecidableEq α] [MulAction G α]
+variable (G : Type*) [Group G] (α : Type*) [MulAction G α]
 
 open scoped Pointwise
 
@@ -27,7 +27,7 @@ def Nat.Combination (n : ℕ) := {s : Finset α | s.card = n}
 -- theorem Nat.Combination.def  {n : ℕ} (s : n.Combination α) :
 --     (s : Finset α).card = n :=
 --   s.prop
--- 
+--
 theorem Nat.Combination.mem_iff {n : ℕ} {s : Finset α} :
     s ∈ n.Combination α ↔ s.card = n := by
   unfold Combination
@@ -38,7 +38,7 @@ variable {α}
 -- theorem Finset.smul_card_eq (s : Finset α) (g : G) :
 --   (g • s).card = s.card := by
 --   simp only [card_smul_finset]
--- 
+--
 theorem Nat.Combination.eq_iff {n : ℕ} (s t : n.Combination α) :
     s = t ↔ (s : Finset α) = (t : Finset α) := Subtype.ext_iff
 
@@ -57,31 +57,31 @@ variable (α)
 variable (n : ℕ)
 
 /-- `Combination α n` as a `SubMulAction` of `Finset α`-/
-def Nat.Combination.SubMulAction : SubMulAction G (Finset α) where
+def Nat.Combination.SubMulAction [DecidableEq α] : SubMulAction G (Finset α) where
   carrier := n.Combination α
   smul_mem' g s hs := by
     rw [Nat.Combination.mem_iff] at hs ⊢
     rw [← hs]
     rw [Finset.card_smul_finset]
 
-instance Nat.Combination.MulAction : MulAction G (n.Combination α) :=
+instance Nat.Combination.MulAction [DecidableEq α] : MulAction G (n.Combination α) :=
   (Nat.Combination.SubMulAction G α n).mulAction
 
 variable {α G}
 
 -- Why does `Nat.Combination.mulAction_apply` doesn't work?
 @[simp]
-theorem Nat.combination_mulAction_apply
+theorem Nat.combination_mulAction_apply [DecidableEq α]
     {n : ℕ} {g : G} {s : Finset α} {hs : s ∈ n.Combination α} :
     g • s = (g • (⟨s, hs⟩ : n.Combination α)) := by
   rfl
 
 @[simp]
-theorem Nat.combination_mulAction.coe_apply' (g : G) (s : n.Combination α) :
+theorem Nat.combination_mulAction.coe_apply' [DecidableEq α] (g : G) (s : n.Combination α) :
     ↑(g • s) = g • (↑s : Finset α) :=
   rfl
 
-theorem Nat.combination.smul_ne_iff_hasMem_not_mem {s t : n.Combination α} {g : G} :
+theorem Nat.combination.smul_ne_iff_hasMem_not_mem [DecidableEq α] {s t : n.Combination α} {g : G} :
     g • s ≠ t ↔ ∃ a  ∈ (s : Finset α), a ∉ g⁻¹ • (t : Finset α) := by
   simp only [ne_eq, exists_prop]
   rw [← Finset.not_subset]
@@ -91,7 +91,7 @@ theorem Nat.combination.smul_ne_iff_hasMem_not_mem {s t : n.Combination α} {g :
   simp only [Nat.combination_mulAction.coe_apply', Finset.le_eq_subset]
   exact Finset.smul_finset_subset_iff
 
-theorem Nat.combination.mulAction_faithful (hn : 1 ≤ n) (hα : n.succ ≤ PartENat.card α)
+theorem Nat.combination.mulAction_faithful [DecidableEq α] (hn : 1 ≤ n) (hα : n.succ ≤ PartENat.card α)
       {g : G}
       (hg : (MulAction.toPerm g : Equiv.Perm α) ≠ 1) :
       ∃ s : n.Combination α, g • s ≠ s := by
@@ -141,12 +141,12 @@ example {s : Set α} {a : α} {g : G} : a ∉ g⁻¹ • s ↔ g • a ∈ sᶜ 
 
 example : MulAction G (Fin n ↪ α) := by infer_instance
 
-example : MulAction G (n.Combination α) := by infer_instance
+example [DecidableEq α] : MulAction G (n.Combination α) := by infer_instance
 
 variable (α G)
 
 /-- The equivariant map from arrangements to combinations -/
-def EmbeddingToFinset.map : (Fin n ↪ α) →[G] n.Combination α where
+def EmbeddingToFinset.map [DecidableEq α] : (Fin n ↪ α) →[G] n.Combination α where
   toFun := fun f : Fin n ↪ α =>
     ⟨Finset.univ.map f, by rw [Nat.Combination.mem_iff, Finset.card_map, Finset.card_fin]⟩
   map_smul' g f := by
@@ -160,7 +160,7 @@ def EmbeddingToFinset.map : (Fin n ↪ α) →[G] n.Combination α where
 
 variable {n}
 
-theorem EmbeddingToFinset.map_def (f : Fin n ↪ α) :
+theorem EmbeddingToFinset.map_def [DecidableEq α] (f : Fin n ↪ α) :
     ↑((EmbeddingToFinset.map G α n).toFun f) = Finset.univ.map f :=
   rfl
 
@@ -174,7 +174,7 @@ lemma Finset.exists_fin_enum (s : Finset α) (hsn : Finset.card s = n) :
   rw [← Finset.mem_toList, List.mem_iff_get]
   rfl
 
-theorem EmbeddingToFinset.map_surjective :
+theorem EmbeddingToFinset.map_surjective [DecidableEq α] :
     Function.Surjective (EmbeddingToFinset.map G α n) := by
   rintro ⟨s, hs⟩
   -- have : Set.Finite (s : Set α) := Finset.finite_toSet s
@@ -184,9 +184,7 @@ theorem EmbeddingToFinset.map_surjective :
   simp only [Function.Embedding.mk_coe, Nat.Combination.eq_iff]
   exact hf
 
-variable [Fintype α]
-
-theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
+theorem Nat.Combination_nontrivial [DecidableEq α] [Fintype α] (h1 : 0 < n) (h2 : n < Fintype.card α) :
     Nontrivial (n.Combination α) := by
   suffices Nonempty (n.Combination α) by
     obtain ⟨s, hs⟩ := this
@@ -216,18 +214,18 @@ theorem Nat.Combination_nontrivial (h1 : 0 < n) (h2 : n < Fintype.card α) :
   use s
   exact hs'
 
-theorem Nat.Combination_isPretransitive_of_IsMultiplyPretransitive
+theorem Nat.Combination_isPretransitive_of_IsMultiplyPretransitive [DecidableEq α]
     (h : IsMultiplyPretransitive G α n) :
     IsPretransitive G (n.Combination α) :=
   isPretransitive.of_surjective_map (EmbeddingToFinset.map_surjective G α) h
 
-theorem Nat.Combination_isPretransitive :
+theorem Nat.Combination_isPretransitive [DecidableEq α] [Fintype α] :
     IsPretransitive (Equiv.Perm α) (n.Combination α) := by
   apply Nat.Combination_isPretransitive_of_IsMultiplyPretransitive
   apply Equiv.Perm.isMultiplyPretransitive
 
 /-- The complement of a combination -/
-def Nat.Combination_compl {m : ℕ} (hm : m + n = Fintype.card α) :
+def Nat.Combination_compl [DecidableEq α] [Fintype α] {m : ℕ} (hm : m + n = Fintype.card α) :
     n.Combination α →[G] m.Combination α where
   toFun := fun ⟨s, hs⟩ =>
     ⟨(sᶜ : Finset α), by
@@ -242,7 +240,7 @@ def Nat.Combination_compl {m : ℕ} (hm : m + n = Fintype.card α) :
     simp only [Finset.mem_compl]
     simp [← Finset.inv_smul_mem_iff]
 
-theorem Nat.Combination_compl_bijective {m : ℕ} (hm : m + n = Fintype.card α) :
+theorem Nat.Combination_compl_bijective [DecidableEq α] [Fintype α] {m : ℕ} (hm : m + n = Fintype.card α) :
     Function.Bijective (Nat.Combination_compl G α hm) := by
   constructor
   · rintro ⟨s, hs⟩ ⟨t, ht⟩ h
@@ -258,12 +256,12 @@ theorem Nat.Combination_compl_bijective {m : ℕ} (hm : m + n = Fintype.card α)
     change sᶜᶜ = s; rw [compl_compl]
 
 /-- The obvious map from a type to its 1-combinations, as an equivariant map -/
-def Nat.toCombination_one_equivariant :
+def Nat.toCombination_one_equivariant [DecidableEq α] :
     α →[G] Nat.Combination α 1 where
   toFun := fun x => ⟨{x}, Finset.card_singleton x⟩
   map_smul' _ _ := rfl
 
-theorem Nat.bijective_toCombination_one_equivariant :
+theorem Nat.bijective_toCombination_one_equivariant [DecidableEq α] :
     Function.Bijective (Nat.toCombination_one_equivariant G α) := by
   constructor
   · intro a b h

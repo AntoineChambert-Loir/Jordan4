@@ -19,7 +19,7 @@ import Jordan.MultipleTransitivity
 -- import group_theory.specific_groups.alternating
 open scoped Pointwise Classical
 
-variable {α : Type _} [Fintype α] [DecidableEq α]
+variable {α : Type _} [Fintype α]
 
 open MulAction
 

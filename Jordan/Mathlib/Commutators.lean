@@ -5,7 +5,7 @@ Authors: Antoine Chambert-Loir
 
 ! This file was ported from Lean 3 source module for_mathlib.commutators
 -/
-import Mathlib.GroupTheory.QuotientGroup
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.Abelianization
 
 variable {G : Type _} [Group G]

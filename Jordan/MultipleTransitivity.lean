@@ -37,7 +37,7 @@ section Monoid
 
 /- It would be better do have it for has_smul
 but the instance does not automatically transfer to subtypes -/
-variable {M α : Type _} [DecidableEq α] [Monoid M] [MulAction M α]
+variable {M α : Type _} [Monoid M] [MulAction M α]
 
 theorem isPretransitive_of_submonoid {K : Submonoid M} (h : IsPretransitive K α) :
     IsPretransitive M α := by
@@ -366,7 +366,7 @@ theorem is_two_pretransitive_iff :
     let h' := h.exists_smul_eq
     intro a b c d hab hcd
     obtain ⟨m, hm⟩ := h' (f a b hab) (f c d hcd)
-    rw [← Function.Embedding.ext_iff] at hm
+    rw [Function.Embedding.ext_iff] at hm
     use m
     constructor
     simpa only [smul_apply, coeFn_mk, eq_self_iff_true, if_true] using hm 0
@@ -478,7 +478,7 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
     use ⟨g, hg⟩
     ext ⟨i, hi⟩
     simp only [smul_apply, SubMulAction.val_smul_of_tower]
-    rw [← Function.Embedding.ext_iff] at hx' hy'
+    rw [Function.Embedding.ext_iff] at hx' hy'
     specialize hx' ⟨i, hi⟩; specialize hy' ⟨i, hi⟩
     simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id, coeFn_mk]
       at hx' hy'
@@ -527,7 +527,7 @@ theorem stabilizer.isMultiplyPretransitive' (hα' : IsPretransitive M α) {n : �
     ext ⟨i, hi⟩
     rw [mul_smul]; simp only [smul_apply]
     cases' lt_or_eq_of_le (le_of_lt_succ hi) with hi' hi'
-    · rw [← Function.Embedding.ext_iff] at hgx hgy hg
+    · rw [Function.Embedding.ext_iff] at hgx hgy hg
       specialize hgx ⟨i, hi'⟩; specialize hgy ⟨i, hi'⟩; specialize hg ⟨i, hi'⟩
       simp only [succ_eq_add_one, trans_apply, Fin.castLEEmb_apply, Fin.castLE_mk, smul_apply,
         coe_subtype] at hgx hgy hg
@@ -577,7 +577,7 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
     use ⟨g, hg⟩
     ext ⟨i, hi⟩
     simp only [smul_apply, SubMulAction.val_smul_of_tower]
-    rw [← Function.Embedding.ext_iff] at hx' hy'
+    rw [Function.Embedding.ext_iff] at hx' hy'
     specialize hx' ⟨i, hi⟩; specialize hy' ⟨i, hi⟩
     simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, id, coeFn_mk] at hx' hy'
     rw [← hx', ← hy', ← hg']; rfl
@@ -598,7 +598,7 @@ theorem stabilizer.isMultiplyPretransitive (hα' : IsPretransitive M α) {n : �
     ext ⟨i, hi⟩
     rw [mul_smul]; simp only [smul_apply]
     cases' lt_or_eq_of_le (le_of_lt_succ hi) with hi' hi'
-    · rw [← Function.Embedding.ext_iff] at hgx hgy hg
+    · rw [Function.Embedding.ext_iff] at hgx hgy hg
       specialize hgx ⟨i, hi'⟩; specialize hgy ⟨i, hi'⟩; specialize hg ⟨i, hi'⟩
       simp only [trans_apply, RelEmbedding.coe_toEmbedding, Fin.castLE_mk, smul_apply,
         Function.Embedding.coe_subtype] at hgx hgy hg
@@ -644,7 +644,7 @@ theorem remaining_transitivity
       simp only [trans_apply, Function.Embedding.coe_subtype]
       rfl
     rw [this]
-    rw [← Function.Embedding.ext_iff] at hx'1 hy'1
+    rw [Function.Embedding.ext_iff] at hx'1 hy'1
     simp_rw [← hy'1 i, ← hx'1 i, ← hg]
     simp only [trans_apply, smul_apply, RelEmbedding.coe_toEmbedding]
     rfl
@@ -1012,7 +1012,7 @@ theorem IsMultiplyPretransitive.eq_top_of_is_full_minus_one_pretransitive
   have hgk' : ∀ (i : Fin (Fintype.card α)) (_ : i.val < Fintype.card α - 1),
     (g • x) i = (k • x) i := by
     intro i hi
-    exact Function.Embedding.ext_iff.mpr hg' ⟨i.val, hi⟩
+    exact Function.Embedding.ext_iff.mp hg' ⟨i.val, hi⟩
   have hgk : ∀ i : Fin (Fintype.card α), (g • x) i = (k • x) i := by
     intro i
     cases' aux_lt_iff_lt_or_eq i.prop with hi hi
