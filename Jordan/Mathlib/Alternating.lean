@@ -81,7 +81,7 @@ theorem alternatingGroup_is_perfect (h5 : 5 ≤ Fintype.card α) :
 theorem alternatingGroup_is_perfect' (h5 : 5 ≤ Fintype.card α) :
     ⁅alternatingGroup α, alternatingGroup α⁆ = alternatingGroup α := by
   rw [← Subgroup.commutator_eq', alternatingGroup_is_perfect h5, Subgroup.map_top_eq_range,
-    Subgroup.subtype_range]
+    Subgroup.range_subtype]
 
 theorem alternatingGroup.commutator_group_le :
     commutator (Perm α) ≤ alternatingGroup α := by

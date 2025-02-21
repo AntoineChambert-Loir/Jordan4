@@ -233,7 +233,7 @@ theorem Equiv.Perm.normal_subgroups {α : Type _} [DecidableEq α] [Fintype α]
   obtain ⟨s, hs⟩ := Nat.combination.mulAction_faithful
     (G := Equiv.Perm α) (α := α) (g := g) 2
     (by norm_num)
-    (by rw [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+    (by rw [ENat.card_eq_coe_fintype_card, ENat.coe_le_coe]
         apply le_trans (by norm_num) hα)
     (by exact hg_ne)
   apply hs

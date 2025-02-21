@@ -318,7 +318,7 @@ theorem Subgroup.closure_subgroupOf_eq {G : Type _} [Group G]
   suffices N.subtype '' (N.subtype ⁻¹' s) = s by
     rw [this]
     rw [Subgroup.map_comap_eq]
-    simp only [Subgroup.subtype_range, right_eq_inf, Subgroup.closure_le]
+    simp only [Subgroup.range_subtype, right_eq_inf, Subgroup.closure_le]
     exact hs
   rw [Set.image_preimage_eq_inter_range, Subgroup.coeSubtype, Subtype.range_coe_subtype]
   exact Set.inter_eq_self_of_subset_left hs
@@ -333,7 +333,7 @@ theorem closure_three_cycles_alternating_eq_top :
       {g : Equiv.Perm α | Equiv.Perm.IsThreeCycle g} by
     rw [this, Equiv.Perm.closure_three_cycles_eq_alternating,
       ← Subgroup.comap_top (alternatingGroup α).subtype,
-      Subgroup.map_comap_eq, Subgroup.subtype_range, inf_top_eq]
+      Subgroup.map_comap_eq, Subgroup.range_subtype, inf_top_eq]
   · ext g
     simp only [Subgroup.coeSubtype, Set.mem_image, Set.mem_setOf_eq]
     constructor
@@ -436,7 +436,7 @@ theorem is_normal_subgroup_iff_of_ne_6 {α : Type _} [DecidableEq α] [Fintype �
   · intro h
     obtain ⟨g, hgN, hg⟩ := N.nontrivial_iff_exists_ne_one.mp hN
     obtain ⟨s, hs⟩ := Nat.combination.mulAction_faithful (α := α) (g := g) 3 (by norm_num)
-      (by rw [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+      (by rw [ENat.card_eq_coe_fintype_card, ENat.coe_le_coe]
           exact le_trans (by norm_num) hα)
       (by intro hg'; apply hg
           exact OneMemClass.coe_eq_one.mp hg')
@@ -684,7 +684,7 @@ theorem closure_perm22_alternating_eq_top (hα : 5 ≤ Fintype.card α) :
         {g : Equiv.Perm α | g.cycleType = {2, 2}} by
       rw [this]
       rw [closure_perm22_eq_top hα]
-      rw [← Subgroup.comap_top (alternatingGroup α).subtype, Subgroup.map_comap_eq, Subgroup.subtype_range, inf_top_eq]
+      rw [← Subgroup.comap_top (alternatingGroup α).subtype, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_top_eq]
     · ext g
       simp only [Subgroup.coeSubtype, Set.mem_image, Set.mem_setOf_eq]
       constructor
@@ -811,7 +811,7 @@ theorem normal_subgroups_6
     obtain ⟨g, hgN, hg_ne⟩ := N.nontrivial_iff_exists_ne_one.mp ntN
     have : ∃ s : Nat.Combination α 3, g • s ≠ s := by
       apply Nat.combination.mulAction_faithful 3 (by norm_num)
-      simp only [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+      simp only [ENat.card_eq_coe_fintype_card, ENat.coe_le_coe]
       exact le_trans (by norm_num) hα
       intro hg_ne'; apply hg_ne
       ext; simp only [Subgroup.coe_one, ← hg_ne']
@@ -844,7 +844,7 @@ theorem normal_subgroups_8 {α : Type _} [DecidableEq α] [Fintype α]
   obtain ⟨g, hgN, hg_ne⟩ := N.nontrivial_iff_exists_ne_one.mp ntN
   obtain ⟨s, hs⟩ := Nat.combination.mulAction_faithful (α := α) (g := g) 4
     (by norm_num)
-    (by rw [PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe]
+    (by rw [ENat.card_eq_coe_fintype_card, ENat.coe_le_coe]
         exact le_trans (by norm_num) hα)
     (by intro hg'; apply hg_ne
         exact OneMemClass.coe_eq_one.mp hg')

@@ -27,14 +27,11 @@ namespace Equiv.Perm
 
 theorem ofSubtype_mem_stabilizer (s : Set α) (g : Equiv.Perm s) :
     Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s := by
-  rw [mem_stabilizer_of_finite_iff_smul_le]
-  intro x
+  rw [mem_stabilizer_set_iff_subset_smul_set s.toFinite]
+  intro x hx
   rw [Set.mem_smul_set]
-  rintro ⟨y, hy, rfl⟩
-  simp only [Equiv.Perm.smul_def]
-  rw [Equiv.Perm.ofSubtype_apply_of_mem g hy]
-  refine Subtype.mem _
-  exact s.toFinite
+  use g.symm ⟨x, hx⟩
+  simp
 
 theorem ofSubtype_mem_stabilizer' (s : Set α) (g : Equiv.Perm (sᶜ : Set α)) :
     Equiv.Perm.ofSubtype g ∈ stabilizer (Equiv.Perm α) s := by
@@ -44,14 +41,11 @@ theorem ofSubtype_mem_stabilizer' (s : Set α) (g : Equiv.Perm (sᶜ : Set α)) 
       rw ← stabilizer_compl,
       let hz := @equiv.perm.of_subtype.mem_stabilizer α _ _ (sᶜ : set α) g,
   -/
-  rw [mem_stabilizer_of_finite_iff_smul_le]
-  · intro x
-    rw [Set.mem_smul_set]
-    rintro ⟨y, hy, rfl⟩
-    simp only [Equiv.Perm.smul_def]
-    rw [Equiv.Perm.ofSubtype_apply_of_not_mem g (Set.not_mem_compl_iff.mpr hy)]
-    exact hy
-  exact s.toFinite
+  rw [mem_stabilizer_set_iff_subset_smul_set s.toFinite]
+  intro x hx
+  rw [Set.mem_smul_set]
+  use x, hx
+  simp [Equiv.Perm.ofSubtype_apply_of_not_mem g (Set.not_mem_compl_iff.mpr hx)]
 
 theorem stabilizer_isPreprimitive (s : Set α) : IsPreprimitive (stabilizer (Equiv.Perm α) s) s :=
   by

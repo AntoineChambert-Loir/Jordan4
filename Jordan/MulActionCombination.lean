@@ -91,7 +91,7 @@ theorem Nat.combination.smul_ne_iff_hasMem_not_mem [DecidableEq α] {s t : n.Com
   simp only [Nat.combination_mulAction.coe_apply', Finset.le_eq_subset]
   exact Finset.smul_finset_subset_iff
 
-theorem Nat.combination.mulAction_faithful [DecidableEq α] (hn : 1 ≤ n) (hα : n.succ ≤ PartENat.card α)
+theorem Nat.combination.mulAction_faithful [DecidableEq α] (hn : 1 ≤ n) (hα : n.succ ≤ ENat.card α)
       {g : G}
       (hg : (MulAction.toPerm g : Equiv.Perm α) ≠ 1) :
       ∃ s : n.Combination α, g • s ≠ s := by
@@ -124,7 +124,6 @@ theorem Nat.combination.mulAction_faithful [DecidableEq α] (hn : 1 ≤ n) (hα 
   have hα' : n ≤ Set.encard ({g • a}ᶜ) := by
     rw [← not_lt, ← WithTop.add_one_lt_coe_succ_iff, not_lt, add_comm,
       ← Set.encard_singleton (g • a), Set.encard_add_encard_compl, Set.encard_univ]
-    rw [← PartENat.withTopEquiv_natCast, PartENat.withTopEquiv_le]
     exact hα
   obtain ⟨s, has, has', hs⟩ := Set.exists_superset_subset_encard_eq this (by
     rw [Set.encard_singleton, ← Nat.cast_one, Nat.cast_le]

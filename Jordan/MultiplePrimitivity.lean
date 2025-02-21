@@ -249,7 +249,7 @@ theorem remaining_primitivity
 
 /-- n.succ-fold pretransitivity implies n-fold preprimitivity -/
 theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
-    (hα : ↑n.succ ≤ PartENat.card α) (h : IsMultiplyPretransitive M α n.succ) :
+    (hα : ↑n.succ ≤ ENat.card α) (h : IsMultiplyPretransitive M α n.succ) :
     IsMultiplyPreprimitive M α n := by
   cases' Nat.eq_zero_or_pos n with hn hn
   -- n = 0
@@ -272,7 +272,7 @@ theorem isMultiplyPreprimitive_of_multiply_pretransitive_succ {n : ℕ}
 
 /-- An n-fold preprimitive action is m-fold preprimitive for m ≤ n -/
 theorem isMultiplyPreprimitive_of_higher
-    {n : ℕ} {m : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α)
+    {n : ℕ} {m : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ ENat.card α)
     (hn : IsMultiplyPreprimitive M α n) :
     IsMultiplyPreprimitive M α m := by
   -- induction on n
@@ -287,7 +287,7 @@ theorem isMultiplyPreprimitive_of_higher
     · rw [hmn]; exact hn
     -- m < n + 1 : use induction hypothesis
     · apply hrec (Nat.lt_succ_iff.mp hmn')
-      refine le_trans ?_ hα; rw [PartENat.coe_le_coe]; exact Nat.le_succ n
+      refine le_trans ?_ hα; rw [ENat.coe_le_coe]; exact Nat.le_succ n
       -- get one step by transitivity
       apply isMultiplyPreprimitive_of_multiply_pretransitive_succ M α hα hn.left
 

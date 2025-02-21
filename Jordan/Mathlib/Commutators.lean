@@ -30,7 +30,7 @@ theorem Subgroup.map_commutator_eq {G H : Type _} [Group H] [Group G] (f : H →
 
 theorem Subgroup.commutator_eq' {G : Type _} [Group G] (H : Subgroup G) :
     Subgroup.map H.subtype (_root_.commutator H) = ⁅H, H⁆ := by
-  simp only [map_commutator_eq, subtype_range]
+  simp only [map_commutator_eq, range_subtype]
 
 /-- If G and H have multiplications *
 and φ : G → H is a surjective multiplicative map,
@@ -88,7 +88,7 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   refine surj_to_comm φ.toMulHom ?_ hH.is_comm
   simp only [MulHom.coe_mk, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe]
   -- On prouve que l'image de φ est égale à ⊤
-  rw [← MonoidHom.range_top_iff_surjective]
+  rw [← MonoidHom.range_eq_top]
   -- let R := monoid_hom.range φ,
   /-  j : H → G, p : G → G/N,  φ = p o j, on veut prouver que φ est surjective.
       R = im(φ), S = p⁻¹(R) ⊆ G -/
@@ -97,7 +97,7 @@ theorem contains_commutators_of (N : Subgroup G) (nN : N.Normal) (H : Subgroup G
   suffices S_top : φ.range.comap (QuotientGroup.mk' N) = ⊤ by
     rw [eq_top_iff]
     intro x _
-    let y := Quotient.out' x
+    let y := Quotient.out x
     have hy : y ∈ φ.range.comap (QuotientGroup.mk' N) := by rw [S_top]; exact Subgroup.mem_top y
     rw [← QuotientGroup.out_eq' x]
     exact Subgroup.mem_comap.mp hy

@@ -200,8 +200,8 @@ theorem stabilizer_univ_eq_top (G : Type _) [Group G] (α : Type _) [MulAction G
   rw [mem_stabilizer_iff]
   simp only [Set.smul_set_univ]
 
-example : ↑(Nat.card α) ≤ PartENat.card α := by
-  simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
+example : ↑(Nat.card α) ≤ ENat.card α := by
+  simp only [Nat.card_eq_fintype_card, ENat.card_eq_coe_fintype_card, le_refl]
 theorem stabilizer_nonempty_ne_top (α : Type _) (s : Set α) (hs : s.Nonempty) (hs' : sᶜ.Nonempty) :
     stabilizer (Equiv.Perm α) s ≠ ⊤ :=
   by
@@ -537,7 +537,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
         simp only [add_le_add_iff_left]
         rw [Nat.succ_le_iff, Set.ncard_pos]
         exact h1
-      simp only [Nat.card_eq_fintype_card, PartENat.card_eq_coe_fintype_card, le_refl]
+      simp only [Nat.card_eq_fintype_card, ENat.card_eq_coe_fintype_card, le_refl]
   -- Conclusion of the proof : B = ⊤
   rw [eq_top_iff]
   intro x _

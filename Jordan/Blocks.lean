@@ -15,6 +15,7 @@ import Mathlib.Data.Set.Card
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.Algebra.Group.Subgroup.Actions
+import Mathlib.Algebra.Pointwise.Stabilizer
 
 
 /-! # Blocks
@@ -744,7 +745,7 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     apply Set.Finite.subset (Set.Finite.map _ hfB) (hB'₀ k ⟨b, hb, hk⟩)
 --  have ha : a ∈ B' := by
 --    apply Set.mem_biInter; intro g; intro h; exact h
-  have hag : ∀ g : G, a ∈ g • B' → B' ≤ g • B' :=  by
+  have hag : ∀ g : G, a ∈ g • B' → B' ⊆ g • B' :=  by
     intro g hg x hx
     -- a = g • b ; b ∈ B' ; a ∈ k • B → b ∈ k • B
     use g⁻¹ • x
@@ -763,9 +764,7 @@ theorem IsBlock.of_subset [IsPretransitive G X] (a : X) (B : Set X) (hfB : B.Fin
     intro g hg
     apply symm
     rw [← mem_stabilizer_iff]
-    rw [← Subgroup.inv_mem_iff (stabilizer G B')]
-    rw [mem_stabilizer_of_finite_iff_smul_le B' hfB' g⁻¹]
-    rw [← Set.subset_set_smul_iff]
+    rw [mem_stabilizer_set_iff_subset_smul_set hfB']
     exact hag g hg
   rw [IsBlock.mk_notempty_one]
   intro g hg

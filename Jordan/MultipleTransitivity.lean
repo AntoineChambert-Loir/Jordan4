@@ -386,7 +386,7 @@ theorem is_two_pretransitive_iff :
 
 /-- An n-pretransitive action is m-pretransitive for any m ≤ n -/
 theorem isMultiplyPretransitive_of_higher {n : ℕ} (hn : IsMultiplyPretransitive M α n) {m : ℕ}
-    (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α) : IsMultiplyPretransitive M α m :=
+    (hmn : m ≤ n) (hα : ↑n ≤ ENat.card α) : IsMultiplyPretransitive M α m :=
   by
   unfold IsMultiplyPretransitive
   let hn_eq := hn.exists_smul_eq
@@ -617,8 +617,8 @@ theorem remaining_transitivity
     (hmn : n = m + s.ncard) :
     IsMultiplyPretransitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) m := by
 
-  have hs : PartENat.card s = s.ncard := by
-    rw [s.ncard_eq_toFinset_card, PartENat.card_eq_coe_natCard, Set.Nat.card_coe_set_eq, PartENat.natCast_inj, s.ncard_eq_toFinset_card]
+  have hs : ENat.card s = s.ncard := by
+    rw [s.ncard_eq_toFinset_card, ENat.card_eq_coe_natCard, Set.Nat.card_coe_set_eq, Nat.cast_inj, s.ncard_eq_toFinset_card]
 
   -- have hdn : s.ncard ≤ n := by
   --   rw [hmn]
@@ -660,7 +660,7 @@ theorem remaining_transitivity
 
 theorem remaining_transitivity' {m n : ℕ} (s : Set α) [Finite s]
     (h : IsMultiplyPretransitive M α n)
-    (hmn : m + s.ncard ≤ n) (hn : (n : PartENat) ≤ PartENat.card α) :
+    (hmn : m + s.ncard ≤ n) (hn : (n : ENat) ≤ ENat.card α) :
     IsMultiplyPretransitive (fixingSubgroup M s) (SubMulAction.ofFixingSubgroup M s) m := by
 
   -- have hs : PartENat.card s = s.ncard := by
@@ -804,7 +804,7 @@ private theorem IsMultiplyPretransitive.index_of_fixing_subgroup_aux
     apply isMultiplyPretransitive_of_higher M α hmk
     · rw [Nat.succ_le_succ_iff]; apply Nat.zero_le
     · rw [← hs]
-      simp only [PartENat.card_eq_coe_fintype_card, Fintype.card_coe, PartENat.coe_le_coe]
+      simp only [ENat.card_eq_coe_fintype_card, Fintype.card_coe, ENat.coe_le_coe]
       apply Set.ncard_le_fintype_card
 
   have : s.Nonempty := by
@@ -826,7 +826,7 @@ private theorem IsMultiplyPretransitive.index_of_fixing_subgroup_aux
   rw [Subgroup.index_map]
   rw [(MonoidHom.ker_eq_bot_iff (stabilizer M a).subtype).mpr
       (by simp only [Subgroup.coeSubtype, Subtype.coe_injective])]
-  simp only [sup_bot_eq, Subgroup.subtype_range]
+  simp only [sup_bot_eq, Subgroup.range_subtype]
   have hscard : s.ncard = 1 + t.ncard := by
     rw [hat']
     suffices ¬ a ∈ (Subtype.val '' t) by
@@ -899,9 +899,11 @@ theorem IsMultiplyPretransitive.isPreprimitive_of_two
   -- but preprimitivity holds trivially
   · apply IsPreprimitive.on_subsingleton
   -- The (important) case where α has at least 2 elements
-  have hα' : 2 ≤ PartENat.card α := by
-    rw [← PartENat.card_le_one_iff_subsingleton, not_le] at hα
-    exact PartENat.coe_succ_le_iff.mpr hα
+  have hα' : 2 ≤ ENat.card α := by
+    rw [← ENat.card_le_one_iff_subsingleton, not_le] at hα
+    cases h : ENat.card α with
+    | top => simp
+    | coe a => simp_all [Nat.succ_le]
   have : IsPretransitive M α := by
     rw [isPretransitive_iff_is_one_pretransitive]
     apply isMultiplyPretransitive_of_higher M α h2
@@ -946,7 +948,7 @@ theorem _root_.Equiv.Perm.isMultiplyPretransitive (n : ℕ) :
   cases' le_or_gt n (Fintype.card α) with hn hn
   · apply isMultiplyPretransitive_of_higher (Equiv.Perm α) α _ hn
     apply le_of_eq
-    rw [PartENat.card_eq_coe_fintype_card]
+    rw [ENat.card_eq_coe_fintype_card]
     apply IsPretransitive.mk
     intro x y
     suffices h : Function.Bijective x ∧ Function.Bijective y by
@@ -1054,8 +1056,8 @@ theorem IsMultiplyPretransitive.alternatingGroup_of_sub_two [DecidableEq α] :
   apply IsPretransitive.mk
   rw [hn']
   intro x y
-  obtain ⟨x', hx'⟩ := may_extend hn_le (le_of_eq PartENat.card_eq_coe_fintype_card.symm) x
-  obtain ⟨y', hy'⟩ := may_extend hn_le (le_of_eq PartENat.card_eq_coe_fintype_card.symm) y
+  obtain ⟨x', hx'⟩ := may_extend hn_le (le_of_eq ENat.card_eq_coe_fintype_card.symm) x
+  obtain ⟨y', hy'⟩ := may_extend hn_le (le_of_eq ENat.card_eq_coe_fintype_card.symm) y
   let heq := (Equiv.Perm.isMultiplyPretransitive α (Fintype.card α)).exists_smul_eq
   obtain ⟨g, hg⟩ := heq x' y'
   cases' Int.units_eq_one_or (Equiv.Perm.sign g) with h h
@@ -1145,7 +1147,7 @@ theorem alternatingGroup.isPretransitive [DecidableEq α] (h : 3 ≤ Fintype.car
   apply IsMultiplyPretransitive.alternatingGroup_of_sub_two
   apply le_trans _ (Nat.sub_le_sub_right h 2)
   norm_num
-  simp only [ge_iff_le, PartENat.card_eq_coe_fintype_card, PartENat.coe_le_coe,
+  simp only [ge_iff_le, ENat.card_eq_coe_fintype_card, ENat.coe_le_coe,
     tsub_le_iff_right, le_add_iff_nonneg_right]
   norm_num
 
@@ -1231,7 +1233,7 @@ theorem alternatingGroup.has_trivial_blocks [DecidableEq α]
   apply isMultiplyPretransitive_of_higher
   apply IsMultiplyPretransitive.alternatingGroup_of_sub_two
   apply le_trans _ (Nat.sub_le_sub_right h4 2); norm_num
-  simp only [PartENat.card_eq_coe_fintype_card, cast_le, tsub_le_iff_right, le_add_iff_nonneg_right,
+  simp only [ENat.card_eq_coe_fintype_card, cast_le, tsub_le_iff_right, le_add_iff_nonneg_right,
     _root_.zero_le]
 
 /-- The alternating group on 3 letters or more acts primitively -/

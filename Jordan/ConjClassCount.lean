@@ -744,7 +744,7 @@ def Equiv.permConjStabilizerFun (g : Equiv.Perm α) :
       (fun c => dite (c ∈ g.cycleFactorsFinset) (fun hc => uv.snd c hc) fun hc => 1)
       fun c hc d hd h => by
       simp only [Finset.mem_coe] at hc hd
-      simp only [dif_pos hd, dif_pos hc]
+      simp only [Function.onFun, dif_pos hd, dif_pos hc]
       obtain ⟨m, hc'⟩ := Subgroup.mem_zpowers_iff.mp (uv.snd c hc).prop
       obtain ⟨n, hd'⟩ := Subgroup.mem_zpowers_iff.mp (uv.snd d hd).prop
       rw [← hc', ← hd']
@@ -1435,7 +1435,7 @@ def φ' (a : Equiv.Perm.Basis g) :
     ⟨ConjAct.toConjAct (φ'Fun a (mem_Iφ_iff.mp τhτ.prop)),
       φ'_mem_stabilizer a (mem_Iφ_iff.mp τhτ.prop)⟩
   map_one' := by
-    simp only [φ'Fun, OneMemClass.coe_one, k_one, Subgroup.mk_eq_one, MulEquivClass.map_eq_one_iff]
+    simp only [φ'Fun, OneMemClass.coe_one, k_one, Subgroup.mk_eq_one, EmbeddingLike.map_eq_one_iff]
     ext
     simp
   map_mul' σ τ := by

@@ -93,7 +93,7 @@ theorem isPretransitive_ofFixingSubgroup (s : Set α) (h0 : s.Nontrivial)
       Nat.add_sub_assoc (le_of_lt h1'), add_le_add_iff_left]
     apply Nat.le_sub_of_add_le
     exact h1'
-  · rw [PartENat.card_eq_coe_fintype_card]
+  · rw [ENat.card_eq_coe_fintype_card]
     simp only [Nat.cast_le, tsub_le_iff_right, le_add_iff_nonneg_right, zero_le]
 
 theorem stabilizer_ne_top' (s : Set α) (hs : s.Nonempty) (hsc : sᶜ.Nontrivial) :
@@ -167,16 +167,21 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
       constructor
       · simp only [Subgroup.mem_inf]
         constructor
-        · rw [mem_stabilizer_of_finite_iff_smul_le _ t.toFinite]
+        · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_set_smul_iff]
           rintro _ ⟨x, hx, rfl⟩
-          simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
-          have hx_ne : ∀ u ∈ tᶜ, x ≠ u := fun u hu h => Set.mem_compl hu (by rw [← h]; exact hx)
-          rw [Equiv.swap_apply_of_ne_of_ne (hx_ne c hc) (hx_ne d hd)]
+          simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
+            Function.comp_apply]
           by_cases hxa : x = a
-          · rw [hxa, Equiv.swap_apply_left]; exact hb
+          · rwa [hxa, Equiv.swap_apply_left, Equiv.swap_apply_of_ne_of_ne]
+            · apply ne_of_mem_of_not_mem hb hc
+            · apply ne_of_mem_of_not_mem hb hd
           · by_cases hxb : x = b
-            · rw [hxb, Equiv.swap_apply_right]; exact ha
-            · rw [Equiv.swap_apply_of_ne_of_ne hxa hxb]; exact hx
+            · rwa [hxb, Equiv.swap_apply_right, Equiv.swap_apply_of_ne_of_ne]
+              · apply ne_of_mem_of_not_mem ha hc
+              · apply ne_of_mem_of_not_mem ha hd
+            · rwa [Equiv.swap_apply_of_ne_of_ne hxa hxb, Equiv.swap_apply_of_ne_of_ne]
+              · apply ne_of_mem_of_not_mem hx hc
+              · apply ne_of_mem_of_not_mem hx hd
         · simp only [Equiv.Perm.mem_alternatingGroup, Equiv.Perm.sign_mul]
           rw [Equiv.Perm.sign_swap hab]; rw [Equiv.Perm.sign_swap hcd]
           simp only [Int.units_mul_self]
@@ -193,19 +198,18 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         constructor
         · simp only [Subgroup.mem_inf]
           constructor
-          · rw [mem_stabilizer_of_finite_iff_smul_le _ t.toFinite]
+          · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_set_smul_iff]
             rintro _ ⟨x, hx, rfl⟩
-            · simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
+            · simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
+                Function.comp_apply]
               by_cases hxa : x = a
-              · rw [hxa, Equiv.swap_apply_left]
-                rw [Equiv.swap_apply_of_ne_of_ne hab.symm hcb.symm]
-                exact hb
+              · rwa [hxa, Equiv.swap_apply_left, Equiv.swap_apply_of_ne_of_ne hca hcb]
               · rw [← Ne] at hxa
-                by_cases hxb : x = b
-                · rw [hxb, Equiv.swap_apply_right, Equiv.swap_apply_left]; exact hc
-                · rw [← Ne] at hxb
-                  rw [Equiv.swap_apply_of_ne_of_ne hxa hxb]
-                  by_cases hxc : x = c
+                by_cases hxc : x = c
+                · rwa [hxc, Equiv.swap_apply_right, Equiv.swap_apply_left]
+                · rw [← Ne] at hxc
+                  rw [Equiv.swap_apply_of_ne_of_ne hxa hxc]
+                  by_cases hxc : x = b
                   · rw [hxc, Equiv.swap_apply_right]; exact ha
                   · rw [← Ne] at hxc
                     rw [Equiv.swap_apply_of_ne_of_ne hxa hxc]
@@ -250,13 +254,14 @@ theorem has_three_cycle_of_stabilizer' (s : Set α) (hs : 2 < Set.ncard s) :
   constructor
   apply Equiv.Perm.isThreeCycle_swap_mul_swap_same hab hac hbc
   rw [← stabilizer_compl]
-  rw [mem_stabilizer_of_finite_iff_smul_le _ sᶜ.toFinite]
+  rw [mem_stabilizer_set_iff_subset_smul_set sᶜ.toFinite, Set.subset_set_smul_iff]
   rintro _ ⟨x, hx, rfl⟩
-  simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
+  simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
+    Function.comp_apply, Set.mem_compl_iff]
   rw [Set.mem_compl_iff] at hx
   suffices h : ∀ u ∈ s, x ≠ u by
-    rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h c hc)]
     rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h b hb)]
+    rw [Equiv.swap_apply_of_ne_of_ne (h a ha) (h c hc)]
     exact hx
   intro u hu; exact ne_of_prop_ne hx hu
 
@@ -752,8 +757,8 @@ theorem Nat.Combination.isPreprimitive_of_alt (n : ℕ) (h_one_le : 1 ≤ n)
     apply Nat.Combination_isPretransitive_of_IsMultiplyPretransitive
     apply isMultiplyPretransitive_of_higher (alternatingGroup α) α _
       (Nat.sub_le_sub_left h_one_lt _)
-    · rw [PartENat.card_eq_coe_fintype_card]
-      simp only [PartENat.coe_le_coe, tsub_le_self]
+    · rw [ENat.card_eq_coe_fintype_card]
+      simp only [ENat.coe_le_coe, tsub_le_self]
     · apply IsMultiplyPretransitive.alternatingGroup_of_sub_two
   have : Nontrivial (n.Combination α) :=
     Nat.Combination_nontrivial α (lt_trans (Nat.lt_succ_self 0) h_one_lt) hn
