@@ -85,14 +85,11 @@ instance ofStabilizerLift (a : α) : HasLiftT (SubMulAction.ofStabilizer M a) α
 
 
 lemma add_card_ofStabilizer_eq (a : α) :
-    1 + PartENat.card (SubMulAction.ofStabilizer M a) = PartENat.card α :=  by
-  unfold PartENat.card
-  rw [← Cardinal.mk_sum_compl {a}, map_add]
+    1 + ENat.card (SubMulAction.ofStabilizer M a) = ENat.card α :=  by
+  unfold ENat.card
+  rw [← Cardinal.mk_sum_compl {a}, map_add, eq_comm]
   congr
-  simp only [Cardinal.mk_fintype, Fintype.card_ofSubsingleton, Nat.cast_one]
-  conv_lhs => rw [← Nat.cast_one]
-  apply symm
-  exact Iff.mpr Cardinal.toPartENat_eq_natCast_iff rfl
+  simp only [Cardinal.mk_fintype, Fintype.card_ofSubsingleton, Nat.cast_one, Cardinal.toENat_eq_one]
 
 /-- The sub_mul_action of fixing_subgroup M s on the complement -/
 def ofFixingSubgroup (s : Set α) : SubMulAction (fixingSubgroup M s) α

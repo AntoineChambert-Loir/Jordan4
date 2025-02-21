@@ -202,7 +202,7 @@ theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characterist
   refine Sylow.characteristic_of_normal S ?_
   rw [← Subgroup.normalizer_eq_top]
   rw [← Subgroup.index_eq_one]
-  rw [← card_sylow_eq_index_normalizer]
+  rw [← Sylow.card_eq_index_normalizer]
   rw [Nat.card_eq_fintype_card]
   exact A4_card_two_sylow_eq_one α hα4
 
@@ -357,7 +357,7 @@ theorem V4_eq_commutator (hα4 : Fintype.card α = 4) :
         refine Subgroup.mem_map_of_mem _ hk
       apply symm
       rw [← MonoidHom.range_eq_map]
-      rw [MonoidHom.range_top_iff_surjective]
+      rw [MonoidHom.range_eq_top]
       exact MulEquiv.surjective _
   have hk2 := comm_le hk
   rw [← Subgroup.mem_carrier, V4_carrier_eq α hα4] at hk2

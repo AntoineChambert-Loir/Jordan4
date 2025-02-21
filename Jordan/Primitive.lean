@@ -234,7 +234,7 @@ theorem isTrivialBlock_of_surjective_map {φ : M → N} {f : α →ₑ[φ] β} (
   cases' hB with hB hB
   · apply Or.intro_left; apply Set.Subsingleton.image hB
   · apply Or.intro_right; rw [hB]
-    simp only [Set.top_eq_univ, Set.image_univ, Set.range_iff_surjective]
+    simp only [Set.top_eq_univ, Set.image_univ, Set.range_eq_univ]
     exact hf
 
 theorem isTrivialBlock_of_injective_map {φ : M → N} {f : α →ₑ[φ] β} (hf : Function.Injective f)

@@ -154,18 +154,12 @@ theorem isPretransitive_ofFixingSubgroup_inter
 
 lemma _root_.SubMulAction.add_encard_ofStabilizer_eq
     {G : Type _} [Group G] [MulAction G α] (a : α) :
-    1 + (SubMulAction.ofStabilizer G a).carrier.encard = PartENat.card α :=  by
+    1 + (SubMulAction.ofStabilizer G a).carrier.encard = ENat.card α :=  by
   classical
   rw [SubMulAction.ofStabilizer_carrier]
-  rw [← Nat.cast_one]
-  apply PartENat.withTopAddEquiv.injective
-  rw [map_add]
   convert Set.encard_add_encard_compl {a}
   · rw [Set.encard_singleton]
-    apply PartENat.toWithTop_natCast'
-  · rw [← AddEquiv.eq_symm_apply]
-    rfl
-  · convert (Set.encard_univ α).symm
+  · exact (Set.encard_univ α).symm
 
 lemma _root_.SubMulAction.add_encard_ofStabilizer_eq'
     {G : Type _} [Group G] [MulAction G α] (a : α) :
@@ -182,7 +176,7 @@ variable {α : Type _}
 variable {G : Type _} [Group G] [MulAction G α]
 
 /-- In a 2-pretransitive action, the normal closure of stabilizers is the full group -/
-theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
+theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < ENat.card α)
     (hG' : IsMultiplyPretransitive G α 2) {a : α} :
     Subgroup.normalClosure ((stabilizer G a) : Set G) = ⊤ := by
   have hG : IsPretransitive G α := by
@@ -193,9 +187,9 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
     rw [Nat.cast_two]
     exact le_of_lt hsn'
   have : Nontrivial α := by
-    rw [← PartENat.one_lt_card_iff_nontrivial]
+    rw [← ENat.one_lt_card_iff_nontrivial]
     refine lt_trans ?_ hsn'
-    rw [← Nat.cast_two, ← Nat.cast_one, PartENat.coe_lt_coe]
+    rw [← Nat.cast_two, ← Nat.cast_one, ENat.coe_lt_coe]
     norm_num
   have hGa : (stabilizer G a).IsMaximal :=  by
     rw [maximal_stabilizer_iff_preprimitive G a]
@@ -210,14 +204,10 @@ theorem normalClosure_of_stabilizer_eq_top (hsn' : 2 < PartENat.card α)
       apply Set.Nontrivial.coe_sort
       rw [← Set.one_lt_encard_iff_nontrivial]
       rw [← not_le, ← Nat.cast_one, ← WithTop.add_one_le_coe_succ_iff, not_le]
-      rw [← PartENat.withTopEquiv_lt, ← Set.encard_univ] at hsn'
+      rw [← Set.encard_univ] at hsn'
       convert hsn'
-      simp only [SetLike.coe_sort_coe, Nat.cast_succ, Nat.cast_one]
-      rw [← Nat.cast_two]
-      rw [← PartENat.withTopEquiv.symm_apply_eq]
-      rfl
       rw [add_comm]
-      exact SubMulAction.add_encard_ofStabilizer_eq' a
+      simpa using SubMulAction.add_encard_ofStabilizer_eq' a
     rw [nontrivial_iff] at this
     obtain ⟨b, c, hbc⟩ := this
     have : IsPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) := by
@@ -770,7 +760,7 @@ theorem nontrivial_on_equiv_perm_two {K : Type _} [Group K] [MulAction K α]
     rw [← hα]
     apply Equiv.Perm.isMultiplyPretransitive
 
-  rw [← MonoidHom.range_top_iff_surjective]
+  rw [← MonoidHom.range_eq_top]
   apply Subgroup.eq_top_of_card_eq
   apply le_antisymm
   · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]

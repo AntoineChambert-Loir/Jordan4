@@ -81,6 +81,7 @@ theorem alternatingGroup_is_characteristic : (alternatingGroup α).Characteristi
 theorem isCommutative_of_prime_order {G : Type _} [Group G] [Fintype G]
     {p : ℕ} [hp : Fact p.Prime] (h : Fintype.card G = p) :
     Std.Commutative (· * · : G → G → G) := by
+  rw [← Nat.card_eq_fintype_card] at h
   haveI := isCyclic_of_prime_card h
   exact Std.Commutative.mk (IsCyclic.commGroup.mul_comm)
 

@@ -23,39 +23,38 @@ example (h q : Prop) : h → ¬h → q :=
   absurd
 
 /-- Given a nat.card inequality, get an embedding from a fin _ -/
-theorem gimme_some {m : ℕ} (hα : ↑m ≤ PartENat.card α) : Nonempty (Fin m ↪ α) := by
+theorem gimme_some {m : ℕ} (hα : ↑m ≤ ENat.card α) : Nonempty (Fin m ↪ α) := by
   suffices Nonempty (ULift (Fin m) ↪ α) by
     obtain ⟨x'⟩ := this;
     use Equiv.ulift.symm.toEmbedding.trans x'
     apply Function.Embedding.injective
   rw [← Cardinal.le_def, Cardinal.mk_fintype, Fintype.card_ulift, Fintype.card_fin]
-  exact Iff.mp Cardinal.natCast_le_toPartENat_iff hα
+  exact Iff.mp Cardinal.natCast_le_toENat_iff hα
 
 theorem gimme_some_equiv {m : ℕ} [Fintype α] (hα : m = Fintype.card α) : Nonempty (Fin m ≃ α) := by
   exact ⟨(Fintype.equivFinOfCardEq hα.symm).symm⟩
 
 
 
-theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : PartENat.card α = m) :
+theorem equiv_fin_of_partENat_card_eq {m : ℕ} (hα : ENat.card α = m) :
     Nonempty (Fin m ≃ α) := by
   cases' fintypeOrInfinite α with h h -- <;> skip
-  · simp only [PartENat.card_eq_coe_fintype_card, PartENat.natCast_inj] at hα
+  · simp only [ENat.card_eq_coe_fintype_card, Nat.cast_inj] at hα
     exact ⟨(Fintype.equivFinOfCardEq hα).symm⟩
-  · rw [PartENat.card_eq_top_of_infinite] at hα
+  · rw [ENat.card_eq_top_of_infinite] at hα
     exfalso
-    apply PartENat.natCast_ne_top m
-    rw [hα]
+    simp only [ENat.top_ne_coe] at hα
 
 /-- Given an embedding and a strict nat.card inequality, get another element  -/
-theorem gimme_another {m : ℕ} (f : Fin m → α) (hα : ↑m < PartENat.card α) :
+theorem gimme_another {m : ℕ} (f : Fin m → α) (hα : ↑m < ENat.card α) :
     ∃ a : α, a ∉ Set.range f := by
   rw [← Set.ne_univ_iff_exists_not_mem]
   intro h
   rw [← not_le] at hα
   apply hα
-  rw [← PartENat.card_congr (Equiv.Set.univ α), ← h]
-  unfold PartENat.card
-  rw [Cardinal.toPartENat_le_natCast_iff]
+  rw [← ENat.card_congr (Equiv.Set.univ α), ← h]
+  unfold ENat.card
+  rw [Cardinal.toENat_le_natCast_iff]
   convert Cardinal.mk_range_le
   swap
   exact fun n ↦ f (n.down)
@@ -99,8 +98,8 @@ theorem may_extend_with {n : ℕ} (x : Fin n ↪ α) (a : α) (ha : a ∉ Set.ra
 
 
 
-/-- Extend an embedding from Fin given a PartENat.card inequality -/
-theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α) (x : Fin m ↪ α) :
+/-- Extend an embedding from Fin given a ENat.card inequality -/
+theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ ENat.card α) (x : Fin m ↪ α) :
     ∃ x' : Fin n ↪ α, (Fin.castLEEmb hmn).trans x' = x :=
   by
   induction' n with n hrec
@@ -118,9 +117,9 @@ theorem may_extend {m n : ℕ} (hmn : m ≤ n) (hα : ↑n ≤ PartENat.card α)
     -- case where m < n.succ
     | inr h =>
       obtain ⟨y, hy⟩ :=
-        hrec (Nat.le_of_lt_succ h) (le_trans (PartENat.coe_le_coe.mpr (le_succ n)) hα)
+        hrec (Nat.le_of_lt_succ h) (le_trans (ENat.coe_le_coe.mpr (le_succ n)) hα)
       obtain ⟨a, ha⟩ :=
-        gimme_another y (lt_of_lt_of_le (PartENat.coe_lt_coe.mpr (Nat.lt_succ_self n)) hα)
+        gimme_another y (lt_of_lt_of_le (ENat.coe_lt_coe.mpr (Nat.lt_succ_self n)) hα)
       obtain ⟨x', hx', _⟩ := may_extend_with y a ha
       use x'; rw [← hy]; rw [← hx']
       ext ⟨i, hi⟩; rfl
