@@ -1535,7 +1535,7 @@ theorem hφ_range' :
       {τ : Equiv.Perm g.cycleFactorsFinset | fsc ∘ τ = fsc} := by
   rw [← Iφ_eq_range]
   ext τ
-  simp only [Finset.coe_sort_coe, Set.mem_setOf_eq, Function.funext_iff, Function.comp_apply]
+  simp only [Finset.coe_sort_coe, Set.mem_setOf_eq, funext_iff, Function.comp_apply]
   simp only [SetLike.mem_coe, mem_Iφ_iff]
   apply forall_congr'
   intro c

@@ -9,7 +9,6 @@ import Jordan.Mathlib.ULift
 -- import Jordan.Mathlib.Cardinal
 
 -- import Mathlib.Tactic.Lift
-import Mathlib.Data.Finite.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 
 section Extensions

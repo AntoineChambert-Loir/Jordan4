@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.SpecificGroups.Alternating
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Sylow
 import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Nat.Prime.Factorial
 
 /-!
 # Some complements on finite groups
