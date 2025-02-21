@@ -50,15 +50,15 @@ theorem Setoid.isPartition_on {α : Type _} {P : Set (Set α)}
     rw [Set.inter_comm, ← Subtype.image_preimage_coe, ht, Set.image_empty]
   · intro a
     obtain ⟨t, ht⟩ := hP.right ↑a
-    simp only [exists_unique_iff_exists, exists_prop, and_imp] at ht
+    simp only [existsUnique_iff_exists, exists_prop, and_imp] at ht
     use Subtype.val ⁻¹' t
     constructor
-    · simp only [Ne, Set.mem_setOf_eq, Set.mem_preimage, exists_unique_iff_exists, exists_prop]
+    · simp only [Ne, Set.mem_setOf_eq, Set.mem_preimage, existsUnique_iff_exists, exists_prop]
       refine ⟨⟨t, ht.1.1, rfl, ?_⟩, ht.1.2⟩
       intro h
       rw [← Set.mem_empty_iff_false (a : α), ← h]
       exact Set.mem_inter ht.left.right (Subtype.mem a)
-    · simp only [Ne, Set.mem_setOf_eq, exists_unique_iff_exists,
+    · simp only [Ne, Set.mem_setOf_eq, existsUnique_iff_exists,
         exists_prop, and_imp, forall_exists_index]
       intro y x hxP hxy _ hay
       rw [← hxy, Subtype.preimage_coe_eq_preimage_coe_iff]
@@ -80,7 +80,7 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
   intro a
   rw [Finset.card_eq_one]
   obtain ⟨s, hs, hs'⟩ := hc.right a
-  simp only [Set.mem_setOf_eq, exists_unique_iff_exists, exists_eq_left', exists_prop, and_imp] at hs hs'
+  simp only [Set.mem_setOf_eq, existsUnique_iff_exists, exists_eq_left', exists_prop, and_imp] at hs hs'
   have hs'2 : ∀ z : Finset α, z ∈ c → a ∈ z → z = s.toFinset := by
     intro z hz ha
     rw [← Finset.coe_inj, Set.coe_toFinset]
@@ -186,7 +186,7 @@ theorem Partition.card_of_partition'' [DecidableEq α] [Fintype α] {c : Finset 
   rw [Finset.card_eq_one]
   obtain ⟨s, ⟨hs, has⟩, hs'⟩ := hc.right a
   simp only [Set.mem_setOf_eq] at hs
-  simp only [Set.mem_setOf_eq, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index] at hs'
+  simp only [Set.mem_setOf_eq, existsUnique_iff_exists, exists_prop, and_imp, forall_exists_index] at hs'
   obtain ⟨t, rfl, ht⟩ := hs
   use t
   ext u

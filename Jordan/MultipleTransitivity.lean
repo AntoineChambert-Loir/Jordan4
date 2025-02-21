@@ -884,12 +884,13 @@ theorem IsMultiplyPretransitive.index_of_fixingSubgroup'
   rw [Nat.choose_mul_factorial_mul_factorial]
   apply Set.ncard_le_fintype_card
 
-lemma _root_.PartENat.lt_coe_succ_iff_le' {x : PartENat} {n : ℕ} :
+lemma _root_.ENat.lt_coe_succ_iff_le' {x : ENat} {n : ℕ} :
     x < n.succ ↔ x ≤ n := by
-  by_cases hx : x = ⊤
-  · rw [hx]
-    simp only [cast_succ, not_top_lt, top_le_iff, PartENat.natCast_ne_top]
-  · rw [Nat.succ_eq_add_one n, Nat.cast_add, Nat.cast_one, PartENat.lt_add_one_iff_lt hx]
+  cases x with
+  | top =>
+    simp only [succ_eq_add_one, cast_succ, not_top_lt, top_le_iff, ENat.coe_ne_top]
+  | coe a =>
+    rw [Nat.succ_eq_add_one n, cast_le, cast_lt, Nat.lt_add_one_iff]
 
 /-- A 2-transitive action is primitive -/
 theorem IsMultiplyPretransitive.isPreprimitive_of_two

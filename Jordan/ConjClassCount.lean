@@ -1162,7 +1162,6 @@ theorem _root_.Equiv.Perm.Basis.Kf_apply' (a : Equiv.Perm.Basis g)
     (d : Equiv.Perm α) (Kf a e ⟨c, i⟩) = Kf a e ⟨c, i + 1⟩ := by
   -- Kf e ⟨c, i⟩ = (g ^ i) (a (e c)) appartient au cycle de e c
   rw [hd]
-  change (e c : Equiv.Perm α) _ = _
   rw [Equiv.Perm.Basis.eq_cycleOf', Equiv.Perm.cycleOf_apply_self,
     Equiv.Perm.Basis.Kf_apply]
 

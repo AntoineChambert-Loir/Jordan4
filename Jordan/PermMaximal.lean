@@ -326,7 +326,6 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       rw [← Subgroup.coe_mk G g hg]
       change (⟨g, hg⟩ : ↥G) • s = s
       rw [← mem_stabilizer_iff]
-      change _ ∈ stabilizer (↥G) s
       rw [h]
       trivial
   apply IsPreprimitive.mk
