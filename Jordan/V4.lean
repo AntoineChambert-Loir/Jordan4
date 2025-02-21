@@ -200,7 +200,7 @@ theorem V4_is_characteristic (hα4 : Fintype.card α = 4) : (V4 α).Characterist
   obtain ⟨S : Sylow 2 (alternatingGroup α)⟩ := Sylow.nonempty (G := alternatingGroup α)
   rw [V4_is_unique_sylow α hα4 S]
   refine Sylow.characteristic_of_normal S ?_
-  rw [← Subgroup.normalizer_eq_top]
+  rw [← Subgroup.normalizer_eq_top_iff]
   rw [← Subgroup.index_eq_one]
   rw [← Sylow.card_eq_index_normalizer]
   rw [Nat.card_eq_fintype_card]
@@ -222,7 +222,6 @@ theorem V4_is_normal (hα4 : Fintype.card α = 4) : (V4 α).Normal :=
 theorem V4_card (hα4 : Fintype.card α = 4) : Fintype.card (V4 α) = 4 := by
   obtain ⟨S : Sylow 2 (alternatingGroup α)⟩ := Sylow.nonempty (G := alternatingGroup α)
   rw [V4_is_unique_sylow α hα4 S]
-  change Fintype.card S = 4
   exact A4_sylow_card α hα4 S
 
 theorem isCommutative_of_exponent_two {G : Type _} [Group G] (hG2 : ∀ g : G, g ^ 2 = 1) :

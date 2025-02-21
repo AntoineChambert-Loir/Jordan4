@@ -420,7 +420,7 @@ theorem IsBlockSystem.of_block [hGX : MulAction.IsPretransitive G X] {B : Set X}
     use g • B
     constructor
     · simp only [Set.mem_range, exists_apply_eq_apply, hg, and_self]
-    · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
+    · simp only [Set.mem_range, existsUnique_iff_exists, exists_prop, and_imp, forall_exists_index,
         forall_apply_eq_imp_iff']
       intro B' g' hg' ha
       rw [← hg']
@@ -442,7 +442,7 @@ theorem IsPartition.of_orbits : Setoid.IsPartition (Set.range fun a : X => orbit
   intro a; use orbit G a
   constructor
   · simp only [Set.mem_range, exists_apply_eq_apply, mem_orbit_self, and_self]
-  · simp only [Set.mem_range, exists_unique_iff_exists, exists_prop, and_imp, forall_exists_index,
+  · simp only [Set.mem_range, existsUnique_iff_exists, exists_prop, and_imp, forall_exists_index,
       forall_apply_eq_imp_iff']
     rintro B b ⟨rfl⟩ ha
     apply symm
