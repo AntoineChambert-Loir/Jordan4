@@ -190,7 +190,7 @@ theorem IsBlock.mk_subset {B : Set X} :
   constructor
   · intro hB g b hb hgb
 
-    rw [Set.le_iff_subset, Set.set_smul_subset_iff,
+    rw [Set.le_iff_subset, Set.smul_set_subset_iff_subset_inv_smul_set,
       IsBlock.def_mem hB hb (Set.mem_smul_set_iff_inv_smul_mem.mp hgb)]
   · rw [IsBlock.mk_notempty_one]
     intro hB g hg
@@ -200,7 +200,7 @@ theorem IsBlock.mk_subset {B : Set X} :
     · exact hB hb hb'
     suffices g⁻¹ • B ≤ B by
       rw [Set.le_iff_subset] at this ⊢
-      rw [← inv_inv g, ← Set.set_smul_subset_iff]; exact this
+      rw [← inv_inv g, ← Set.smul_set_subset_iff_subset_inv_smul_set]; exact this
     exact
       hB (Set.mem_smul_set_iff_inv_smul_mem.mp hb') (Set.smul_mem_smul_set_iff.mpr hb)
 

@@ -208,7 +208,7 @@ def iwasawa_two : IwasawaStructure (Equiv.Perm α) (Nat.Combination α 2) where
     rw [Equiv.Perm.ofSubtype_range_eq]
     rw [mem_fixingSubgroup_iff]
     intro x hx
-    simp only [Finset.mem_singleton, Finset.coe_insert, Finset.coe_singleton, Set.mem_singleton_iff] at hx
+    simp only [s, Finset.mem_singleton, Finset.coe_insert, Finset.coe_singleton, Set.mem_singleton_iff] at hx
     simp only [Set.mem_singleton_iff, Set.mem_compl_iff, Set.mem_insert_iff] at hx
     rw [not_or] at hx
     apply Equiv.swap_apply_of_ne_of_ne hx.left hx.right

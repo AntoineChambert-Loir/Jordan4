@@ -24,7 +24,7 @@ open MulAction
 theorem Subgroup.smul_le_iff_le_inv_smul {G : Type _} [Group G] (g : G) (H K : Subgroup G) :
     MulAut.conj g • H ≤ K ↔ H ≤ MulAut.conj g⁻¹ • K := by
   simp only [← SetLike.coe_subset_coe, Subgroup.coe_pointwise_smul, map_inv,
-    Set.set_smul_subset_iff]
+    Set.smul_set_subset_iff_subset_inv_smul_set]
 
 theorem mulAut_smul_subgroupOf_eq {G : Type _} [Group G] {N H : Subgroup G}
     (f : MulAut G) (f' : MulAut N) (hff' : ∀ n : N, f n = f' n) :

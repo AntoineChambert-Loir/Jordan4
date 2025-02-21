@@ -167,7 +167,7 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
       constructor
       · simp only [Subgroup.mem_inf]
         constructor
-        · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_set_smul_iff]
+        · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_smul_set_iff]
           rintro _ ⟨x, hx, rfl⟩
           simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
             Function.comp_apply]
@@ -198,7 +198,7 @@ theorem moves_in (hα : 4 ≤ Fintype.card α) (t : Set α) :
         constructor
         · simp only [Subgroup.mem_inf]
           constructor
-          · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_set_smul_iff]
+          · rw [mem_stabilizer_set_iff_subset_smul_set t.toFinite, Set.subset_smul_set_iff]
             rintro _ ⟨x, hx, rfl⟩
             · simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
                 Function.comp_apply]
@@ -254,7 +254,7 @@ theorem has_three_cycle_of_stabilizer' (s : Set α) (hs : 2 < Set.ncard s) :
   constructor
   apply Equiv.Perm.isThreeCycle_swap_mul_swap_same hab hac hbc
   rw [← stabilizer_compl]
-  rw [mem_stabilizer_set_iff_subset_smul_set sᶜ.toFinite, Set.subset_set_smul_iff]
+  rw [mem_stabilizer_set_iff_subset_smul_set sᶜ.toFinite, Set.subset_smul_set_iff]
   rintro _ ⟨x, hx, rfl⟩
   simp only [mul_inv_rev, Equiv.swap_inv, Equiv.Perm.smul_def, Equiv.Perm.coe_mul,
     Function.comp_apply, Set.mem_compl_iff]
@@ -483,7 +483,7 @@ end
       let φ' : stabilizer G (sᶜ : Set α) → G := Subtype.val
       let f' : (sᶜ : Set α) →ₑ[φ'] α := {
         toFun := Subtype.val
-        map_smul' := fun m x => by simp only [SMul.smul_stabilizer_def] }
+        map_smul' := fun m x => by simp only [φ', SMul.smul_stabilizer_def] }
       apply MulAction.IsBlock_preimage f' hB
     apply stabilizer.isPreprimitive'
     · rw [compl_compl]; exact h0
@@ -534,7 +534,7 @@ end
       let φ' : stabilizer G s → G := Subtype.val
       let f' : s →ₑ[φ'] α := {
         toFun := Subtype.val
-        map_smul' := fun ⟨m, _⟩ x => by simp }
+        map_smul' := fun ⟨m, _⟩ x => by simp [φ'] }
       apply MulAction.IsBlock_preimage f' hB
     apply stabilizer.isPreprimitive' s h1
     convert le_trans (le_of_lt hG) inf_le_left
