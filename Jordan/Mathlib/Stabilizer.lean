@@ -11,7 +11,7 @@ import Jordan.Mathlib.Set
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 import Mathlib.GroupTheory.GroupAction.SubMulAction
-import Mathlib.Data.Finset.Pointwise.Basic
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 
 /-!
 
@@ -54,8 +54,8 @@ theorem stabilizer_compl {s : Set α} : stabilizer G (sᶜ) = stabilizer G s :=
 /-- The instance that makes the stabilizer of a set acting on that set -/
 instance _root_.SMul.ofStabilizer (s : Set α) : SMul (stabilizer G s) s where
   smul g x := ⟨g • ↑x, by
-    conv_rhs => rw [← mem_stabilizer_iff.mp g.prop]
-    exact Set.smul_mem_smul_set x.prop⟩
+    convert Set.smul_mem_smul_set x.prop
+    exact (mem_stabilizer_iff.mp g.prop).symm⟩
 
 @[simp]
 theorem _root_.SMul.smul_stabilizer_def (s : Set α) (g : stabilizer G s) (x : s) :

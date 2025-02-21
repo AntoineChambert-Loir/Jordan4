@@ -9,7 +9,7 @@ Authors: Antoine Chambert-Loir
 import Jordan.Mathlib.Set
 
 import Mathlib.Algebra.Group.Defs
-import Mathlib.Data.Set.Pointwise.Basic
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.GroupTheory.GroupAction.Hom
 
 /-! Complements on equivariant maps
@@ -341,5 +341,5 @@ theorem inverse_inverse
     (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
     (f.inverse g k₂ h₁ h₂).inverse f k₁ h₂ h₁ = f :=
   ext fun b => by simp only [inverse_apply]
--- 
+--
 end Inverse

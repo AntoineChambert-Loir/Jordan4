@@ -292,7 +292,7 @@ theorem le_of_isPreprimitive (s : Set α) (hα : 4 < Fintype.card α)
   -- By Jordan's theorem, it suffices to prove that G acts primitively
   apply jordan_three_cycle hG' hg3
   · apply hG
-    simp only [Subgroup.mem_inf, hg, true_and_iff]
+    simp only [Subgroup.mem_inf, hg, true_and]
     exact Equiv.Perm.IsThreeCycle.mem_alternatingGroup hg3
 
 /- lemma stabilizer.is_preprimitive (s : set α) (hs : (sᶜ : set α).nontrivial):

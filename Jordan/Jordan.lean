@@ -725,7 +725,7 @@ theorem isMultiplyPreprimitive_jordan
       simp
       rw [or_and_left]
       simp_rw [or_not]
-      rw [and_true_iff]
+      rw [and_true]
       constructor
       intro hx; apply Or.intro_right _ hx
       intro hx; cases' hx with hx hx

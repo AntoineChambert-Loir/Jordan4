@@ -63,8 +63,6 @@ theorem orbit.isPretransitive_iff (a : X) : orbit G a = ⊤ ↔ IsPretransitive 
   rw [Set.ext_iff]
   apply forall_congr'
   intro x
-  simp_rw [Set.top_eq_univ, Set.mem_univ, iff_true_iff]
-  rw [mem_orbit_iff]
+  simp_rw [Set.top_eq_univ, Set.mem_univ, iff_true, mem_orbit_iff]
 
 end MulAction
-

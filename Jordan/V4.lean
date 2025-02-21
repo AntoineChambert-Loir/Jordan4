@@ -76,7 +76,7 @@ theorem mem_V4_of_order_two_pow (hα4 : Fintype.card α = 4) (g : Equiv.Perm α)
         simp only [this]
         simp only [Finset.mem_univ, Multiset.replicate_succ, Multiset.replicate_one,
           Multiset.empty_eq_zero, Multiset.cons_ne_zero, Multiset.insert_eq_cons, eq_self_iff_true,
-          false_or_iff, and_self_iff]
+          false_or, and_self_iff]
         simp only [Multiset.replicate_zero, Multiset.cons_zero]
       · -- we know : g.cycleType.card ≤ 1
         rw [Nat.lt_succ_iff] at hk1
