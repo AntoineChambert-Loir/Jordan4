@@ -157,50 +157,6 @@ theorem Subgroup.normal_of_index_eq_smallest_prime_factor
   rw [hHp]
   exact Nat.Prime.ne_zero hp
 
-/-- A subgroup of index 2 is normal (does not require finiteness of G) -/
-theorem Subgroup.normal_of_index_eq_two {G : Type _} [Group G]
-    {H : Subgroup G} (hH : H.index = 2) : H.Normal := by
-  have : Fintype (G ⧸ H) := by
-    apply fintypeOfNotInfinite _
-    intro h
-    apply two_ne_zero (α := ℕ)
-    rw [← hH]
-    exact Cardinal.mk_toNat_of_infinite
-  let f := MulAction.toPermHom G (G ⧸ H)
-  convert MonoidHom.normal_ker f
-  suffices H.normalCore.relindex H = 1 by
-    rw [← Subgroup.normalCore_eq_ker]
-    erw [Subgroup.index_eq_one] at this
-    apply le_antisymm _ (Subgroup.normalCore_le _)
-    intro x hx
-    rw [← Subgroup.coe_mk H x hx, ← Subgroup.mem_subgroupOf, this]
-    apply Subgroup.mem_top
-  suffices H.index ≠ 0 by
-    apply mul_left_injective₀ this; dsimp
-    rw [Subgroup.relindex_mul_index (Subgroup.normalCore_le H), one_mul,
-      Subgroup.normalCore_eq_ker, hH]
-  --  change f.ker.index = 2,
-    apply Nat.eq_of_lt_succ_of_not_lt
-    rw [Subgroup.index_ker f, Nat.card_eq_fintype_card, Nat.lt_succ_iff]
-    apply Nat.le_of_dvd two_pos
-    rw [← Nat.card_eq_fintype_card]
-    apply dvd_trans f.range.card_subgroup_dvd_card
-    rw [Nat.card_eq_fintype_card, Fintype.card_perm, ← Nat.card_eq_fintype_card]
-    unfold Subgroup.index at hH ; rw [hH]; norm_num
-  -- ¬(f.ker.index < 2)
-    intro h
-    apply Nat.not_succ_le_self 1
-    change 2 ≤ 1
-    rw [Nat.lt_succ_iff] at h
-    apply le_trans _ h
-    rw [← hH, ← Subgroup.normalCore_eq_ker H]
-    apply Nat.le_of_dvd
-    · rw [zero_lt_iff, Subgroup.normalCore_eq_ker H, Subgroup.index_ker f,
-        Nat.card_eq_fintype_card]
-      exact Fintype.card_ne_zero
-    exact Subgroup.index_dvd_of_le (Subgroup.normalCore_le H)
-  · rw [hH]; norm_num
-
 variable {α}
 
 -- I don't know why this stuff is not there !
@@ -279,9 +235,9 @@ theorem is_alternating_of_index_2 {G : Subgroup (Equiv.Perm α)} (hG : G.index =
     apply this'; exact hl y hyl
   obtain ⟨m, hm⟩ := Nat.even_or_odd' l.length
   cases' hm with hm hm
-  · simp only [hm, pow_mul, hsk2, Int.units_sq, one_pow] at hsg hsg'
+  · simp only [s, hm, pow_mul, hsk2, Int.units_sq, one_pow] at hsg hsg'
     simp only [hsg, hsg']
-  · simp only [hm, pow_add, pow_mul, pow_one, hsk2, Int.units_sq, one_pow, one_mul] at hsg hsg'
+  · simp only [s, hm, pow_add, pow_mul, pow_one, hsk2, Int.units_sq, one_pow, one_mul] at hsg hsg'
     simp only [hsg, hsg', neg_units_ne_self, false_iff, ne_eq]
     simp only [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, s]
     exact hk'

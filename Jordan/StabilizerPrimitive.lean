@@ -76,7 +76,7 @@ theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv
     { toFun := id
       map_smul' := fun ⟨m, hm⟩ x => by
         simp only [id_eq, ← Subtype.coe_inj, SMul.smul_stabilizer_def, Perm.smul_def,
-          Subgroup.mk_smul] }
+          Subgroup.mk_smul, φ] }
   have : Function.Surjective f := Function.surjective_id
   apply isPreprimitive_of_surjective_map this
   apply stabilizer_isPreprimitive

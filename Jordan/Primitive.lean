@@ -28,6 +28,7 @@ import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Card
+import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Set.Card
 
 /-!

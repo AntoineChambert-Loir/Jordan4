@@ -109,7 +109,7 @@ theorem swap_mem_stabilizer {a b : α} {s : Set α} (ha : a ∈ s) (hb : b ∈ s
     rw [mem_stabilizer_iff]
     apply Set.Subset.antisymm
     exact this
-    exact Set.subset_set_smul_iff.mpr this
+    exact Set.subset_smul_set_iff.mpr this
   rintro _ ⟨x, hx, rfl⟩
   simp only [Equiv.Perm.smul_def]
   cases' em (x = a) with hxa hxa'
@@ -388,7 +388,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       let f' : (sᶜ : Set α) →ₑ[φ'] α := {
         toFun := Subtype.val
         map_smul' := fun ⟨m, _⟩ x => by
-          simp only [SMul.smul_stabilizer_def] }
+          simp only [SMul.smul_stabilizer_def, φ'] }
       apply MulAction.IsBlock_preimage f' hB
     -- is_preprimitive (stabilizer G (sᶜ : set α)) (sᶜ : set α)
     let φ : stabilizer G (sᶜ : Set α) → Equiv.Perm (sᶜ : Set α) := MulAction.toPerm
@@ -465,7 +465,7 @@ theorem isMaximalStab' (s : Set α) (h0 : s.Nonempty) (h1 : sᶜ.Nonempty)
       let f' : s →ₑ[φ'] α := {
         toFun := Subtype.val
         map_smul' := fun ⟨m, _⟩ x => by
-          simp only [SMul.smul_stabilizer_def] }
+          simp only [SMul.smul_stabilizer_def, φ'] }
       apply MulAction.IsBlock_preimage f' hB
     -- IsPreprimitive (stabilizer G s) s
     let φ : stabilizer G s → Equiv.Perm s := MulAction.toPerm

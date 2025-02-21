@@ -75,7 +75,7 @@ open scoped Classical
   the sum of cardinals of the parts of a partition (finset style)-/
 theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
     (hc : Setoid.IsPartition  ({s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c} : Set (Set α))) :
-    ∑ s : Finset α in c, s.card = Fintype.card α := by
+    ∑ s ∈ c, s.card = Fintype.card α := by
   rw [← mul_one (Fintype.card α), ← Finset.sum_card]
   intro a
   rw [Finset.card_eq_one]
@@ -99,7 +99,7 @@ theorem Partition.card_of_partition' [Fintype α] {c : Finset (Finset α)}
 /-- The cardinal of ambient fintype equals
   the sum of cardinals of the parts of a partition (set style)-/
 theorem Partition.card_of_partition [Fintype α] {c : Set (Set α)} (hc : Setoid.IsPartition c) :
-    ∑ s : Set α in c.toFinset, s.toFinset.card = Fintype.card α := by
+    ∑ s ∈ c.toFinset, s.toFinset.card = Fintype.card α := by
   let c' : Finset (Finset α) := {s : Finset α | (s : Set α) ∈ c}.toFinset
   have hcc' : c = {s : Set α | ∃ t : Finset α, s.toFinset = t ∧ t ∈ c'} := by
     simp only [c', Set.toFinset_setOf, Finset.mem_univ, forall_true_left,
@@ -179,7 +179,7 @@ section
   the sum of cardinals of the parts of a partition (finset style)-/
 theorem Partition.card_of_partition'' [DecidableEq α] [Fintype α] {c : Finset (Finset α)}
     (hc : Setoid.IsPartition  ({s : Set α | ∃ t : Finset α, s = ↑t ∧ t ∈ c} : Set (Set α))) :
-    ∑ s : Finset α in c, s.card = Fintype.card α := by
+    ∑ s ∈ c, s.card = Fintype.card α := by
   classical
   rw [← mul_one (Fintype.card α), ← Finset.sum_card]
   intro a
