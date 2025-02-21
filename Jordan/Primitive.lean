@@ -24,7 +24,7 @@ import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.QuotientGroup.Basic
-import Mathlib.Data.Set.Pointwise.Basic
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Card

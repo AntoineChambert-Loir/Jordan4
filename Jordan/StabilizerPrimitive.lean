@@ -81,8 +81,8 @@ theorem Equiv.Perm.Stabilizer.is_preprimitive' (s : Set α) (G : Subgroup (Equiv
   let f : s →ₑ[φ] s :=
     { toFun := id
       map_smul' := fun ⟨m, hm⟩ x => by
-        simp only [id_eq, ← Subtype.coe_inj, SMul.smul_stabilizer_def,
-          Perm.smul_def, Submonoid.mk_smul] }
+        simp only [id_eq, ← Subtype.coe_inj, SMul.smul_stabilizer_def, Perm.smul_def,
+          Subgroup.mk_smul] }
   have : Function.Surjective f := Function.surjective_id
   apply isPreprimitive_of_surjective_map this
   apply stabilizer_isPreprimitive
@@ -126,12 +126,12 @@ theorem stabilizer.isPreprimitive (s : Set α) (hs : (sᶜ : Set α).Nontrivial)
     cases' Int.units_eq_one_or (Equiv.Perm.sign g) with hsg hsg
     · simp only [g', hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
       ext x
-      simp only [toPerm_apply, SMul.smul_stabilizer_def, Submonoid.mk_smul, Equiv.Perm.smul_def,
+      simp only [toPerm_apply, SMul.smul_stabilizer_def, Subgroup.mk_smul, Equiv.Perm.smul_def,
         Equiv.Perm.ofSubtype_apply_coe]
     · simp only [g', hsg, eq_self_iff_true, if_true, hminus_one_ne_one, if_false]
       ext x
       simp only [toPerm_apply, SMul.smul_stabilizer_def, Submonoid.mk_smul]
-      simp only [Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
+      simp only [Subgroup.mk_smul, Equiv.Perm.smul_def, Equiv.Perm.coe_mul, Function.comp_apply]
       rw [Equiv.Perm.ofSubtype_apply_of_not_mem k _]
       exact Equiv.Perm.ofSubtype_apply_coe g x
       rw [Set.not_mem_compl_iff]; exact x.prop

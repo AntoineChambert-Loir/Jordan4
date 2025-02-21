@@ -8,7 +8,7 @@ Authors: Antoine Chambert-Loir
 -- ==> Mathlib.GroupTheory.GroupAction.SubMulAction.Invariant
 import Jordan.EquivariantMap
 
-import Mathlib.Data.Finset.Pointwise.Basic
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.Tactic.Group

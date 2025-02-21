@@ -6,7 +6,7 @@ Authors: Antoine Chambert-Loir
 ! This file was ported from Lean 3 source module for_mathlib.set
 -/
 import Mathlib.Data.Set.Lattice
-import Mathlib.Data.Finset.Pointwise.Basic
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Data.Set.Card
 
